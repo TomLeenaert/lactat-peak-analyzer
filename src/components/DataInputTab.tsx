@@ -146,7 +146,6 @@ const DataInputTab = ({
                 <TableHead>Lactaat (mmol/L)</TableHead>
                 <TableHead>Hartslag (bpm)</TableHead>
                 <TableHead>Watt (W)</TableHead>
-                <TableHead>Snelheid (km/h)</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -154,7 +153,9 @@ const DataInputTab = ({
               {testData.map((row, i) => (
                 <TableRow key={i}>
                   <TableCell className="font-mono">{i + 1}</TableCell>
-                  <TableCell className="font-mono font-semibold">{row.speed > 0 ? formatPace(row.speed) : '-'}</TableCell>
+                  <TableCell>
+                    <PaceInput speedKmh={row.speed} onChange={v => updateRow(i, 'speed', String(v))} />
+                  </TableCell>
                   <TableCell>
                     <Input type="number" step="0.1" className="w-20 font-mono text-center" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} />
                   </TableCell>
