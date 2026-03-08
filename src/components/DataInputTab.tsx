@@ -127,8 +127,8 @@ const DataInputTab = ({
             <Input type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="bv. 1.0" />
           </div>
           <div>
-            <Label>Stapduur (min)</Label>
-            <Input type="number" value={stepDuration} onChange={e => setStepDuration(e.target.value)} min={3} max={8} />
+            <Label>Stapafstand (m)</Label>
+            <Input type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
           </div>
           <div>
             <Label>Stap-increment</Label>
