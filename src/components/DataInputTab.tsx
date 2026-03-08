@@ -130,7 +130,7 @@ const DataInputTab = ({
             <Input type="number" value={stepDuration} onChange={e => setStepDuration(e.target.value)} min={3} max={8} />
           </div>
           <div>
-            <Label>Stap-increment (km/h)</Label>
+            <Label>Stap-increment</Label>
             <Input type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
           </div>
         </div>
