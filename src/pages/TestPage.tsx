@@ -15,7 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 const QUICK_PROTOCOL: ProtocolSettings = {
   startSpeed: 10,
   stepIncrement: 1.5,
-  stepDuration: 3,
+  paceIncrementSec: 30,
+  stepDistance: 1200,
   numberOfSteps: 4,
   allOutEnabled: false,
   allOutDistance: 800,
