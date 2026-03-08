@@ -140,6 +140,20 @@ export function interpolateHR(speed: number, speeds: number[], hrs: number[]): n
   return hrs[hrs.length - 1];
 }
 
+export function interpolateWatt(speed: number, speeds: number[], watts: number[]): number {
+  const validWatts = watts.filter(w => w > 0);
+  if (validWatts.length === 0) return 0;
+  if (speed <= speeds[0]) return watts[0];
+  if (speed >= speeds[speeds.length - 1]) return watts[watts.length - 1];
+  for (let i = 0; i < speeds.length - 1; i++) {
+    if (speed >= speeds[i] && speed <= speeds[i + 1]) {
+      const frac = (speed - speeds[i]) / (speeds[i + 1] - speeds[i]);
+      return Math.round(watts[i] + frac * (watts[i + 1] - watts[i]));
+    }
+  }
+  return watts[watts.length - 1];
+}
+
 export function formatPace(speedKmh: number): string {
   if (!speedKmh || speedKmh <= 0) return '-';
   const minPerKm = 60 / speedKmh;
