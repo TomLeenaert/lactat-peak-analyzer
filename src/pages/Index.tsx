@@ -38,7 +38,7 @@ const Index = () => {
       steps.push({ speed: 0, lactate: 0, hr: 0, watt: 0 });
     }
     setTestData(steps);
-    setStepDuration(String(protocol.stepDuration));
+    setStepDistance(String(protocol.stepDistance));
     setStepIncrement(String(protocol.stepIncrement));
     setActiveTab('data');
     toast({ title: 'Stappen gegenereerd', description: `${protocol.numberOfSteps} stappen${protocol.allOutEnabled ? ' + all-out' : ''} klaargezet in Data Invoer.` });
