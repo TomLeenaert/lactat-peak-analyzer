@@ -1,0 +1,162 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatPace, type StepData } from '@/lib/lactate-math';
+
+interface DataInputTabProps {
+  testData: StepData[];
+  setTestData: (data: StepData[]) => void;
+  athleteName: string;
+  setAthleteName: (v: string) => void;
+  testDate: string;
+  setTestDate: (v: string) => void;
+  restingLactate: string;
+  setRestingLactate: (v: string) => void;
+  stepDuration: string;
+  setStepDuration: (v: string) => void;
+  stepIncrement: string;
+  setStepIncrement: (v: string) => void;
+  onCalculate: () => void;
+}
+
+const EXAMPLE_DATA: StepData[] = [
+  { speed: 9, lactate: 0.9, hr: 128 },
+  { speed: 10, lactate: 1.0, hr: 138 },
+  { speed: 11, lactate: 1.2, hr: 148 },
+  { speed: 12, lactate: 1.5, hr: 155 },
+  { speed: 13, lactate: 2.1, hr: 163 },
+  { speed: 14, lactate: 3.0, hr: 171 },
+  { speed: 15, lactate: 4.5, hr: 178 },
+  { speed: 16, lactate: 7.2, hr: 186 },
+];
+
+const DataInputTab = ({
+  testData, setTestData,
+  athleteName, setAthleteName,
+  testDate, setTestDate,
+  restingLactate, setRestingLactate,
+  stepDuration, setStepDuration,
+  stepIncrement, setStepIncrement,
+  onCalculate,
+}: DataInputTabProps) => {
+
+  const loadExample = () => {
+    setAthleteName('Voorbeeld Atleet');
+    setTestDate('2026-03-08');
+    setRestingLactate('1.0');
+    setStepDuration('5');
+    setStepIncrement('1');
+    setTestData([...EXAMPLE_DATA]);
+  };
+
+  const clearData = () => {
+    setAthleteName('');
+    setTestDate(new Date().toISOString().split('T')[0]);
+    setRestingLactate('');
+    setStepDuration('5');
+    setStepIncrement('1');
+    setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0 })));
+  };
+
+  const updateRow = (i: number, field: keyof StepData, val: string) => {
+    const newData = [...testData];
+    newData[i] = { ...newData[i], [field]: parseFloat(val) || 0 };
+    setTestData(newData);
+  };
+
+  const addRow = () => {
+    const lastSpeed = testData.length > 0 ? testData[testData.length - 1].speed : 0;
+    const inc = parseFloat(stepIncrement) || 1;
+    setTestData([...testData, { speed: lastSpeed > 0 ? lastSpeed + inc : 0, lactate: 0, hr: 0 }]);
+  };
+
+  const removeRow = (i: number) => {
+    setTestData(testData.filter((_, idx) => idx !== i));
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center flex-wrap gap-2">
+          <CardTitle>Testgegevens invoeren</CardTitle>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld laden</Button>
+            <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <Label>Naam atleet</Label>
+            <Input value={athleteName} onChange={e => setAthleteName(e.target.value)} placeholder="Naam" />
+          </div>
+          <div>
+            <Label>Datum test</Label>
+            <Input type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div>
+            <Label>Rustlactaat (mmol/L)</Label>
+            <Input type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="bv. 1.0" />
+          </div>
+          <div>
+            <Label>Stapduur (min)</Label>
+            <Input type="number" value={stepDuration} onChange={e => setStepDuration(e.target.value)} min={3} max={8} />
+          </div>
+          <div>
+            <Label>Stap-increment (km/h)</Label>
+            <Input type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
+          </div>
+        </div>
+
+        <h4 className="text-lg font-semibold mb-4">Stapgegevens</h4>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-16">Stap</TableHead>
+                <TableHead>Snelheid (km/h)</TableHead>
+                <TableHead>Lactaat (mmol/L)</TableHead>
+                <TableHead>Hartslag (bpm)</TableHead>
+                <TableHead>Tempo (min/km)</TableHead>
+                <TableHead className="w-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {testData.map((row, i) => (
+                <TableRow key={i}>
+                  <TableCell className="font-mono">{i + 1}</TableCell>
+                  <TableCell>
+                    <Input type="number" step="0.5" className="w-20 font-mono text-center" value={row.speed || ''} onChange={e => updateRow(i, 'speed', e.target.value)} />
+                  </TableCell>
+                  <TableCell>
+                    <Input type="number" step="0.1" className="w-20 font-mono text-center" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} />
+                  </TableCell>
+                  <TableCell>
+                    <Input type="number" className="w-20 font-mono text-center" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} />
+                  </TableCell>
+                  <TableCell className="font-mono">{row.speed > 0 ? formatPace(row.speed) : '-'}</TableCell>
+                  <TableCell>
+                    <Button variant="destructive" size="sm" onClick={() => removeRow(i)}>✕</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="flex gap-2 mt-4">
+          <Button variant="secondary" size="sm" onClick={addRow}>+ Stap toevoegen</Button>
+        </div>
+        <Button className="w-full mt-4" onClick={onCalculate}>🧮 Berekenen</Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default DataInputTab;
