@@ -4,6 +4,7 @@ export interface StepData {
   speed: number;
   lactate: number;
   hr: number;
+  watt: number;
 }
 
 export interface LT1Results {
