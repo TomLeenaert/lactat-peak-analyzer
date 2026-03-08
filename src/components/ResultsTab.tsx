@@ -47,8 +47,9 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
     );
   }
 
-  const { lt1, lt2, speeds, hrs, coeffs, r2 } = results;
+  const { lt1, lt2, speeds, hrs, watts, coeffs, r2 } = results;
   const [a, b, c, d] = coeffs;
+  const hasWatts = watts.some(w => w > 0);
 
   return (
     <div className="space-y-6">
