@@ -22,14 +22,14 @@ interface DataInputTabProps {
 }
 
 const EXAMPLE_DATA: StepData[] = [
-  { speed: 9, lactate: 0.9, hr: 128 },
-  { speed: 10, lactate: 1.0, hr: 138 },
-  { speed: 11, lactate: 1.2, hr: 148 },
-  { speed: 12, lactate: 1.5, hr: 155 },
-  { speed: 13, lactate: 2.1, hr: 163 },
-  { speed: 14, lactate: 3.0, hr: 171 },
-  { speed: 15, lactate: 4.5, hr: 178 },
-  { speed: 16, lactate: 7.2, hr: 186 },
+  { speed: 9, lactate: 0.9, hr: 128, watt: 180 },
+  { speed: 10, lactate: 1.0, hr: 138, watt: 210 },
+  { speed: 11, lactate: 1.2, hr: 148, watt: 240 },
+  { speed: 12, lactate: 1.5, hr: 155, watt: 270 },
+  { speed: 13, lactate: 2.1, hr: 163, watt: 300 },
+  { speed: 14, lactate: 3.0, hr: 171, watt: 330 },
+  { speed: 15, lactate: 4.5, hr: 178, watt: 360 },
+  { speed: 16, lactate: 7.2, hr: 186, watt: 390 },
 ];
 
 // Echte testdata: 1600m stappen, tempo → snelheid (km/h)
