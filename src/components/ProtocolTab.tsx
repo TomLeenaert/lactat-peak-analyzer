@@ -134,17 +134,30 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
           </div>
 
           {/* Preview */}
-          <div className="border border-border rounded-lg p-4 mb-4">
-            <h4 className="text-sm font-semibold text-muted-foreground mb-2">📋 Protocol preview</h4>
-            <div className="flex flex-wrap gap-2">
+          <div className="border border-border rounded-xl p-5 mb-4">
+            <h4 className="text-sm font-semibold text-muted-foreground mb-3">📋 Protocol preview</h4>
+            <div className="space-y-2">
               {previewSpeeds.map((s, i) => (
-                <div key={i} className="bg-muted px-3 py-1.5 rounded-md text-sm font-mono">
-                  Stap {i + 1}: {s.toFixed(1)} km/h ({formatPace(s)}/km) × {protocol.stepDuration} min
+                <div key={i} className="flex items-center gap-3 bg-muted/60 hover:bg-muted transition-colors px-4 py-3 rounded-lg">
+                  <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1 flex items-baseline gap-2">
+                    <span className="font-semibold text-sm">{s.toFixed(1)} km/h</span>
+                    <span className="text-muted-foreground text-xs">({formatPace(s)}/km)</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground font-mono">{protocol.stepDuration} min</span>
                 </div>
               ))}
               {protocol.allOutEnabled && (
-                <div className="bg-destructive/10 text-destructive px-3 py-1.5 rounded-md text-sm font-mono font-semibold">
-                  🏁 All-out: {protocol.allOutDistance}m (max {protocol.allOutDuration}s)
+                <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/20 px-4 py-3 rounded-lg">
+                  <span className="w-7 h-7 rounded-full bg-destructive/20 text-destructive flex items-center justify-center text-xs shrink-0">
+                    🏁
+                  </span>
+                  <div className="flex-1">
+                    <span className="font-semibold text-sm text-destructive">All-out</span>
+                  </div>
+                  <span className="text-xs text-destructive font-mono">{protocol.allOutDistance}m (max {protocol.allOutDuration}s)</span>
                 </div>
               )}
             </div>
