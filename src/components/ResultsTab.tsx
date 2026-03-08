@@ -67,8 +67,8 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
             <ResultBox
               variant="success"
               label="Beste schatting (Baseline+0.5)"
-              value={`${lt1.best.toFixed(1)} km/h`}
-              detail={`Tempo: ${formatPace(lt1.best)} /km · HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
+              value={`${formatPace(lt1.best)} /km`}
+              detail={`${lt1.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 2.0</MethodTag> {formatThreshold(lt1.obla)}</p>
