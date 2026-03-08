@@ -34,13 +34,13 @@ const EXAMPLE_DATA: StepData[] = [
 
 // Echte testdata: 1600m stappen, tempo → snelheid (km/h)
 const TEST_DATA: StepData[] = [
-  { speed: 13.2, lactate: 1.8, hr: 140 },
-  { speed: 13.7, lactate: 1.7, hr: 146 },
-  { speed: 14.1, lactate: 1.3, hr: 152 },
-  { speed: 14.9, lactate: 2.7, hr: 160 },
-  { speed: 15.1, lactate: 2.3, hr: 164 },
-  { speed: 15.7, lactate: 3.8, hr: 167 },
-  { speed: 16.3, lactate: 5.8, hr: 176 },
+  { speed: 13.19, lactate: 1.8, hr: 140 },  // 4:33/km
+  { speed: 13.69, lactate: 1.7, hr: 146 },  // 4:23/km
+  { speed: 14.12, lactate: 1.3, hr: 152 },  // 4:15/km
+  { speed: 14.88, lactate: 2.7, hr: 160 },  // 4:02/km
+  { speed: 15.06, lactate: 2.3, hr: 164 },  // 3:59/km
+  { speed: 15.72, lactate: 3.8, hr: 167 },  // 3:49/km
+  { speed: 16.29, lactate: 5.8, hr: 176 },  // 3:41/km
 ];
 
 const DataInputTab = ({

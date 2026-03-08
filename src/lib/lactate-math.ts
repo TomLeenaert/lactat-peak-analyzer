@@ -141,8 +141,9 @@ export function interpolateHR(speed: number, speeds: number[], hrs: number[]): n
 export function formatPace(speedKmh: number): string {
   if (!speedKmh || speedKmh <= 0) return '-';
   const minPerKm = 60 / speedKmh;
-  const mins = Math.floor(minPerKm);
-  const secs = Math.round((minPerKm - mins) * 60);
+  let mins = Math.floor(minPerKm);
+  let secs = Math.round((minPerKm - mins) * 60);
+  if (secs === 60) { mins += 1; secs = 0; }
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
