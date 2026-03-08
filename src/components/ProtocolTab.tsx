@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { ProtocolSettings } from '@/lib/protocol-types';
-import type { StepData } from '@/lib/lactate-math';
+import { formatPace, type StepData } from '@/lib/lactate-math';
 
 interface ProtocolTabProps {
   protocol: ProtocolSettings;
@@ -139,7 +139,7 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
             <div className="flex flex-wrap gap-2">
               {previewSpeeds.map((s, i) => (
                 <div key={i} className="bg-muted px-3 py-1.5 rounded-md text-sm font-mono">
-                  Stap {i + 1}: {s.toFixed(1)} km/h × {protocol.stepDuration} min
+                  Stap {i + 1}: {s.toFixed(1)} km/h ({formatPace(s)}/km) × {protocol.stepDuration} min
                 </div>
               ))}
               {protocol.allOutEnabled && (
