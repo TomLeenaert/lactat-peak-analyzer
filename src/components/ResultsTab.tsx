@@ -33,7 +33,7 @@ const ResultBox = ({ variant, label, value, detail }: { variant: 'success' | 'wa
 
 const formatThreshold = (val: number | null): string => {
   if (!val) return 'n.v.t.';
-  return `${val.toFixed(1)} km/h (${formatPace(val)}/km)`;
+  return `${formatPace(val)} /km (${val.toFixed(1)} km/h)`;
 };
 
 const ResultsTab = ({ results }: ResultsTabProps) => {
