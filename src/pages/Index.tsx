@@ -32,7 +32,7 @@ const Index = () => {
     }));
     if (protocol.allOutEnabled) {
       // Add all-out row with speed 0 (to be filled by user)
-      steps.push({ speed: 0, lactate: 0, hr: 0 });
+      steps.push({ speed: 0, lactate: 0, hr: 0, watt: 0 });
     }
     setTestData(steps);
     setStepDuration(String(protocol.stepDuration));
