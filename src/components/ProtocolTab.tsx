@@ -139,7 +139,7 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
             <div className="flex flex-wrap gap-2">
               {previewSpeeds.map((s, i) => (
                 <div key={i} className="bg-muted px-3 py-1.5 rounded-md text-sm font-mono">
-                  Stap {i + 1}: {s.toFixed(1)} km/h × {protocol.stepDuration} min
+                  Stap {i + 1}: {s.toFixed(1)} km/h ({formatPace(s)}/km) × {protocol.stepDuration} min
                 </div>
               ))}
               {protocol.allOutEnabled && (
