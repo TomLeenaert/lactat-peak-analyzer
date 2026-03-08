@@ -39,10 +39,10 @@ const LactateChart = ({ results }: LactateChartProps) => {
             dataKey="speed"
             type="number"
             domain={[xMin, xMax]}
-            tickFormatter={(v: number) => `${v}`}
+            tickFormatter={(v: number) => formatPace(v)}
             allowDuplicatedCategory={false}
           >
-            <Label value="Snelheid (km/h)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
+            <Label value="Tempo (min/km)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
           </XAxis>
           <YAxis domain={[0, yMax]}>
             <Label value="Lactaat (mmol/L)" angle={-90} position="insideLeft" offset={0} className="fill-muted-foreground text-xs" />
