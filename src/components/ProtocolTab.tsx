@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { ProtocolSettings } from '@/lib/protocol-types';
-import { formatPace } from '@/lib/lactate-math';
+import { formatPace, formatPace400 } from '@/lib/lactate-math';
 import PaceInput, { PaceIncrementInput } from './PaceInput';
 
 interface ProtocolTabProps {
@@ -147,9 +147,9 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
                   <span className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
                     {i + 1}
                   </span>
-                  <div className="flex-1 flex items-baseline gap-2">
+                <div className="flex-1 flex items-baseline gap-2">
                     <span className="font-semibold text-sm">{formatPace(s)} /km</span>
-                    <span className="text-muted-foreground text-xs">({s.toFixed(1)} km/h)</span>
+                    <span className="text-muted-foreground text-xs">{formatPace400(s)} /400m</span>
                   </div>
                   <span className="text-xs text-muted-foreground font-mono">{protocol.stepDistance}m</span>
                 </div>

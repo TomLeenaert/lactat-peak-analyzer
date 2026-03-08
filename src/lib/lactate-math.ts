@@ -163,6 +163,15 @@ export function formatPace(speedKmh: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
+export function formatPace400(speedKmh: number): string {
+  if (!speedKmh || speedKmh <= 0) return '-';
+  const minPer400 = (60 / speedKmh) * 0.4;
+  const mins = Math.floor(minPer400);
+  let secs = Math.round((minPer400 - mins) * 60);
+  if (secs === 60) return `${mins + 1}:00`;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 function linRegError(xs: number[], ys: number[]): number {
   const n = xs.length;
   if (n < 2) return 0;
