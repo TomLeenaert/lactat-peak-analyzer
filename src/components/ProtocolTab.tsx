@@ -151,8 +151,8 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
                     {i + 1}
                   </span>
                   <div className="flex-1 flex items-baseline gap-2">
-                    <span className="font-semibold text-sm">{s.toFixed(1)} km/h</span>
-                    <span className="text-muted-foreground text-xs">({formatPace(s)}/km)</span>
+                    <span className="font-semibold text-sm">{formatPace(s)} /km</span>
+                    <span className="text-muted-foreground text-xs">({s.toFixed(1)} km/h)</span>
                   </div>
                   <span className="text-xs text-muted-foreground font-mono">{protocol.stepDuration} min</span>
                 </div>
