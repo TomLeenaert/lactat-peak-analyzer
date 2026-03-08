@@ -6,11 +6,13 @@ import ResultsTab from '@/components/ResultsTab';
 import ZonesTab from '@/components/ZonesTab';
 import ScienceTab from '@/components/ScienceTab';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
+import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('protocol');
+  const [protocol, setProtocol] = useState<ProtocolSettings>(DEFAULT_PROTOCOL);
   const [testData, setTestData] = useState<StepData[]>(
     Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0 }))
   );
@@ -20,6 +22,23 @@ const Index = () => {
   const [stepDuration, setStepDuration] = useState('5');
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
+
+  const onGenerateSteps = useCallback(() => {
+    const steps: StepData[] = Array.from({ length: protocol.numberOfSteps }, (_, i) => ({
+      speed: protocol.startSpeed + i * protocol.stepIncrement,
+      lactate: 0,
+      hr: 0,
+    }));
+    if (protocol.allOutEnabled) {
+      // Add all-out row with speed 0 (to be filled by user)
+      steps.push({ speed: 0, lactate: 0, hr: 0 });
+    }
+    setTestData(steps);
+    setStepDuration(String(protocol.stepDuration));
+    setStepIncrement(String(protocol.stepIncrement));
+    setActiveTab('data');
+    toast({ title: 'Stappen gegenereerd', description: `${protocol.numberOfSteps} stappen${protocol.allOutEnabled ? ' + all-out' : ''} klaargezet in Data Invoer.` });
+  }, [protocol, toast]);
 
   const onCalculate = useCallback(() => {
     const result = calculate(testData, parseFloat(restingLactate) || 0);
@@ -50,7 +69,9 @@ const Index = () => {
           </TabsList>
 
           <div className="mt-6">
-            <TabsContent value="protocol"><ProtocolTab /></TabsContent>
+            <TabsContent value="protocol">
+              <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
+            </TabsContent>
             <TabsContent value="data">
               <DataInputTab
                 testData={testData} setTestData={setTestData}
