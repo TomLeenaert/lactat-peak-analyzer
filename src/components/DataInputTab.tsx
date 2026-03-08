@@ -76,7 +76,7 @@ const DataInputTab = ({
     setAthleteName('');
     setTestDate(new Date().toISOString().split('T')[0]);
     setRestingLactate('');
-    setStepDuration('5');
+    setStepDistance('1600');
     setStepIncrement('1');
     setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 })));
   };
