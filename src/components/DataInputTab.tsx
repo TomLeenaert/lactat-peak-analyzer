@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
+import PaceInput from './PaceInput';
 
 interface DataInputTabProps {
   testData: StepData[];
