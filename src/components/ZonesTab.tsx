@@ -63,7 +63,6 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
               <TableRow>
                 <TableHead>Zone</TableHead>
                 <TableHead>Beschrijving</TableHead>
-                <TableHead>Snelheid</TableHead>
                 <TableHead>Tempo</TableHead>
                 <TableHead>Hartslag</TableHead>
                 <TableHead>Lactaat</TableHead>
@@ -87,8 +86,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">{z.desc}</TableCell>
-                    <TableCell className="font-mono">{z.from.toFixed(1)} – {z.to.toFixed(1)} km/h</TableCell>
-                    <TableCell className="font-mono">{formatPace(z.to)} – {formatPace(z.from)}</TableCell>
+                    <TableCell className="font-mono">{formatPace(z.to)} – {formatPace(z.from)} /km</TableCell>
                     <TableCell className="font-mono">{hrFrom} – {hrTo} bpm</TableCell>
                     <TableCell className="font-mono">{lacFrom} – {lacTo}</TableCell>
                   </TableRow>
@@ -107,13 +105,13 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={validHR} margin={{ top: 10, right: 20, bottom: 40, left: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="speed" type="number" domain={[xMin, xMax]}>
-                    <Label value="Snelheid (km/h)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
+                  <XAxis dataKey="speed" type="number" domain={[xMin, xMax]} tickFormatter={(v: number) => formatPace(v)}>
+                    <Label value="Tempo (min/km)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
                   </XAxis>
                   <YAxis domain={[hrMin, hrMax]}>
                     <Label value="Hartslag (bpm)" angle={-90} position="insideLeft" offset={0} className="fill-muted-foreground text-xs" />
                   </YAxis>
-                  <Tooltip labelFormatter={(v: number) => `${v} km/h`} formatter={(v: number) => [`${v} bpm`]} />
+                  <Tooltip labelFormatter={(v: number) => `${formatPace(v)} /km`} formatter={(v: number) => [`${v} bpm`]} />
 
                   {lt1.best >= xMin && lt1.best <= xMax && (
                     <ReferenceLine x={parseFloat(lt1.best.toFixed(1))} stroke="#34d399" strokeDasharray="6 4" label={{ value: 'LT1', position: 'top', className: 'fill-green-400 text-[11px] font-bold' }} />

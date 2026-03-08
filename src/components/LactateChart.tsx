@@ -39,10 +39,10 @@ const LactateChart = ({ results }: LactateChartProps) => {
             dataKey="speed"
             type="number"
             domain={[xMin, xMax]}
-            tickFormatter={(v: number) => `${v}`}
+            tickFormatter={(v: number) => formatPace(v)}
             allowDuplicatedCategory={false}
           >
-            <Label value="Snelheid (km/h)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
+            <Label value="Tempo (min/km)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
           </XAxis>
           <YAxis domain={[0, yMax]}>
             <Label value="Lactaat (mmol/L)" angle={-90} position="insideLeft" offset={0} className="fill-muted-foreground text-xs" />
@@ -51,7 +51,7 @@ const LactateChart = ({ results }: LactateChartProps) => {
             formatter={(value: number, name: string) => [
               `${value.toFixed(1)} ${name === 'fit' ? 'mmol/L (fit)' : 'mmol/L'}`,
             ]}
-            labelFormatter={(v: number) => `${v} km/h (${formatPace(v)}/km)`}
+            labelFormatter={(v: number) => `${formatPace(v)} /km (${v} km/h)`}
           />
 
           {/* OBLA lines */}
@@ -60,12 +60,12 @@ const LactateChart = ({ results }: LactateChartProps) => {
 
           {/* LT1 vertical */}
           {lt1.best >= xMin && lt1.best <= xMax && (
-            <ReferenceLine x={parseFloat(lt1.best.toFixed(1))} stroke="#34d399" strokeDasharray="6 4" label={{ value: `LT1 ${lt1.best.toFixed(1)}`, position: 'top', className: 'fill-green-400 text-[11px] font-bold' }} />
+            <ReferenceLine x={parseFloat(lt1.best.toFixed(1))} stroke="#34d399" strokeDasharray="6 4" label={{ value: `LT1 ${formatPace(lt1.best)}`, position: 'top', className: 'fill-green-400 text-[11px] font-bold' }} />
           )}
 
           {/* LT2 vertical */}
           {lt2.best >= xMin && lt2.best <= xMax && (
-            <ReferenceLine x={parseFloat(lt2.best.toFixed(1))} stroke="#f97316" strokeDasharray="6 4" label={{ value: `LT2 ${lt2.best.toFixed(1)}`, position: 'top', className: 'fill-orange-500 text-[11px] font-bold' }} />
+            <ReferenceLine x={parseFloat(lt2.best.toFixed(1))} stroke="#f97316" strokeDasharray="6 4" label={{ value: `LT2 ${formatPace(lt2.best)}`, position: 'top', className: 'fill-orange-500 text-[11px] font-bold' }} />
           )}
 
           {/* Polynomial curve */}

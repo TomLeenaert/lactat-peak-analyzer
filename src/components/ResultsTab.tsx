@@ -33,7 +33,7 @@ const ResultBox = ({ variant, label, value, detail }: { variant: 'success' | 'wa
 
 const formatThreshold = (val: number | null): string => {
   if (!val) return 'n.v.t.';
-  return `${val.toFixed(1)} km/h (${formatPace(val)}/km)`;
+  return `${formatPace(val)} /km (${val.toFixed(1)} km/h)`;
 };
 
 const ResultsTab = ({ results }: ResultsTabProps) => {
@@ -67,8 +67,8 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
             <ResultBox
               variant="success"
               label="Beste schatting (Baseline+0.5)"
-              value={`${lt1.best.toFixed(1)} km/h`}
-              detail={`Tempo: ${formatPace(lt1.best)} /km · HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
+              value={`${formatPace(lt1.best)} /km`}
+              detail={`${lt1.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 2.0</MethodTag> {formatThreshold(lt1.obla)}</p>
@@ -84,8 +84,8 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
             <ResultBox
               variant="warning"
               label="Beste schatting (Modified Dmax)"
-              value={`${lt2.best.toFixed(1)} km/h`}
-              detail={`Tempo: ${formatPace(lt2.best)} /km · HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
+              value={`${formatPace(lt2.best)} /km`}
+              detail={`${lt2.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 4.0</MethodTag> {formatThreshold(lt2.obla)}</p>
@@ -118,11 +118,10 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Snelheid</TableHead>
+                <TableHead>Tempo</TableHead>
                 <TableHead>Gemeten</TableHead>
                 <TableHead>Fit</TableHead>
                 <TableHead>Verschil</TableHead>
-                <TableHead>Tempo</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,11 +130,10 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
                 const diff = results.lactates[i] - fitted;
                 return (
                   <TableRow key={i}>
-                    <TableCell className="font-mono">{s} km/h</TableCell>
+                    <TableCell className="font-mono">{formatPace(s)} /km</TableCell>
                     <TableCell className="font-mono">{results.lactates[i].toFixed(1)}</TableCell>
                     <TableCell className="font-mono">{fitted.toFixed(2)}</TableCell>
                     <TableCell className="font-mono">{diff >= 0 ? '+' : ''}{diff.toFixed(2)}</TableCell>
-                    <TableCell className="font-mono">{formatPace(s)}</TableCell>
                   </TableRow>
                 );
               })}
