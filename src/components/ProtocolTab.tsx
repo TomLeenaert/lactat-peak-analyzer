@@ -4,8 +4,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { ProtocolSettings } from '@/lib/protocol-types';
-import { formatPace, type StepData } from '@/lib/lactate-math';
-import PaceInput from './PaceInput';
+import { formatPace } from '@/lib/lactate-math';
+import PaceInput, { PaceIncrementInput } from './PaceInput';
 
 interface ProtocolTabProps {
   protocol: ProtocolSettings;
@@ -31,64 +31,70 @@ const ProtocolStep = ({ num, title, desc }: { num: string; title: string; desc: 
   </div>
 );
 
+/** Convert pace increment (seconds faster) to km/h increment at a given base speed */
+function paceSecToSpeedIncrement(baseSpeedKmh: number, paceIncrementSec: number): number {
+  const basePaceMin = 60 / baseSpeedKmh;
+  const newPaceMin = basePaceMin - paceIncrementSec / 60;
+  if (newPaceMin <= 0) return 1;
+  const newSpeed = 60 / newPaceMin;
+  return newSpeed - baseSpeedKmh;
+}
+
 const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProps) => {
   const update = (field: keyof ProtocolSettings, value: number | boolean) => {
     setProtocol({ ...protocol, [field]: value });
   };
 
-  // Preview van de stappen
-  const previewSpeeds = Array.from({ length: protocol.numberOfSteps }, (_, i) =>
-    protocol.startSpeed + i * protocol.stepIncrement
-  );
+  // Generate preview speeds using pace-based increments
+  const previewSpeeds: number[] = [];
+  let currentSpeed = protocol.startSpeed;
+  for (let i = 0; i < protocol.numberOfSteps; i++) {
+    previewSpeeds.push(currentSpeed);
+    const currentPaceMin = 60 / currentSpeed;
+    const nextPaceMin = currentPaceMin - protocol.paceIncrementSec / 60;
+    if (nextPaceMin <= 0) break;
+    currentSpeed = 60 / nextPaceMin;
+  }
 
   return (
     <div className="space-y-6">
-      {/* Protocol instellingen */}
       <Card>
         <CardHeader>
           <CardTitle>⚙️ Protocol instellen</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="bg-accent/10 border border-primary/20 rounded-lg p-4 mb-6 text-sm leading-relaxed">
-            <strong className="text-primary">Pas je protocol aan:</strong> Stel de startsnelheid, het aantal stappen, de stapduur en het increment in. Je kunt ook een laatste all-out inspanning toevoegen voor VO₂max-bepaling.
+            <strong className="text-primary">Pas je protocol aan:</strong> Stel het starttempo, het tempo-increment en de stapafstand in. Je kunt ook een laatste all-out inspanning toevoegen voor VO₂max-bepaling.
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div>
               <Label>Starttempo (min/km)</Label>
               <PaceInput
                 speedKmh={protocol.startSpeed}
                 onChange={v => update('startSpeed', v)}
               />
+              <p className="text-xs text-muted-foreground mt-1">Tempo van de eerste stap</p>
             </div>
             <div>
-              <Label>Increment (per stap)</Label>
-              <Input
-                type="number"
-                step="0.5"
-                value={protocol.stepIncrement}
-                onChange={e => update('stepIncrement', parseFloat(e.target.value) || 0.5)}
+              <Label>Increment (mm:ss sneller)</Label>
+              <PaceIncrementInput
+                seconds={protocol.paceIncrementSec}
+                onChange={v => update('paceIncrementSec', v)}
               />
+              <p className="text-xs text-muted-foreground mt-1">Hoeveel sneller per stap</p>
             </div>
             <div>
-              <Label>Stapduur (minuten)</Label>
+              <Label>Stapafstand (meter)</Label>
               <Input
                 type="number"
-                min={2}
-                max={10}
-                value={protocol.stepDuration}
-                onChange={e => update('stepDuration', parseInt(e.target.value) || 5)}
+                step="100"
+                min={400}
+                max={3000}
+                value={protocol.stepDistance}
+                onChange={e => update('stepDistance', parseInt(e.target.value) || 1600)}
               />
-            </div>
-            <div>
-              <Label>Aantal stappen</Label>
-              <Input
-                type="number"
-                min={4}
-                max={15}
-                value={protocol.numberOfSteps}
-                onChange={e => update('numberOfSteps', parseInt(e.target.value) || 6)}
-              />
+              <p className="text-xs text-muted-foreground mt-1">Typisch: 1200m, 1600m of 2000m</p>
             </div>
           </div>
 
@@ -145,7 +151,7 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
                     <span className="font-semibold text-sm">{formatPace(s)} /km</span>
                     <span className="text-muted-foreground text-xs">({s.toFixed(1)} km/h)</span>
                   </div>
-                  <span className="text-xs text-muted-foreground font-mono">{protocol.stepDuration} min</span>
+                  <span className="text-xs text-muted-foreground font-mono">{protocol.stepDistance}m</span>
                 </div>
               ))}
               {protocol.allOutEnabled && (
@@ -180,7 +186,7 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
           <h4 className="text-lg font-semibold mb-4 mt-6">Testverloop</h4>
           <ProtocolStep num="1" title="Rustmeting" desc="Meet rustlactaat vóór de warming-up. Dit is je baseline. Normaal: 0.5–1.5 mmol/L. Bij >2.5 mmol/L: check voeding/stress." />
           <ProtocolStep num="2" title="Warming-up (15 min)" desc={`Lichte jog op 60-65% HFmax (~${formatPace(8)} /km). Bouw op tot licht bezweet. Eindig met 2–3 korte versnellingen (10s).`} />
-          <ProtocolStep num="3" title={`Stappen van ${protocol.stepDuration} minuten`} desc={`Loop ${protocol.stepDuration} minuten per stap. Start op ${formatPace(protocol.startSpeed)} /km, verhoog met ${protocol.stepIncrement} km/h per stap. Na elke stap: 30s pauze voor bloedafname.`} />
+          <ProtocolStep num="3" title={`Stappen van ${protocol.stepDistance}m`} desc={`Loop ${protocol.stepDistance}m per stap. Start op ${formatPace(protocol.startSpeed)} /km, verhoog het tempo met ${protocol.paceIncrementSec}s per stap. Na elke stap: 30s pauze voor bloedafname.`} />
           <ProtocolStep num="4" title="Bloedafname" desc="Reinig de prikplaats met alcohol. Prik, veeg eerste druppel weg, test de tweede druppel. Noteer: lactaat (mmol/L), hartslag (einde stap), RPE (1-10)." />
           {protocol.allOutEnabled && (
             <ProtocolStep num="5" title={`All-out: ${protocol.allOutDistance}m`} desc={`Na de laatste reguliere stap: maximale inspanning over ${protocol.allOutDistance}m (max ${protocol.allOutDuration}s). Meet hartslag en lactaat direct na afloop en na 1 min rust.`} />
