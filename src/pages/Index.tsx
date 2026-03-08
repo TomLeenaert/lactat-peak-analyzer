@@ -27,21 +27,23 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const onGenerateSteps = useCallback(() => {
-    const steps: StepData[] = Array.from({ length: protocol.numberOfSteps }, (_, i) => ({
-      speed: protocol.startSpeed + i * protocol.stepIncrement,
-      lactate: 0,
-      hr: 0,
-      watt: 0,
-    }));
+    const steps: StepData[] = [];
+    let currentSpeed = protocol.startSpeed;
+    for (let i = 0; i < protocol.numberOfSteps; i++) {
+      steps.push({ speed: currentSpeed, lactate: 0, hr: 0, watt: 0 });
+      const currentPaceMin = 60 / currentSpeed;
+      const nextPaceMin = currentPaceMin - protocol.paceIncrementSec / 60;
+      if (nextPaceMin <= 0) break;
+      currentSpeed = 60 / nextPaceMin;
+    }
     if (protocol.allOutEnabled) {
-      // Add all-out row with speed 0 (to be filled by user)
       steps.push({ speed: 0, lactate: 0, hr: 0, watt: 0 });
     }
     setTestData(steps);
     setStepDistance(String(protocol.stepDistance));
     setStepIncrement(String(protocol.stepIncrement));
     setActiveTab('data');
-    toast({ title: 'Stappen gegenereerd', description: `${protocol.numberOfSteps} stappen${protocol.allOutEnabled ? ' + all-out' : ''} klaargezet in Data Invoer.` });
+    toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen${protocol.allOutEnabled ? ' + all-out' : ''} klaargezet in Data Invoer.` });
   }, [protocol, toast]);
 
   const onCalculate = useCallback(() => {
