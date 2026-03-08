@@ -15,8 +15,8 @@ interface DataInputTabProps {
   setTestDate: (v: string) => void;
   restingLactate: string;
   setRestingLactate: (v: string) => void;
-  stepDuration: string;
-  setStepDuration: (v: string) => void;
+  stepDistance: string;
+  setStepDistance: (v: string) => void;
   stepIncrement: string;
   setStepIncrement: (v: string) => void;
   onCalculate: () => void;
