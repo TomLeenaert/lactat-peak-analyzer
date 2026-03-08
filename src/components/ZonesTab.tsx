@@ -22,7 +22,8 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
   }
 
   const zones = getZones(results);
-  const { speeds, hrs, lt1, lt2, coeffs } = results;
+  const { speeds, hrs, watts, lt1, lt2, coeffs } = results;
+  const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
 
   // HR chart data
