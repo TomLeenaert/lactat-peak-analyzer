@@ -32,6 +32,17 @@ const EXAMPLE_DATA: StepData[] = [
   { speed: 16, lactate: 7.2, hr: 186 },
 ];
 
+// Echte testdata: 1600m stappen, tempo → snelheid (km/h)
+const TEST_DATA: StepData[] = [
+  { speed: 13.2, lactate: 1.8, hr: 140 },
+  { speed: 13.7, lactate: 1.7, hr: 146 },
+  { speed: 14.1, lactate: 1.3, hr: 152 },
+  { speed: 14.9, lactate: 2.7, hr: 160 },
+  { speed: 15.1, lactate: 2.3, hr: 164 },
+  { speed: 15.7, lactate: 3.8, hr: 167 },
+  { speed: 16.3, lactate: 5.8, hr: 176 },
+];
+
 const DataInputTab = ({
   testData, setTestData,
   athleteName, setAthleteName,
@@ -49,6 +60,15 @@ const DataInputTab = ({
     setStepDuration('5');
     setStepIncrement('1');
     setTestData([...EXAMPLE_DATA]);
+  };
+
+  const loadTestData = () => {
+    setAthleteName('Testatleet 1600m');
+    setTestDate('2026-03-08');
+    setRestingLactate('1.3');
+    setStepDuration('5');
+    setStepIncrement('0.5');
+    setTestData([...TEST_DATA]);
   };
 
   const clearData = () => {
@@ -81,8 +101,9 @@ const DataInputTab = ({
       <CardHeader>
         <div className="flex justify-between items-center flex-wrap gap-2">
           <CardTitle>Testgegevens invoeren</CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld laden</Button>
+            <Button variant="secondary" size="sm" onClick={loadTestData}>🧪 Testdata 1600m</Button>
             <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
           </div>
         </div>
