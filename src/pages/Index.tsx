@@ -28,6 +28,7 @@ const Index = () => {
       speed: protocol.startSpeed + i * protocol.stepIncrement,
       lactate: 0,
       hr: 0,
+      watt: 0,
     }));
     if (protocol.allOutEnabled) {
       // Add all-out row with speed 0 (to be filled by user)
