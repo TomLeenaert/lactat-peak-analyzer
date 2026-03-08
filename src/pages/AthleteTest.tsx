@@ -28,7 +28,7 @@ const AthleteTest = () => {
   const [athleteName, setAthleteName] = useState('');
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
   const [restingLactate, setRestingLactate] = useState('');
-  const [stepDuration, setStepDuration] = useState('5');
+  const [stepDistance, setStepDistance] = useState('1600');
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
 
