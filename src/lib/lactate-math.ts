@@ -277,7 +277,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt2_best = lt2_moddmax || lt2_dmax || lt2_obla || xMax;
 
   return {
-    coeffs, r2, speeds, lactates, hrs, restLac, minActiveLac,
+    coeffs, r2, speeds, lactates, hrs, watts, restLac, minActiveLac,
     lt1: { obla: lt1_obla, bsln: lt1_bsln, loglog: lt1_loglog, best: lt1_best },
     lt2: { obla: lt2_obla, dmax: lt2_dmax, moddmax: lt2_moddmax, best: lt2_best },
     modStartIdx,
