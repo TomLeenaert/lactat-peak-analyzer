@@ -108,7 +108,7 @@ export const PaceIncrementInput = ({ seconds, onChange, className = '' }: PaceIn
   return (
     <Input
       type="text"
-      className={`w-24 font-mono text-center ${className}`}
+      className={`font-mono text-center ${className || 'w-full'}`}
       value={value}
       placeholder="M:SS"
       onFocus={() => setFocused(true)}

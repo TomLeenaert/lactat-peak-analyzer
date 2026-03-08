@@ -75,27 +75,27 @@ const TestPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
-        <div className="max-w-[900px] mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+        <div className="max-w-[900px] mx-auto px-3 sm:px-4 py-3 flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold">
-            {isQuick ? '⚡ Veldtest' : '🔬 Volledige inspanningstest'}
+          <h1 className="text-base sm:text-lg font-semibold truncate">
+            {isQuick ? '⚡ Veldtest' : '🔬 Inspanningstest'}
           </h1>
         </div>
       </header>
 
-      <main className="max-w-[900px] mx-auto px-4 py-6">
+      <main className="max-w-[900px] mx-auto px-3 sm:px-4 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted p-1">
-            <TabsTrigger value="protocol" className="flex-1 min-w-[100px]">📋 Protocol</TabsTrigger>
-            <TabsTrigger value="data" className="flex-1 min-w-[100px]">📊 Data</TabsTrigger>
-            <TabsTrigger value="results" className="flex-1 min-w-[100px]">🎯 Resultaten</TabsTrigger>
-            <TabsTrigger value="zones" className="flex-1 min-w-[100px]">🏃 Zones</TabsTrigger>
-            <TabsTrigger value="science" className="flex-1 min-w-[100px]">📚 Wetenschap</TabsTrigger>
+          <TabsList className="w-full flex h-auto gap-0.5 bg-muted p-1 overflow-x-auto">
+            <TabsTrigger value="protocol" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📋 Protocol</TabsTrigger>
+            <TabsTrigger value="data" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📊 Data</TabsTrigger>
+            <TabsTrigger value="results" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🎯 Resultaat</TabsTrigger>
+            <TabsTrigger value="zones" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🏃 Zones</TabsTrigger>
+            <TabsTrigger value="science" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📚 Info</TabsTrigger>
           </TabsList>
 
-          <div className="mt-6">
+          <div className="mt-4 sm:mt-6">
             <TabsContent value="protocol">
               <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
             </TabsContent>
