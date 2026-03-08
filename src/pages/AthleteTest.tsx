@@ -158,7 +158,7 @@ const AthleteTest = () => {
                 athleteName={athleteName} setAthleteName={setAthleteName}
                 testDate={testDate} setTestDate={setTestDate}
                 restingLactate={restingLactate} setRestingLactate={setRestingLactate}
-                stepDuration={stepDuration} setStepDuration={setStepDuration}
+                stepDistance={stepDistance} setStepDistance={setStepDistance}
                 stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
                 onCalculate={onCalculate}
               />
