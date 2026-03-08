@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
+import PaceInput from './PaceInput';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -145,7 +146,6 @@ const DataInputTab = ({
                 <TableHead>Lactaat (mmol/L)</TableHead>
                 <TableHead>Hartslag (bpm)</TableHead>
                 <TableHead>Watt (W)</TableHead>
-                <TableHead>Snelheid (km/h)</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -153,7 +153,9 @@ const DataInputTab = ({
               {testData.map((row, i) => (
                 <TableRow key={i}>
                   <TableCell className="font-mono">{i + 1}</TableCell>
-                  <TableCell className="font-mono font-semibold">{row.speed > 0 ? formatPace(row.speed) : '-'}</TableCell>
+                  <TableCell>
+                    <PaceInput speedKmh={row.speed} onChange={v => updateRow(i, 'speed', String(v))} />
+                  </TableCell>
                   <TableCell>
                     <Input type="number" step="0.1" className="w-20 font-mono text-center" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} />
                   </TableCell>
@@ -162,9 +164,6 @@ const DataInputTab = ({
                   </TableCell>
                   <TableCell>
                     <Input type="number" className="w-20 font-mono text-center" value={row.watt || ''} onChange={e => updateRow(i, 'watt', e.target.value)} />
-                  </TableCell>
-                  <TableCell>
-                    <Input type="number" step="0.5" className="w-20 font-mono text-center" value={row.speed || ''} onChange={e => updateRow(i, 'speed', e.target.value)} />
                   </TableCell>
                   <TableCell>
                     <Button variant="destructive" size="sm" onClick={() => removeRow(i)}>✕</Button>
