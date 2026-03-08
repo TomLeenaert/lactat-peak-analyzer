@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Monitor, Smartphone } from 'lucide-react';
 import ProtocolTab from '@/components/ProtocolTab';
 import DataInputTab from '@/components/DataInputTab';
 import ResultsTab from '@/components/ResultsTab';
