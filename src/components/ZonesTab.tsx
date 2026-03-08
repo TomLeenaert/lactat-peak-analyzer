@@ -74,6 +74,8 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
               {zones.map(z => {
                 const hrFrom = interpolateHR(z.from, speeds, hrs);
                 const hrTo = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
+                const wattFrom = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
+                const wattTo = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
                 const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
                 const lacTo = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
                 return (
