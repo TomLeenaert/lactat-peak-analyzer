@@ -141,7 +141,7 @@ const DataInputTab = ({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-16">Stap</TableHead>
-                <TableHead>Snelheid (km/h)</TableHead>
+                <TableHead>Tempo (min/km)</TableHead>
                 <TableHead>Lactaat (mmol/L)</TableHead>
                 <TableHead>Hartslag (bpm)</TableHead>
                 <TableHead>Watt (W)</TableHead>
