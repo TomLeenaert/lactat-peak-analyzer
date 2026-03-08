@@ -58,7 +58,7 @@ const DataInputTab = ({
     setAthleteName('Voorbeeld Atleet');
     setTestDate('2026-03-08');
     setRestingLactate('1.0');
-    setStepDuration('5');
+    setStepDistance('1600');
     setStepIncrement('1');
     setTestData([...EXAMPLE_DATA]);
   };
