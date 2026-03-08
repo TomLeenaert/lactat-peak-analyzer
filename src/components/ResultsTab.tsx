@@ -23,10 +23,10 @@ const ResultBox = ({ variant, label, value, detail }: { variant: 'success' | 'wa
     info: 'bg-muted-foreground/15 border-muted-foreground/25',
   };
   return (
-    <div className={`p-4 rounded-lg mb-4 border ${colors[variant]}`}>
+    <div className={`p-3 sm:p-4 rounded-lg mb-3 border ${colors[variant]}`}>
       <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{label}</div>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-sm text-muted-foreground mt-1">{detail}</div>
+      <div className="text-xl sm:text-2xl font-bold break-all">{value}</div>
+      <div className="text-xs sm:text-sm text-muted-foreground mt-1">{detail}</div>
     </div>
   );
 };
