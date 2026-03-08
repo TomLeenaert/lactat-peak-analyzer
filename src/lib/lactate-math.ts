@@ -187,6 +187,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const speeds = valid.map(r => r.speed);
   const lactates = valid.map(r => r.lactate);
   const hrs = valid.map(r => r.hr);
+  const watts = valid.map(r => r.watt || 0);
   const restLac = restingLactate || lactates[0];
 
   const coeffs = polyFit3(speeds, lactates);
