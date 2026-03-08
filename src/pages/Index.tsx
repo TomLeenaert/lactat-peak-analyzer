@@ -24,6 +24,7 @@ const Index = () => {
   const [stepDuration, setStepDuration] = useState('5');
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const onGenerateSteps = useCallback(() => {
     const steps: StepData[] = Array.from({ length: protocol.numberOfSteps }, (_, i) => ({
