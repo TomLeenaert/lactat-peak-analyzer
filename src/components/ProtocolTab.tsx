@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { ProtocolSettings } from '@/lib/protocol-types';
-import { formatPace } from '@/lib/lactate-math';
+import { formatPace, formatPace400 } from '@/lib/lactate-math';
 import PaceInput, { PaceIncrementInput } from './PaceInput';
 
 interface ProtocolTabProps {
