@@ -54,24 +54,17 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div>
-              <Label>Startsnelheid (min/km)</Label>
-              <Input
-                type="text"
-                value={formatPace(protocol.startSpeed)}
-                readOnly
-                className="bg-muted"
-              />
+              <Label>Startsnelheid</Label>
               <Input
                 type="number"
                 step="0.5"
                 value={protocol.startSpeed}
                 onChange={e => update('startSpeed', parseFloat(e.target.value) || 0)}
-                className="sr-only"
               />
-              <p className="text-xs text-muted-foreground mt-1">{protocol.startSpeed} km/h</p>
+              <p className="text-xs text-muted-foreground mt-1">{formatPace(protocol.startSpeed)} /km</p>
             </div>
             <div>
-              <Label>Increment (min/km per stap)</Label>
+              <Label>Increment (per stap)</Label>
               <Input
                 type="number"
                 step="0.5"
