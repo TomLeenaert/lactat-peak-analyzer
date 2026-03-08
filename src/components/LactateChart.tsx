@@ -60,7 +60,7 @@ const LactateChart = ({ results }: LactateChartProps) => {
 
           {/* LT1 vertical */}
           {lt1.best >= xMin && lt1.best <= xMax && (
-            <ReferenceLine x={parseFloat(lt1.best.toFixed(1))} stroke="#34d399" strokeDasharray="6 4" label={{ value: `LT1 ${lt1.best.toFixed(1)}`, position: 'top', className: 'fill-green-400 text-[11px] font-bold' }} />
+            <ReferenceLine x={parseFloat(lt1.best.toFixed(1))} stroke="#34d399" strokeDasharray="6 4" label={{ value: `LT1 ${formatPace(lt1.best)}`, position: 'top', className: 'fill-green-400 text-[11px] font-bold' }} />
           )}
 
           {/* LT2 vertical */}
