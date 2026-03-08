@@ -27,6 +27,7 @@ export interface CalculationResults {
   speeds: number[];
   lactates: number[];
   hrs: number[];
+  watts: number[];
   restLac: number;
   minActiveLac: number;
   lt1: LT1Results;
