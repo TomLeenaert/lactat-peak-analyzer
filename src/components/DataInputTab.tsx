@@ -101,8 +101,9 @@ const DataInputTab = ({
       <CardHeader>
         <div className="flex justify-between items-center flex-wrap gap-2">
           <CardTitle>Testgegevens invoeren</CardTitle>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld laden</Button>
+            <Button variant="secondary" size="sm" onClick={loadTestData}>🧪 Testdata 1600m</Button>
             <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
           </div>
         </div>
