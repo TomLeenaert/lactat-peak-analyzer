@@ -39,7 +39,7 @@ const TestPage = () => {
   const [athleteName, setAthleteName] = useState('');
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
   const [restingLactate, setRestingLactate] = useState('');
-  const [stepDuration, setStepDuration] = useState(String(defaultProtocol.stepDuration));
+  const [stepDistance, setStepDistance] = useState(String(defaultProtocol.stepDistance));
   const [stepIncrement, setStepIncrement] = useState(String(defaultProtocol.stepIncrement));
   const [results, setResults] = useState<CalculationResults | null>(null);
 
