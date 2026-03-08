@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
 import {
   ComposedChart, Line, Scatter, XAxis, YAxis, CartesianGrid, ReferenceLine,
@@ -26,7 +25,6 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
   const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
 
-  // HR chart data
   const validHR = speeds.map((s, i) => ({ speed: s, hr: hrs[i] })).filter(d => d.hr > 0);
   const hrMin = validHR.length > 0 ? Math.floor(Math.min(...validHR.map(d => d.hr)) / 10) * 10 - 10 : 100;
   const hrMax = validHR.length > 0 ? Math.ceil(Math.max(...validHR.map(d => d.hr)) / 10) * 10 + 10 : 200;
@@ -34,22 +32,24 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
   const xMax = validHR.length > 0 ? validHR[validHR.length - 1].speed + 0.5 : 18;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
-        <CardHeader><CardTitle>Trainingszones (5-zone model)</CardTitle></CardHeader>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Trainingszones (5-zone model)</CardTitle>
+        </CardHeader>
         <CardContent>
-          <div className="bg-accent/10 border border-primary/20 rounded-lg p-4 mb-4 text-sm leading-relaxed">
-            Zones gebaseerd op je individuele LT1 en LT2 waarden (Seiler, 2010; Kindermann, 1979). De snelheden en hartslagen zijn interpolaties uit je testdata.
+          <div className="bg-accent/10 border border-primary/20 rounded-lg p-3 mb-4 text-xs leading-relaxed">
+            Zones gebaseerd op je individuele LT1 en LT2 waarden (Seiler, 2010).
           </div>
 
           {/* Zone bar */}
-          <div className="flex rounded-md overflow-hidden h-8 mb-4">
+          <div className="flex rounded-md overflow-hidden h-7 mb-4">
             {zones.map(z => {
               const width = Math.max(((z.to - z.from) / totalRange) * 100, 5);
               return (
                 <div
                   key={z.name}
-                  className="flex items-center justify-center text-xs font-semibold text-white"
+                  className="flex items-center justify-center text-[10px] font-semibold text-white"
                   style={{ width: `${width}%`, background: z.color, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
                 >
                   {z.name}
@@ -58,63 +58,49 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
             })}
           </div>
 
-          {/* Zone table */}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Zone</TableHead>
-                <TableHead>Beschrijving</TableHead>
-                <TableHead>Tempo</TableHead>
-                <TableHead>Hartslag</TableHead>
-                {hasWatts && <TableHead>Watt</TableHead>}
-                <TableHead>Lactaat</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {zones.map(z => {
-                const hrFrom = interpolateHR(z.from, speeds, hrs);
-                const hrTo = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
-                const wattFrom = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
-                const wattTo = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
-                const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
-                const lacTo = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
-                return (
-                  <TableRow key={z.name}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-sm inline-block" style={{ background: z.color }} />
-                        <div>
-                          <strong>{z.name}</strong>
-                          <div className="text-muted-foreground text-xs">{z.label}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{z.desc}</TableCell>
-                    <TableCell className="font-mono">{formatPace(z.to)} – {formatPace(z.from)} /km</TableCell>
-                    <TableCell className="font-mono">{hrFrom} – {hrTo} bpm</TableCell>
-                    {hasWatts && <TableCell className="font-mono">{wattFrom} – {wattTo} W</TableCell>}
-                    <TableCell className="font-mono">{lacFrom} – {lacTo}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+          {/* Zone cards - mobile friendly */}
+          <div className="space-y-2">
+            {zones.map(z => {
+              const hrFrom = interpolateHR(z.from, speeds, hrs);
+              const hrTo = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
+              const wattFrom = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
+              const wattTo = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
+              const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
+              const lacTo = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
+              return (
+                <div key={z.name} className="border border-border rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-3 h-3 rounded-sm shrink-0" style={{ background: z.color }} />
+                    <strong className="text-sm">{z.name}</strong>
+                    <span className="text-xs text-muted-foreground">{z.label}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">{z.desc}</p>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                    <div><span className="text-muted-foreground">Tempo:</span> <span className="font-mono">{formatPace(z.to)}–{formatPace(z.from)}</span></div>
+                    <div><span className="text-muted-foreground">HR:</span> <span className="font-mono">{hrFrom}–{hrTo}</span></div>
+                    {hasWatts && <div><span className="text-muted-foreground">Watt:</span> <span className="font-mono">{wattFrom}–{wattTo}</span></div>}
+                    <div><span className="text-muted-foreground">Lac:</span> <span className="font-mono">{lacFrom}–{lacTo}</span></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </CardContent>
       </Card>
 
       {validHR.length >= 2 && (
         <Card>
-          <CardHeader><CardTitle>Hartslag vs Snelheid</CardTitle></CardHeader>
+          <CardHeader className="pb-3"><CardTitle className="text-lg">Hartslag vs Tempo</CardTitle></CardHeader>
           <CardContent>
-            <div className="w-full h-[350px]">
+            <div className="w-full h-[280px] sm:h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={validHR} margin={{ top: 10, right: 20, bottom: 40, left: 10 }}>
+                <ComposedChart data={validHR} margin={{ top: 10, right: 10, bottom: 40, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis dataKey="speed" type="number" domain={[xMin, xMax]} tickFormatter={(v: number) => formatPace(v)}>
+                  <XAxis dataKey="speed" type="number" domain={[xMin, xMax]} tickFormatter={(v: number) => formatPace(v)} tick={{ fontSize: 11 }}>
                     <Label value="Tempo (min/km)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
                   </XAxis>
-                  <YAxis domain={[hrMin, hrMax]}>
-                    <Label value="Hartslag (bpm)" angle={-90} position="insideLeft" offset={0} className="fill-muted-foreground text-xs" />
+                  <YAxis domain={[hrMin, hrMax]} tick={{ fontSize: 11 }}>
+                    <Label value="HR (bpm)" angle={-90} position="insideLeft" offset={0} className="fill-muted-foreground text-xs" />
                   </YAxis>
                   <Tooltip labelFormatter={(v: number) => `${formatPace(v)} /km`} formatter={(v: number) => [`${v} bpm`]} />
 
@@ -126,7 +112,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
                   )}
 
                   <Line dataKey="hr" type="monotone" stroke="#ef4444" strokeWidth={2.5} dot={false} />
-                  <Scatter dataKey="hr" fill="#ef4444" stroke="hsl(var(--card))" strokeWidth={2} r={5} />
+                  <Scatter dataKey="hr" fill="#ef4444" stroke="hsl(var(--card))" strokeWidth={2} r={4} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>

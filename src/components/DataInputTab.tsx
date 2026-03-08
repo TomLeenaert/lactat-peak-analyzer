@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
 import PaceInput from './PaceInput';
+import { Trash2, Plus } from 'lucide-react';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -33,7 +33,6 @@ const EXAMPLE_DATA: StepData[] = [
   { speed: 16, lactate: 7.2, hr: 186, watt: 390 },
 ];
 
-// Echte testdata: 1600m stappen, tempo → snelheid (km/h)
 const TEST_DATA: StepData[] = [
   { speed: 13.19, lactate: 1.8, hr: 140, watt: 260 },
   { speed: 13.69, lactate: 1.7, hr: 146, watt: 275 },
@@ -99,85 +98,81 @@ const DataInputTab = ({
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center flex-wrap gap-2">
-          <CardTitle>Testgegevens invoeren</CardTitle>
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <CardTitle className="text-lg">Testgegevens invoeren</CardTitle>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld laden</Button>
-            <Button variant="secondary" size="sm" onClick={loadTestData}>🧪 Testdata 1600m</Button>
+            <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld</Button>
+            <Button variant="secondary" size="sm" onClick={loadTestData}>🧪 Testdata</Button>
             <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <CardContent className="space-y-4">
+        {/* Meta fields */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label>Naam atleet</Label>
+            <Label className="text-xs">Naam atleet</Label>
             <Input value={athleteName} onChange={e => setAthleteName(e.target.value)} placeholder="Naam" />
           </div>
           <div>
-            <Label>Datum test</Label>
+            <Label className="text-xs">Datum</Label>
             <Input type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-3 gap-3">
           <div>
-            <Label>Rustlactaat (mmol/L)</Label>
-            <Input type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="bv. 1.0" />
+            <Label className="text-xs">Rustlactaat</Label>
+            <Input type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="1.0" />
           </div>
           <div>
-            <Label>Stapafstand (m)</Label>
+            <Label className="text-xs">Afstand (m)</Label>
             <Input type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
           </div>
           <div>
-            <Label>Stap-increment</Label>
+            <Label className="text-xs">Increment</Label>
             <Input type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
           </div>
         </div>
 
-        <h4 className="text-lg font-semibold mb-4">Stapgegevens</h4>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">Stap</TableHead>
-                <TableHead>Tempo (min/km)</TableHead>
-                <TableHead>Lactaat (mmol/L)</TableHead>
-                <TableHead>Hartslag (bpm)</TableHead>
-                <TableHead>Watt (W)</TableHead>
-                <TableHead className="w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {testData.map((row, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-mono">{i + 1}</TableCell>
-                  <TableCell>
-                    <PaceInput speedKmh={row.speed} onChange={v => updateRow(i, 'speed', String(v))} />
-                  </TableCell>
-                  <TableCell>
-                    <Input type="number" step="0.1" className="w-20 font-mono text-center" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} />
-                  </TableCell>
-                  <TableCell>
-                    <Input type="number" className="w-20 font-mono text-center" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} />
-                  </TableCell>
-                  <TableCell>
-                    <Input type="number" className="w-20 font-mono text-center" value={row.watt || ''} onChange={e => updateRow(i, 'watt', e.target.value)} />
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="destructive" size="sm" onClick={() => removeRow(i)}>✕</Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        {/* Step data - mobile card layout */}
+        <h4 className="text-base font-semibold pt-2">Stapgegevens</h4>
+        <div className="space-y-3">
+          {testData.map((row, i) => (
+            <div key={i} className="border border-border rounded-lg p-3 bg-muted/30">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-primary">Stap {i + 1}</span>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => removeRow(i)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Tempo</Label>
+                  <PaceInput speedKmh={row.speed} onChange={v => updateRow(i, 'speed', String(v))} className="w-full" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Lactaat</Label>
+                  <Input type="number" step="0.1" className="font-mono" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} placeholder="mmol/L" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Hartslag</Label>
+                  <Input type="number" className="font-mono" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} placeholder="bpm" />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Watt</Label>
+                  <Input type="number" className="font-mono" value={row.watt || ''} onChange={e => updateRow(i, 'watt', e.target.value)} placeholder="W" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex gap-2 mt-4">
-          <Button variant="secondary" size="sm" onClick={addRow}>+ Stap toevoegen</Button>
-        </div>
-        <Button className="w-full mt-4" onClick={onCalculate}>🧮 Berekenen</Button>
+        <Button variant="secondary" size="sm" onClick={addRow} className="w-full">
+          <Plus className="h-4 w-4 mr-1" /> Stap toevoegen
+        </Button>
+        <Button className="w-full" onClick={onCalculate}>🧮 Berekenen</Button>
       </CardContent>
     </Card>
   );

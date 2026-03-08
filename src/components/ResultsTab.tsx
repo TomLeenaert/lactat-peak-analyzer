@@ -23,10 +23,10 @@ const ResultBox = ({ variant, label, value, detail }: { variant: 'success' | 'wa
     info: 'bg-muted-foreground/15 border-muted-foreground/25',
   };
   return (
-    <div className={`p-4 rounded-lg mb-4 border ${colors[variant]}`}>
+    <div className={`p-3 sm:p-4 rounded-lg mb-3 border ${colors[variant]}`}>
       <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{label}</div>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-sm text-muted-foreground mt-1">{detail}</div>
+      <div className="text-xl sm:text-2xl font-bold break-all">{value}</div>
+      <div className="text-xs sm:text-sm text-muted-foreground mt-1">{detail}</div>
     </div>
   );
 };
@@ -52,7 +52,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
   const hasWatts = watts.some(w => w > 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
         <CardHeader><CardTitle>Lactaatcurve</CardTitle></CardHeader>
         <CardContent>
@@ -61,7 +61,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4">
         <Card>
           <CardHeader><CardTitle>LT1 — Aerobe Drempel</CardTitle></CardHeader>
           <CardContent>
@@ -100,7 +100,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
       <Card>
         <CardHeader><CardTitle>Polynoomfit & Details</CardTitle></CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3">
             <ResultBox
               variant="info"
               label="Polynoomvergelijking"

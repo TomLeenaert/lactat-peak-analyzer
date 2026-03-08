@@ -57,17 +57,17 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle>⚙️ Protocol instellen</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">⚙️ Protocol instellen</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="bg-accent/10 border border-primary/20 rounded-lg p-4 mb-6 text-sm leading-relaxed">
-            <strong className="text-primary">Pas je protocol aan:</strong> Stel het starttempo, het tempo-increment en de stapafstand in. Je kunt ook een laatste all-out inspanning toevoegen voor VO₂max-bepaling.
+          <div className="bg-accent/10 border border-primary/20 rounded-lg p-3 mb-4 text-xs sm:text-sm leading-relaxed">
+            <strong className="text-primary">Pas je protocol aan:</strong> Stel starttempo, increment en stapafstand in.
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div>
               <Label>Starttempo (min/km)</Label>
               <PaceInput

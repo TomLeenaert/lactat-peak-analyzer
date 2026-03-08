@@ -1,7 +1,5 @@
 import { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Monitor, Smartphone } from 'lucide-react';
 import ProtocolTab from '@/components/ProtocolTab';
 import DataInputTab from '@/components/DataInputTab';
 import ResultsTab from '@/components/ResultsTab';
@@ -24,7 +22,6 @@ const Index = () => {
   const [stepDistance, setStepDistance] = useState('1600');
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const onGenerateSteps = useCallback(() => {
     const steps: StepData[] = [];
@@ -43,7 +40,7 @@ const Index = () => {
     setStepDistance(String(protocol.stepDistance));
     setStepIncrement(String(protocol.stepIncrement));
     setActiveTab('data');
-    toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen${protocol.allOutEnabled ? ' + all-out' : ''} klaargezet in Data Invoer.` });
+    toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen klaargezet.` });
   }, [protocol, toast]);
 
   const onCalculate = useCallback(() => {
@@ -54,38 +51,27 @@ const Index = () => {
     }
     setResults(result);
     setActiveTab('results');
-    toast({ title: 'Berekening voltooid', description: 'Bekijk de resultaten en trainingszones.' });
+    toast({ title: 'Berekening voltooid' });
   }, [testData, restingLactate, toast]);
 
   return (
     <div className="min-h-screen bg-background">
-      <div className={`mx-auto px-4 py-6 md:px-6 md:py-8 ${viewMode === 'mobile' ? 'max-w-[480px]' : 'max-w-[900px]'}`}>
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">🔬 Lactaat Inspanningstest</h1>
-            <p className="text-lg text-muted-foreground mt-1">Volledig protocol, berekening & trainingszones</p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setViewMode(v => v === 'desktop' ? 'mobile' : 'desktop')}
-            className="flex items-center gap-2 shrink-0"
-          >
-            {viewMode === 'desktop' ? <Monitor className="h-4 w-4" /> : <Smartphone className="h-4 w-4" />}
-            {viewMode === 'desktop' ? 'Desktop friendly' : 'Mobile friendly'}
-          </Button>
+      <div className="mx-auto px-3 sm:px-6 py-4 sm:py-8 max-w-[900px]">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">🔬 Lactaat Inspanningstest</h1>
+          <p className="text-sm sm:text-lg text-muted-foreground mt-1">Protocol, berekening & trainingszones</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted p-1">
-            <TabsTrigger value="protocol" className="flex-1 min-w-[100px]">📋 Protocol</TabsTrigger>
-            <TabsTrigger value="data" className="flex-1 min-w-[100px]">📊 Data Invoer</TabsTrigger>
-            <TabsTrigger value="results" className="flex-1 min-w-[100px]">🎯 Resultaten</TabsTrigger>
-            <TabsTrigger value="zones" className="flex-1 min-w-[100px]">🏃 Zones</TabsTrigger>
-            <TabsTrigger value="science" className="flex-1 min-w-[100px]">📚 Wetenschap</TabsTrigger>
+          <TabsList className="w-full flex h-auto gap-0.5 bg-muted p-1">
+            <TabsTrigger value="protocol" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📋 Protocol</TabsTrigger>
+            <TabsTrigger value="data" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📊 Data</TabsTrigger>
+            <TabsTrigger value="results" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🎯 Resultaat</TabsTrigger>
+            <TabsTrigger value="zones" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🏃 Zones</TabsTrigger>
+            <TabsTrigger value="science" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📚 Info</TabsTrigger>
           </TabsList>
 
-          <div className="mt-6">
+          <div className="mt-4 sm:mt-6">
             <TabsContent value="protocol">
               <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
             </TabsContent>
