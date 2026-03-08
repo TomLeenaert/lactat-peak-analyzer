@@ -166,9 +166,6 @@ const DataInputTab = ({
                     <Input type="number" className="w-20 font-mono text-center" value={row.watt || ''} onChange={e => updateRow(i, 'watt', e.target.value)} />
                   </TableCell>
                   <TableCell>
-                    <Input type="number" step="0.5" className="w-20 font-mono text-center" value={row.speed || ''} onChange={e => updateRow(i, 'speed', e.target.value)} />
-                  </TableCell>
-                  <TableCell>
                     <Button variant="destructive" size="sm" onClick={() => removeRow(i)}>✕</Button>
                   </TableCell>
                 </TableRow>
