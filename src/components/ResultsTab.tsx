@@ -33,7 +33,7 @@ const ResultBox = ({ variant, label, value, detail }: { variant: 'success' | 'wa
 
 const formatThreshold = (val: number | null): string => {
   if (!val) return 'n.v.t.';
-  return `${formatPace(val)} /km (${val.toFixed(1)} km/h)`;
+  return `${formatPace(val)} /km`;
 };
 
 const ResultsTab = ({ results }: ResultsTabProps) => {
@@ -69,7 +69,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
               variant="success"
               label="Beste schatting (Baseline+0.5)"
               value={`${formatPace(lt1.best)} /km`}
-              detail={`${lt1.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt1.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
+              detail={`HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt1.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 2.0</MethodTag> {formatThreshold(lt1.obla)}</p>
@@ -86,7 +86,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
               variant="warning"
               label="Beste schatting (Modified Dmax)"
               value={`${formatPace(lt2.best)} /km`}
-              detail={`${lt2.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt2.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
+              detail={`HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt2.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 4.0</MethodTag> {formatThreshold(lt2.obla)}</p>

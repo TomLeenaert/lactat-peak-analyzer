@@ -54,16 +54,17 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div>
-              <Label>Startsnelheid (km/h)</Label>
+              <Label>Startsnelheid</Label>
               <Input
                 type="number"
                 step="0.5"
                 value={protocol.startSpeed}
                 onChange={e => update('startSpeed', parseFloat(e.target.value) || 0)}
               />
+              <p className="text-xs text-muted-foreground mt-1">{formatPace(protocol.startSpeed)} /km</p>
             </div>
             <div>
-              <Label>Increment (km/h per stap)</Label>
+              <Label>Increment (per stap)</Label>
               <Input
                 type="number"
                 step="0.5"
@@ -143,8 +144,8 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
                     {i + 1}
                   </span>
                   <div className="flex-1 flex items-baseline gap-2">
-                    <span className="font-semibold text-sm">{s.toFixed(1)} km/h</span>
-                    <span className="text-muted-foreground text-xs">({formatPace(s)}/km)</span>
+                    <span className="font-semibold text-sm">{formatPace(s)} /km</span>
+                    <span className="text-muted-foreground text-xs">({s.toFixed(1)} km/h)</span>
                   </div>
                   <span className="text-xs text-muted-foreground font-mono">{protocol.stepDuration} min</span>
                 </div>
@@ -180,8 +181,8 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
 
           <h4 className="text-lg font-semibold mb-4 mt-6">Testverloop</h4>
           <ProtocolStep num="1" title="Rustmeting" desc="Meet rustlactaat vóór de warming-up. Dit is je baseline. Normaal: 0.5–1.5 mmol/L. Bij >2.5 mmol/L: check voeding/stress." />
-          <ProtocolStep num="2" title="Warming-up (15 min)" desc="Lichte jog op 60-65% HFmax (~8 km/h). Bouw op tot licht bezweet. Eindig met 2–3 korte versnellingen (10s)." />
-          <ProtocolStep num="3" title={`Stappen van ${protocol.stepDuration} minuten`} desc={`Loop ${protocol.stepDuration} minuten per stap. Start op ${protocol.startSpeed} km/h, verhoog met ${protocol.stepIncrement} km/h per stap. Na elke stap: 30s pauze voor bloedafname.`} />
+          <ProtocolStep num="2" title="Warming-up (15 min)" desc={`Lichte jog op 60-65% HFmax (~${formatPace(8)} /km). Bouw op tot licht bezweet. Eindig met 2–3 korte versnellingen (10s).`} />
+          <ProtocolStep num="3" title={`Stappen van ${protocol.stepDuration} minuten`} desc={`Loop ${protocol.stepDuration} minuten per stap. Start op ${formatPace(protocol.startSpeed)} /km, verhoog met ${protocol.stepIncrement} km/h per stap. Na elke stap: 30s pauze voor bloedafname.`} />
           <ProtocolStep num="4" title="Bloedafname" desc="Reinig de prikplaats met alcohol. Prik, veeg eerste druppel weg, test de tweede druppel. Noteer: lactaat (mmol/L), hartslag (einde stap), RPE (1-10)." />
           {protocol.allOutEnabled && (
             <ProtocolStep num="5" title={`All-out: ${protocol.allOutDistance}m`} desc={`Na de laatste reguliere stap: maximale inspanning over ${protocol.allOutDistance}m (max ${protocol.allOutDuration}s). Meet hartslag en lactaat direct na afloop en na 1 min rust.`} />

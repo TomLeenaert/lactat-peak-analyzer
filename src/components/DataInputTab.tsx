@@ -130,7 +130,7 @@ const DataInputTab = ({
             <Input type="number" value={stepDuration} onChange={e => setStepDuration(e.target.value)} min={3} max={8} />
           </div>
           <div>
-            <Label>Stap-increment (km/h)</Label>
+            <Label>Stap-increment</Label>
             <Input type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
           </div>
         </div>
@@ -141,11 +141,11 @@ const DataInputTab = ({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-16">Stap</TableHead>
-                <TableHead>Snelheid (km/h)</TableHead>
+                <TableHead>Tempo (min/km)</TableHead>
                 <TableHead>Lactaat (mmol/L)</TableHead>
                 <TableHead>Hartslag (bpm)</TableHead>
                 <TableHead>Watt (W)</TableHead>
-                <TableHead>Tempo (min/km)</TableHead>
+                <TableHead>Snelheid (km/h)</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -153,9 +153,7 @@ const DataInputTab = ({
               {testData.map((row, i) => (
                 <TableRow key={i}>
                   <TableCell className="font-mono">{i + 1}</TableCell>
-                  <TableCell>
-                    <Input type="number" step="0.5" className="w-20 font-mono text-center" value={row.speed || ''} onChange={e => updateRow(i, 'speed', e.target.value)} />
-                  </TableCell>
+                  <TableCell className="font-mono font-semibold">{row.speed > 0 ? formatPace(row.speed) : '-'}</TableCell>
                   <TableCell>
                     <Input type="number" step="0.1" className="w-20 font-mono text-center" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} />
                   </TableCell>
@@ -165,7 +163,9 @@ const DataInputTab = ({
                   <TableCell>
                     <Input type="number" className="w-20 font-mono text-center" value={row.watt || ''} onChange={e => updateRow(i, 'watt', e.target.value)} />
                   </TableCell>
-                  <TableCell className="font-mono">{row.speed > 0 ? formatPace(row.speed) : '-'}</TableCell>
+                  <TableCell>
+                    <Input type="number" step="0.5" className="w-20 font-mono text-center" value={row.speed || ''} onChange={e => updateRow(i, 'speed', e.target.value)} />
+                  </TableCell>
                   <TableCell>
                     <Button variant="destructive" size="sm" onClick={() => removeRow(i)}>✕</Button>
                   </TableCell>
