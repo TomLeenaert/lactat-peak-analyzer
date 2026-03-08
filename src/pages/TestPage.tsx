@@ -15,7 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 const QUICK_PROTOCOL: ProtocolSettings = {
   startSpeed: 10,
   stepIncrement: 1.5,
-  stepDuration: 3,
+  paceIncrementSec: 30,
+  stepDistance: 1200,
   numberOfSteps: 4,
   allOutEnabled: false,
   allOutDistance: 800,
@@ -38,21 +39,26 @@ const TestPage = () => {
   const [athleteName, setAthleteName] = useState('');
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
   const [restingLactate, setRestingLactate] = useState('');
-  const [stepDuration, setStepDuration] = useState(String(defaultProtocol.stepDuration));
+  const [stepDistance, setStepDistance] = useState(String(defaultProtocol.stepDistance));
   const [stepIncrement, setStepIncrement] = useState(String(defaultProtocol.stepIncrement));
   const [results, setResults] = useState<CalculationResults | null>(null);
 
   const onGenerateSteps = useCallback(() => {
-    const steps: StepData[] = Array.from({ length: protocol.numberOfSteps }, (_, i) => ({
-      speed: protocol.startSpeed + i * protocol.stepIncrement,
-      lactate: 0, hr: 0, watt: 0,
-    }));
+    const steps: StepData[] = [];
+    let currentSpeed = protocol.startSpeed;
+    for (let i = 0; i < protocol.numberOfSteps; i++) {
+      steps.push({ speed: currentSpeed, lactate: 0, hr: 0, watt: 0 });
+      const currentPaceMin = 60 / currentSpeed;
+      const nextPaceMin = currentPaceMin - protocol.paceIncrementSec / 60;
+      if (nextPaceMin <= 0) break;
+      currentSpeed = 60 / nextPaceMin;
+    }
     if (protocol.allOutEnabled) steps.push({ speed: 0, lactate: 0, hr: 0, watt: 0 });
     setTestData(steps);
-    setStepDuration(String(protocol.stepDuration));
+    setStepDistance(String(protocol.stepDistance));
     setStepIncrement(String(protocol.stepIncrement));
     setActiveTab('data');
-    toast({ title: 'Stappen gegenereerd', description: `${protocol.numberOfSteps} stappen klaargezet.` });
+    toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen klaargezet.` });
   }, [protocol, toast]);
 
   const onCalculate = useCallback(() => {
@@ -99,7 +105,7 @@ const TestPage = () => {
                 athleteName={athleteName} setAthleteName={setAthleteName}
                 testDate={testDate} setTestDate={setTestDate}
                 restingLactate={restingLactate} setRestingLactate={setRestingLactate}
-                stepDuration={stepDuration} setStepDuration={setStepDuration}
+                stepDistance={stepDistance} setStepDistance={setStepDistance}
                 stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
                 onCalculate={onCalculate}
               />

@@ -15,8 +15,8 @@ interface DataInputTabProps {
   setTestDate: (v: string) => void;
   restingLactate: string;
   setRestingLactate: (v: string) => void;
-  stepDuration: string;
-  setStepDuration: (v: string) => void;
+  stepDistance: string;
+  setStepDistance: (v: string) => void;
   stepIncrement: string;
   setStepIncrement: (v: string) => void;
   onCalculate: () => void;
@@ -49,7 +49,7 @@ const DataInputTab = ({
   athleteName, setAthleteName,
   testDate, setTestDate,
   restingLactate, setRestingLactate,
-  stepDuration, setStepDuration,
+  stepDistance, setStepDistance,
   stepIncrement, setStepIncrement,
   onCalculate,
 }: DataInputTabProps) => {
@@ -58,7 +58,7 @@ const DataInputTab = ({
     setAthleteName('Voorbeeld Atleet');
     setTestDate('2026-03-08');
     setRestingLactate('1.0');
-    setStepDuration('5');
+    setStepDistance('1600');
     setStepIncrement('1');
     setTestData([...EXAMPLE_DATA]);
   };
@@ -67,7 +67,7 @@ const DataInputTab = ({
     setAthleteName('Testatleet 1600m');
     setTestDate('2026-03-08');
     setRestingLactate('1.3');
-    setStepDuration('5');
+    setStepDistance('1600');
     setStepIncrement('0.5');
     setTestData([...TEST_DATA]);
   };
@@ -76,7 +76,7 @@ const DataInputTab = ({
     setAthleteName('');
     setTestDate(new Date().toISOString().split('T')[0]);
     setRestingLactate('');
-    setStepDuration('5');
+    setStepDistance('1600');
     setStepIncrement('1');
     setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 })));
   };
@@ -127,8 +127,8 @@ const DataInputTab = ({
             <Input type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="bv. 1.0" />
           </div>
           <div>
-            <Label>Stapduur (min)</Label>
-            <Input type="number" value={stepDuration} onChange={e => setStepDuration(e.target.value)} min={3} max={8} />
+            <Label>Stapafstand (m)</Label>
+            <Input type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
           </div>
           <div>
             <Label>Stap-increment</Label>
