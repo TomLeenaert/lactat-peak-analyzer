@@ -63,7 +63,6 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
               <TableRow>
                 <TableHead>Zone</TableHead>
                 <TableHead>Beschrijving</TableHead>
-                <TableHead>Snelheid</TableHead>
                 <TableHead>Tempo</TableHead>
                 <TableHead>Hartslag</TableHead>
                 <TableHead>Lactaat</TableHead>
