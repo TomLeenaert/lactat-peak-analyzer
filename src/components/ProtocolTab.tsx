@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { ProtocolSettings } from '@/lib/protocol-types';
 import { formatPace, type StepData } from '@/lib/lactate-math';
+import PaceInput from './PaceInput';
 
 interface ProtocolTabProps {
   protocol: ProtocolSettings;
