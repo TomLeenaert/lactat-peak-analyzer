@@ -89,7 +89,7 @@ const DataInputTab = ({
   const addRow = () => {
     const lastSpeed = testData.length > 0 ? testData[testData.length - 1].speed : 0;
     const inc = parseFloat(stepIncrement) || 1;
-    setTestData([...testData, { speed: lastSpeed > 0 ? lastSpeed + inc : 0, lactate: 0, hr: 0 }]);
+    setTestData([...testData, { speed: lastSpeed > 0 ? lastSpeed + inc : 0, lactate: 0, hr: 0, watt: 0 }]);
   };
 
   const removeRow = (i: number) => {
