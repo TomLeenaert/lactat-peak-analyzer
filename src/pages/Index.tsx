@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Monitor, Smartphone } from 'lucide-react';
 import ProtocolTab from '@/components/ProtocolTab';
 import DataInputTab from '@/components/DataInputTab';
 import ResultsTab from '@/components/ResultsTab';
@@ -22,6 +24,7 @@ const Index = () => {
   const [stepDuration, setStepDuration] = useState('5');
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const onGenerateSteps = useCallback(() => {
     const steps: StepData[] = Array.from({ length: protocol.numberOfSteps }, (_, i) => ({
@@ -54,10 +57,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-[900px] mx-auto px-4 py-6 md:px-6 md:py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">🔬 Lactaat Inspanningstest</h1>
-          <p className="text-lg text-muted-foreground mt-1">Volledig protocol, berekening & trainingszones</p>
+      <div className={`mx-auto px-4 py-6 md:px-6 md:py-8 ${viewMode === 'mobile' ? 'max-w-[480px]' : 'max-w-[900px]'}`}>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">🔬 Lactaat Inspanningstest</h1>
+            <p className="text-lg text-muted-foreground mt-1">Volledig protocol, berekening & trainingszones</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewMode(v => v === 'desktop' ? 'mobile' : 'desktop')}
+            className="flex items-center gap-2 shrink-0"
+          >
+            {viewMode === 'desktop' ? <Monitor className="h-4 w-4" /> : <Smartphone className="h-4 w-4" />}
+            {viewMode === 'desktop' ? 'Desktop friendly' : 'Mobile friendly'}
+          </Button>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
