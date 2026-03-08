@@ -67,7 +67,7 @@ const DataInputTab = ({
     setAthleteName('Testatleet 1600m');
     setTestDate('2026-03-08');
     setRestingLactate('1.3');
-    setStepDuration('5');
+    setStepDistance('1600');
     setStepIncrement('0.5');
     setTestData([...TEST_DATA]);
   };
