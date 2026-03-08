@@ -62,6 +62,15 @@ const DataInputTab = ({
     setTestData([...EXAMPLE_DATA]);
   };
 
+  const loadTestData = () => {
+    setAthleteName('Testatleet 1600m');
+    setTestDate('2026-03-08');
+    setRestingLactate('1.3');
+    setStepDuration('5');
+    setStepIncrement('0.5');
+    setTestData([...TEST_DATA]);
+  };
+
   const clearData = () => {
     setAthleteName('');
     setTestDate(new Date().toISOString().split('T')[0]);
