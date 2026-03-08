@@ -146,8 +146,8 @@ const AthleteDetail = () => {
                     return (
                       <TableRow key={t.id} className="cursor-pointer" onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}>
                         <TableCell>{t.test_date}</TableCell>
-                        <TableCell>{r?.lt1Speed != null ? `${r.lt1Speed.toFixed(1)} km/h` : '—'}</TableCell>
-                        <TableCell>{r?.lt2Speed != null ? `${r.lt2Speed.toFixed(1)} km/h` : '—'}</TableCell>
+                        <TableCell>{r?.lt1Speed != null ? `${formatPace(r.lt1Speed)} /km` : '—'}</TableCell>
+                        <TableCell>{r?.lt2Speed != null ? `${formatPace(r.lt2Speed)} /km` : '—'}</TableCell>
                         <TableCell>{steps?.length ?? '—'}</TableCell>
                         <TableCell>
                           <Button
