@@ -118,11 +118,10 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Snelheid</TableHead>
+                <TableHead>Tempo</TableHead>
                 <TableHead>Gemeten</TableHead>
                 <TableHead>Fit</TableHead>
                 <TableHead>Verschil</TableHead>
-                <TableHead>Tempo</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,11 +130,10 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
                 const diff = results.lactates[i] - fitted;
                 return (
                   <TableRow key={i}>
-                    <TableCell className="font-mono">{s} km/h</TableCell>
+                    <TableCell className="font-mono">{formatPace(s)} /km</TableCell>
                     <TableCell className="font-mono">{results.lactates[i].toFixed(1)}</TableCell>
                     <TableCell className="font-mono">{fitted.toFixed(2)}</TableCell>
                     <TableCell className="font-mono">{diff >= 0 ? '+' : ''}{diff.toFixed(2)}</TableCell>
-                    <TableCell className="font-mono">{formatPace(s)}</TableCell>
                   </TableRow>
                 );
               })}

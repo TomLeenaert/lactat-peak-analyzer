@@ -65,7 +65,7 @@ const LactateChart = ({ results }: LactateChartProps) => {
 
           {/* LT2 vertical */}
           {lt2.best >= xMin && lt2.best <= xMax && (
-            <ReferenceLine x={parseFloat(lt2.best.toFixed(1))} stroke="#f97316" strokeDasharray="6 4" label={{ value: `LT2 ${lt2.best.toFixed(1)}`, position: 'top', className: 'fill-orange-500 text-[11px] font-bold' }} />
+            <ReferenceLine x={parseFloat(lt2.best.toFixed(1))} stroke="#f97316" strokeDasharray="6 4" label={{ value: `LT2 ${formatPace(lt2.best)}`, position: 'top', className: 'fill-orange-500 text-[11px] font-bold' }} />
           )}
 
           {/* Polynomial curve */}
