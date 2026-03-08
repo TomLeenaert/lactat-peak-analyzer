@@ -77,7 +77,7 @@ const DataInputTab = ({
     setRestingLactate('');
     setStepDuration('5');
     setStepIncrement('1');
-    setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0 })));
+    setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 })));
   };
 
   const updateRow = (i: number, field: keyof StepData, val: string) => {
