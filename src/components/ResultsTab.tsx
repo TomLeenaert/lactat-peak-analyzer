@@ -86,7 +86,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
               variant="warning"
               label="Beste schatting (Modified Dmax)"
               value={`${formatPace(lt2.best)} /km`}
-              detail={`${lt2.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
+              detail={`${lt2.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt2.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 4.0</MethodTag> {formatThreshold(lt2.obla)}</p>

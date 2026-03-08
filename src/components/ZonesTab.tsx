@@ -92,6 +92,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
                     <TableCell className="text-sm">{z.desc}</TableCell>
                     <TableCell className="font-mono">{formatPace(z.to)} – {formatPace(z.from)} /km</TableCell>
                     <TableCell className="font-mono">{hrFrom} – {hrTo} bpm</TableCell>
+                    {hasWatts && <TableCell className="font-mono">{wattFrom} – {wattTo} W</TableCell>}
                     <TableCell className="font-mono">{lacFrom} – {lacTo}</TableCell>
                   </TableRow>
                 );
