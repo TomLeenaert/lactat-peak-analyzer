@@ -51,7 +51,7 @@ const LactateChart = ({ results }: LactateChartProps) => {
             formatter={(value: number, name: string) => [
               `${value.toFixed(1)} ${name === 'fit' ? 'mmol/L (fit)' : 'mmol/L'}`,
             ]}
-            labelFormatter={(v: number) => `${v} km/h (${formatPace(v)}/km)`}
+            labelFormatter={(v: number) => `${formatPace(v)} /km (${v} km/h)`}
           />
 
           {/* OBLA lines */}
