@@ -49,7 +49,7 @@ const DataInputTab = ({
   athleteName, setAthleteName,
   testDate, setTestDate,
   restingLactate, setRestingLactate,
-  stepDuration, setStepDuration,
+  stepDistance, setStepDistance,
   stepIncrement, setStepIncrement,
   onCalculate,
 }: DataInputTabProps) => {
