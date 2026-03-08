@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { type CalculationResults, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
+import { type CalculationResults, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
 
 interface ResultsTabProps {
@@ -47,8 +47,9 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
     );
   }
 
-  const { lt1, lt2, speeds, hrs, coeffs, r2 } = results;
+  const { lt1, lt2, speeds, hrs, watts, coeffs, r2 } = results;
   const [a, b, c, d] = coeffs;
+  const hasWatts = watts.some(w => w > 0);
 
   return (
     <div className="space-y-6">
@@ -68,7 +69,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
               variant="success"
               label="Beste schatting (Baseline+0.5)"
               value={`${formatPace(lt1.best)} /km`}
-              detail={`${lt1.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
+              detail={`${lt1.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt1.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 2.0</MethodTag> {formatThreshold(lt1.obla)}</p>
@@ -85,7 +86,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
               variant="warning"
               label="Beste schatting (Modified Dmax)"
               value={`${formatPace(lt2.best)} /km`}
-              detail={`${lt2.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
+              detail={`${lt2.best.toFixed(1)} km/h · HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt2.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
             />
             <div className="text-sm space-y-2 mt-4">
               <p><MethodTag type="obla">OBLA 4.0</MethodTag> {formatThreshold(lt2.obla)}</p>

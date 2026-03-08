@@ -4,6 +4,7 @@ export interface StepData {
   speed: number;
   lactate: number;
   hr: number;
+  watt: number;
 }
 
 export interface LT1Results {
@@ -26,6 +27,7 @@ export interface CalculationResults {
   speeds: number[];
   lactates: number[];
   hrs: number[];
+  watts: number[];
   restLac: number;
   minActiveLac: number;
   lt1: LT1Results;
@@ -138,6 +140,20 @@ export function interpolateHR(speed: number, speeds: number[], hrs: number[]): n
   return hrs[hrs.length - 1];
 }
 
+export function interpolateWatt(speed: number, speeds: number[], watts: number[]): number {
+  const validWatts = watts.filter(w => w > 0);
+  if (validWatts.length === 0) return 0;
+  if (speed <= speeds[0]) return watts[0];
+  if (speed >= speeds[speeds.length - 1]) return watts[watts.length - 1];
+  for (let i = 0; i < speeds.length - 1; i++) {
+    if (speed >= speeds[i] && speed <= speeds[i + 1]) {
+      const frac = (speed - speeds[i]) / (speeds[i + 1] - speeds[i]);
+      return Math.round(watts[i] + frac * (watts[i + 1] - watts[i]));
+    }
+  }
+  return watts[watts.length - 1];
+}
+
 export function formatPace(speedKmh: number): string {
   if (!speedKmh || speedKmh <= 0) return '-';
   const minPerKm = 60 / speedKmh;
@@ -171,6 +187,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const speeds = valid.map(r => r.speed);
   const lactates = valid.map(r => r.lactate);
   const hrs = valid.map(r => r.hr);
+  const watts = valid.map(r => r.watt || 0);
   const restLac = restingLactate || lactates[0];
 
   const coeffs = polyFit3(speeds, lactates);
@@ -260,7 +277,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt2_best = lt2_moddmax || lt2_dmax || lt2_obla || xMax;
 
   return {
-    coeffs, r2, speeds, lactates, hrs, restLac, minActiveLac,
+    coeffs, r2, speeds, lactates, hrs, watts, restLac, minActiveLac,
     lt1: { obla: lt1_obla, bsln: lt1_bsln, loglog: lt1_loglog, best: lt1_best },
     lt2: { obla: lt2_obla, dmax: lt2_dmax, moddmax: lt2_moddmax, best: lt2_best },
     modStartIdx,

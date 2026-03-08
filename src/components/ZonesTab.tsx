@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
+import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
 import {
   ComposedChart, Line, Scatter, XAxis, YAxis, CartesianGrid, ReferenceLine,
   ResponsiveContainer, Tooltip, Label,
@@ -22,7 +22,8 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
   }
 
   const zones = getZones(results);
-  const { speeds, hrs, lt1, lt2, coeffs } = results;
+  const { speeds, hrs, watts, lt1, lt2, coeffs } = results;
+  const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
 
   // HR chart data
@@ -65,6 +66,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
                 <TableHead>Beschrijving</TableHead>
                 <TableHead>Tempo</TableHead>
                 <TableHead>Hartslag</TableHead>
+                {hasWatts && <TableHead>Watt</TableHead>}
                 <TableHead>Lactaat</TableHead>
               </TableRow>
             </TableHeader>
@@ -72,6 +74,8 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
               {zones.map(z => {
                 const hrFrom = interpolateHR(z.from, speeds, hrs);
                 const hrTo = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
+                const wattFrom = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
+                const wattTo = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
                 const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
                 const lacTo = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
                 return (
@@ -88,6 +92,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
                     <TableCell className="text-sm">{z.desc}</TableCell>
                     <TableCell className="font-mono">{formatPace(z.to)} – {formatPace(z.from)} /km</TableCell>
                     <TableCell className="font-mono">{hrFrom} – {hrTo} bpm</TableCell>
+                    {hasWatts && <TableCell className="font-mono">{wattFrom} – {wattTo} W</TableCell>}
                     <TableCell className="font-mono">{lacFrom} – {lacTo}</TableCell>
                   </TableRow>
                 );

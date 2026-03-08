@@ -22,25 +22,25 @@ interface DataInputTabProps {
 }
 
 const EXAMPLE_DATA: StepData[] = [
-  { speed: 9, lactate: 0.9, hr: 128 },
-  { speed: 10, lactate: 1.0, hr: 138 },
-  { speed: 11, lactate: 1.2, hr: 148 },
-  { speed: 12, lactate: 1.5, hr: 155 },
-  { speed: 13, lactate: 2.1, hr: 163 },
-  { speed: 14, lactate: 3.0, hr: 171 },
-  { speed: 15, lactate: 4.5, hr: 178 },
-  { speed: 16, lactate: 7.2, hr: 186 },
+  { speed: 9, lactate: 0.9, hr: 128, watt: 180 },
+  { speed: 10, lactate: 1.0, hr: 138, watt: 210 },
+  { speed: 11, lactate: 1.2, hr: 148, watt: 240 },
+  { speed: 12, lactate: 1.5, hr: 155, watt: 270 },
+  { speed: 13, lactate: 2.1, hr: 163, watt: 300 },
+  { speed: 14, lactate: 3.0, hr: 171, watt: 330 },
+  { speed: 15, lactate: 4.5, hr: 178, watt: 360 },
+  { speed: 16, lactate: 7.2, hr: 186, watt: 390 },
 ];
 
 // Echte testdata: 1600m stappen, tempo → snelheid (km/h)
 const TEST_DATA: StepData[] = [
-  { speed: 13.19, lactate: 1.8, hr: 140 },  // 4:33/km
-  { speed: 13.69, lactate: 1.7, hr: 146 },  // 4:23/km
-  { speed: 14.12, lactate: 1.3, hr: 152 },  // 4:15/km
-  { speed: 14.88, lactate: 2.7, hr: 160 },  // 4:02/km
-  { speed: 15.06, lactate: 2.3, hr: 164 },  // 3:59/km
-  { speed: 15.72, lactate: 3.8, hr: 167 },  // 3:49/km
-  { speed: 16.29, lactate: 5.8, hr: 176 },  // 3:41/km
+  { speed: 13.19, lactate: 1.8, hr: 140, watt: 260 },
+  { speed: 13.69, lactate: 1.7, hr: 146, watt: 275 },
+  { speed: 14.12, lactate: 1.3, hr: 152, watt: 290 },
+  { speed: 14.88, lactate: 2.7, hr: 160, watt: 310 },
+  { speed: 15.06, lactate: 2.3, hr: 164, watt: 320 },
+  { speed: 15.72, lactate: 3.8, hr: 167, watt: 340 },
+  { speed: 16.29, lactate: 5.8, hr: 176, watt: 360 },
 ];
 
 const DataInputTab = ({
@@ -77,7 +77,7 @@ const DataInputTab = ({
     setRestingLactate('');
     setStepDuration('5');
     setStepIncrement('1');
-    setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0 })));
+    setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 })));
   };
 
   const updateRow = (i: number, field: keyof StepData, val: string) => {
@@ -89,7 +89,7 @@ const DataInputTab = ({
   const addRow = () => {
     const lastSpeed = testData.length > 0 ? testData[testData.length - 1].speed : 0;
     const inc = parseFloat(stepIncrement) || 1;
-    setTestData([...testData, { speed: lastSpeed > 0 ? lastSpeed + inc : 0, lactate: 0, hr: 0 }]);
+    setTestData([...testData, { speed: lastSpeed > 0 ? lastSpeed + inc : 0, lactate: 0, hr: 0, watt: 0 }]);
   };
 
   const removeRow = (i: number) => {
@@ -144,6 +144,7 @@ const DataInputTab = ({
                 <TableHead>Snelheid (km/h)</TableHead>
                 <TableHead>Lactaat (mmol/L)</TableHead>
                 <TableHead>Hartslag (bpm)</TableHead>
+                <TableHead>Watt (W)</TableHead>
                 <TableHead>Tempo (min/km)</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
@@ -160,6 +161,9 @@ const DataInputTab = ({
                   </TableCell>
                   <TableCell>
                     <Input type="number" className="w-20 font-mono text-center" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} />
+                  </TableCell>
+                  <TableCell>
+                    <Input type="number" className="w-20 font-mono text-center" value={row.watt || ''} onChange={e => updateRow(i, 'watt', e.target.value)} />
                   </TableCell>
                   <TableCell className="font-mono">{row.speed > 0 ? formatPace(row.speed) : '-'}</TableCell>
                   <TableCell>

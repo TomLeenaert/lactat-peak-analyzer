@@ -14,7 +14,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('protocol');
   const [protocol, setProtocol] = useState<ProtocolSettings>(DEFAULT_PROTOCOL);
   const [testData, setTestData] = useState<StepData[]>(
-    Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0 }))
+    Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 }))
   );
   const [athleteName, setAthleteName] = useState('');
   const [testDate, setTestDate] = useState(new Date().toISOString().split('T')[0]);
@@ -28,10 +28,11 @@ const Index = () => {
       speed: protocol.startSpeed + i * protocol.stepIncrement,
       lactate: 0,
       hr: 0,
+      watt: 0,
     }));
     if (protocol.allOutEnabled) {
       // Add all-out row with speed 0 (to be filled by user)
-      steps.push({ speed: 0, lactate: 0, hr: 0 });
+      steps.push({ speed: 0, lactate: 0, hr: 0, watt: 0 });
     }
     setTestData(steps);
     setStepDuration(String(protocol.stepDuration));
