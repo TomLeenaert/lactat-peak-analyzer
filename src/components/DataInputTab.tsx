@@ -153,9 +153,7 @@ const DataInputTab = ({
               {testData.map((row, i) => (
                 <TableRow key={i}>
                   <TableCell className="font-mono">{i + 1}</TableCell>
-                  <TableCell>
-                    <Input type="number" step="0.5" className="w-20 font-mono text-center" value={row.speed || ''} onChange={e => updateRow(i, 'speed', e.target.value)} />
-                  </TableCell>
+                  <TableCell className="font-mono font-semibold">{row.speed > 0 ? formatPace(row.speed) : '-'}</TableCell>
                   <TableCell>
                     <Input type="number" step="0.1" className="w-20 font-mono text-center" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} />
                   </TableCell>
