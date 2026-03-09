@@ -186,6 +186,10 @@ const DataInputTab = ({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <CardTitle className="text-lg">Testgegevens invoeren</CardTitle>
           <div className="flex gap-2 flex-wrap">
+            <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+              <Upload className="h-3.5 w-3.5 mr-1" /> JSON
+            </Button>
+            <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
             <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld</Button>
             <Button variant="secondary" size="sm" onClick={loadTestData}>🧪 Testdata</Button>
             <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
