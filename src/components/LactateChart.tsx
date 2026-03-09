@@ -12,85 +12,121 @@ interface LactateChartProps {
 const LactateChart = ({ results }: LactateChartProps) => {
   const { speeds, lactates, coeffs, lt1, lt2 } = results;
 
-  const xMin = speeds[0] - 0.5;
-  const xMax = speeds[speeds.length - 1] + 0.5;
-  const yMax = Math.ceil(Math.max(...lactates) * 1.2);
+  const xMin = speeds[0] - 0.3;
+  const xMax = speeds[speeds.length - 1] + 0.3;
+  const maxLactate = Math.max(...lactates);
+  const yMax = Math.ceil(maxLactate * 1.3);
 
   // Generate polynomial curve data
   const curveData = useMemo(() => {
     const points = [];
-    const steps = 100;
+    const steps = 200;
     for (let i = 0; i <= steps; i++) {
       const x = xMin + (i / steps) * (xMax - xMin);
-      points.push({ speed: parseFloat(x.toFixed(2)), fit: parseFloat(polyEval(coeffs, x).toFixed(2)) });
+      const y = polyEval(coeffs, x);
+      // Clamp to avoid wild polynomial tails
+      if (y >= -0.5 && y <= yMax + 1) {
+        points.push({ speed: parseFloat(x.toFixed(3)), fit: parseFloat(y.toFixed(2)) });
+      }
     }
     return points;
-  }, [coeffs, xMin, xMax]);
+  }, [coeffs, xMin, xMax, yMax]);
 
   // Scatter data (actual measurements)
   const scatterData = speeds.map((s, i) => ({ speed: s, lactate: lactates[i] }));
 
+  // Generate pace ticks from actual data range
+  const paceTickValues = useMemo(() => {
+    const ticks: number[] = [];
+    const start = Math.floor(xMin * 2) / 2;
+    const end = Math.ceil(xMax * 2) / 2;
+    for (let v = start; v <= end; v += 0.5) {
+      ticks.push(parseFloat(v.toFixed(1)));
+    }
+    return ticks;
+  }, [xMin, xMax]);
+
   return (
-    <div className="w-full h-[350px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart margin={{ top: 10, right: 20, bottom: 40, left: 10 }}>
-          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-          <XAxis
-            dataKey="speed"
-            type="number"
-            domain={[xMin, xMax]}
-            tickFormatter={(v: number) => formatPace(v)}
-            allowDuplicatedCategory={false}
-          >
-            <Label value="Tempo (min/km)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />
-          </XAxis>
-          <YAxis domain={[0, yMax]}>
-            <Label value="Lactaat (mmol/L)" angle={-90} position="insideLeft" offset={0} className="fill-muted-foreground text-xs" />
-          </YAxis>
-          <Tooltip
-            formatter={(value: number, name: string) => [
-              `${value.toFixed(1)} ${name === 'fit' ? 'mmol/L (fit)' : 'mmol/L'}`,
-            ]}
-            labelFormatter={(v: number) => `${formatPace(v)} /km`}
-          />
+    <div className="w-full">
+      <div className="w-full h-[400px] sm:h-[450px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart margin={{ top: 30, right: 50, bottom: 50, left: 15 }}>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
+            <XAxis
+              dataKey="speed"
+              type="number"
+              domain={[xMin, xMax]}
+              ticks={paceTickValues}
+              tickFormatter={(v: number) => formatPace(v)}
+              allowDuplicatedCategory={false}
+              tick={{ fontSize: 11 }}
+            >
+              <Label value="Tempo (min/km)" position="bottom" offset={25} className="fill-muted-foreground text-xs" />
+            </XAxis>
+            <YAxis
+              domain={[0, yMax]}
+              tick={{ fontSize: 11 }}
+              width={50}
+            >
+              <Label value="Lactaat (mmol/L)" angle={-90} position="insideLeft" offset={5} className="fill-muted-foreground text-xs" />
+            </YAxis>
+            <Tooltip
+              formatter={(value: number, name: string) => [
+                `${value.toFixed(1)} ${name === 'fit' ? 'mmol/L (fit)' : 'mmol/L'}`,
+              ]}
+              labelFormatter={(v: number) => `${formatPace(v)} /km`}
+            />
 
-          {/* OBLA lines */}
-          <ReferenceLine y={2} stroke="#a3e635" strokeDasharray="3 3" label={{ value: '2 mmol/L', position: 'right', className: 'fill-green-400 text-[10px]' }} />
-          <ReferenceLine y={4} stroke="#fb923c" strokeDasharray="3 3" label={{ value: '4 mmol/L', position: 'right', className: 'fill-orange-400 text-[10px]' }} />
+            {/* OBLA lines */}
+            <ReferenceLine y={2} stroke="hsl(142, 71%, 45%)" strokeDasharray="4 4" strokeWidth={1.5}>
+              <Label value="2 mmol/L" position="right" offset={8} fill="hsl(142, 71%, 45%)" fontSize={10} />
+            </ReferenceLine>
+            <ReferenceLine y={4} stroke="hsl(25, 95%, 53%)" strokeDasharray="4 4" strokeWidth={1.5}>
+              <Label value="4 mmol/L" position="right" offset={8} fill="hsl(25, 95%, 53%)" fontSize={10} />
+            </ReferenceLine>
 
-          {/* LT1 vertical */}
-          {lt1.best >= xMin && lt1.best <= xMax && (
-            <ReferenceLine x={parseFloat(lt1.best.toFixed(1))} stroke="#34d399" strokeDasharray="6 4" label={{ value: `LT1 ${formatPace(lt1.best)}`, position: 'top', className: 'fill-green-400 text-[11px] font-bold' }} />
-          )}
+            {/* LT1 vertical */}
+            {lt1.best >= xMin && lt1.best <= xMax && (
+              <ReferenceLine x={lt1.best} stroke="hsl(160, 60%, 50%)" strokeDasharray="8 4" strokeWidth={1.5}>
+                <Label value={`LT1 ${formatPace(lt1.best)}`} position="top" offset={8} fill="hsl(160, 60%, 50%)" fontSize={11} fontWeight="bold" />
+              </ReferenceLine>
+            )}
 
-          {/* LT2 vertical */}
-          {lt2.best >= xMin && lt2.best <= xMax && (
-            <ReferenceLine x={parseFloat(lt2.best.toFixed(1))} stroke="#f97316" strokeDasharray="6 4" label={{ value: `LT2 ${formatPace(lt2.best)}`, position: 'top', className: 'fill-orange-500 text-[11px] font-bold' }} />
-          )}
+            {/* LT2 vertical */}
+            {lt2.best >= xMin && lt2.best <= xMax && (
+              <ReferenceLine x={lt2.best} stroke="hsl(25, 85%, 50%)" strokeDasharray="8 4" strokeWidth={1.5}>
+                <Label value={`LT2 ${formatPace(lt2.best)}`} position="top" offset={8} fill="hsl(25, 85%, 50%)" fontSize={11} fontWeight="bold" />
+              </ReferenceLine>
+            )}
 
-          {/* Polynomial curve */}
-          <Line
-            data={curveData}
-            dataKey="fit"
-            type="monotone"
-            stroke="hsl(var(--primary))"
-            strokeWidth={2.5}
-            dot={false}
-            name="Polynoomfit"
-          />
+            {/* Polynomial curve */}
+            <Line
+              data={curveData}
+              dataKey="fit"
+              type="monotone"
+              stroke="hsl(var(--primary))"
+              strokeWidth={2.5}
+              dot={false}
+              name="Polynoomfit"
+              isAnimationActive={false}
+            />
 
-          {/* Data points */}
-          <Scatter
-            data={scatterData}
-            dataKey="lactate"
-            fill="hsl(var(--primary))"
-            stroke="hsl(var(--card))"
-            strokeWidth={2}
-            r={5}
-            name="Meetwaarde"
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+            {/* Data points */}
+            <Scatter
+              data={scatterData}
+              dataKey="lactate"
+              fill="hsl(var(--primary))"
+              stroke="hsl(var(--card))"
+              strokeWidth={2}
+              r={5}
+              name="Meetwaarde"
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+      <p className="text-xs text-muted-foreground text-center mt-2">
+        Punten = meetwaarden. Doorgetrokken lijn = 3e-graads polynoomfit. Stippellijnen = drempels.
+      </p>
     </div>
   );
 };
