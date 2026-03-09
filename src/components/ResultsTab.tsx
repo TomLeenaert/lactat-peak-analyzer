@@ -72,7 +72,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
 
       <div className="grid grid-cols-1 gap-4">
         <Card>
-          <CardHeader><CardTitle>LT1 — Aerobe Drempel</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Threshold 2 mmol — Aerobe Drempel</CardTitle></CardHeader>
           <CardContent>
             <ResultBox
               variant="success"
@@ -89,7 +89,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>LT2 — Anaerobe Drempel</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Threshold 4 mmol — Anaerobe Drempel</CardTitle></CardHeader>
           <CardContent>
             <ResultBox
               variant="warning"
