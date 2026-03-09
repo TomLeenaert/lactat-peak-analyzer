@@ -202,6 +202,21 @@ const DataInputTab = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Drop zone */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/50'}`}
+        >
+          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+          <p className="text-sm font-medium text-muted-foreground">
+            Sleep een JSON bestand hierheen of klik om te uploaden
+          </p>
+          <p className="text-xs text-muted-foreground/70 mt-1">.json</p>
+        </div>
+
         {/* Meta fields */}
         <div className="grid grid-cols-2 gap-3">
           <div>
