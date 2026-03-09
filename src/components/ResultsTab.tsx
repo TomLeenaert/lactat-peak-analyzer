@@ -48,6 +48,15 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
   }
 
   const { lt1, lt2, speeds, hrs, watts, coeffs, r2 } = results;
+  if (!coeffs || !Array.isArray(coeffs)) {
+    return (
+      <Card>
+        <CardContent className="text-center text-muted-foreground py-12">
+          <p>Geen berekende resultaten beschikbaar. Ga naar het Data-tabblad en klik op "Berekenen".</p>
+        </CardContent>
+      </Card>
+    );
+  }
   const [a, b, c, d] = coeffs;
   const hasWatts = watts.some(w => w > 0);
 
