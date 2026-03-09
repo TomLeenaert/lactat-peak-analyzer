@@ -87,6 +87,47 @@ const DataInputTab = ({
   const dist = parseFloat(stepDistance) || 1600;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [isDragging, setIsDragging] = useState(false);
+
+  const processJsonFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const json = JSON.parse(ev.target?.result as string);
+        const steps: any[] = Array.isArray(json) ? json : (json.steps || json.data || []);
+        if (!steps.length) {
+          toast({ title: 'Fout', description: 'Geen stappen gevonden in JSON bestand.', variant: 'destructive' });
+          return;
+        }
+        const parsed: StepData[] = steps.map((s: any) => {
+          const distance = s.distance || s.afstand || dist;
+          const time = s.time || s.tijd || 0;
+          const speed = s.speed || s.snelheid || (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+          return { speed, lactate: s.lactate || s.lactaat || 0, hr: s.hr || s.hartslag || s.heartrate || 0, watt: s.watt || s.watts || s.power || 0, distance, time };
+        });
+        if (json.athlete || json.atleet) setAthleteName(json.athlete || json.atleet);
+        if (json.date || json.datum) setTestDate(json.date || json.datum);
+        if (json.restingLactate || json.rustlactaat) setRestingLactate(String(json.restingLactate || json.rustlactaat));
+        if (json.stepDistance || json.afstand) setStepDistance(String(json.stepDistance || json.afstand));
+        setTestData(parsed);
+        toast({ title: 'Geïmporteerd', description: `${parsed.length} stappen geladen uit JSON.` });
+      } catch {
+        toast({ title: 'Fout', description: 'Ongeldig JSON bestand.', variant: 'destructive' });
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.name.endsWith('.json')) {
+      processJsonFile(file);
+    } else {
+      toast({ title: 'Fout', description: 'Alleen JSON bestanden worden ondersteund.', variant: 'destructive' });
+    }
+  };
 
   const handleJsonImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
