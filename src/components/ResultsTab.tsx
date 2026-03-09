@@ -89,7 +89,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>LT2 — Anaerobe Drempel</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Threshold 4 mmol — Anaerobe Drempel</CardTitle></CardHeader>
           <CardContent>
             <ResultBox
               variant="warning"
