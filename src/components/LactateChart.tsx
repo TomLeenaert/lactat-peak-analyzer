@@ -88,7 +88,7 @@ const LactateChart = ({ results }: LactateChartProps) => {
             {/* LT1 vertical */}
             {lt1.best >= xMin && lt1.best <= xMax && (
               <ReferenceLine x={lt1.best} stroke="hsl(160, 60%, 50%)" strokeDasharray="8 4" strokeWidth={1.5}>
-                <Label value={`LT1 ${formatPace(lt1.best)}`} position="top" offset={8} fill="hsl(160, 60%, 50%)" fontSize={11} fontWeight="bold" />
+                <Label value={`T2mmol ${formatPace(lt1.best)}`} position="top" offset={8} fill="hsl(160, 60%, 50%)" fontSize={11} fontWeight="bold" />
               </ReferenceLine>
             )}
 
