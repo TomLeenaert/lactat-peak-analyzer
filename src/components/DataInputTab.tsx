@@ -94,7 +94,12 @@ const DataInputTab = ({
     reader.onload = (ev) => {
       try {
         const json = JSON.parse(ev.target?.result as string);
-        const steps: any[] = Array.isArray(json) ? json : (json.steps || json.data || []);
+        // Support many possible key names for the steps array
+        const steps: any[] = Array.isArray(json)
+          ? json
+          : (json.steps || json.data || json.stappen || json.testen || json.results || json.resultaten || json.inspanningstesten || json.rows || json.metingen ||
+             // Fallback: find first array property in the object
+             Object.values(json).find((v: any) => Array.isArray(v)) || []) as any[];
         if (!steps.length) {
           toast({ title: 'Fout', description: 'Geen stappen gevonden in JSON bestand.', variant: 'destructive' });
           return;
