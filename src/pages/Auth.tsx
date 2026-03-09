@@ -115,6 +115,45 @@ const Auth = () => {
               </button>
             </p>
           </div>
+          <div className="mt-6 pt-4 border-t">
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={submitting}
+              onClick={async () => {
+                setSubmitting(true);
+                try {
+                  // Try to sign in first, if fails create the account
+                  const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email: 'tom@demo.test',
+                    password: 'demo123456',
+                  });
+                  if (signInError) {
+                    // Create account
+                    const { error: signUpError } = await supabase.auth.signUp({
+                      email: 'tom@demo.test',
+                      password: 'demo123456',
+                      options: { data: { full_name: 'Tom' } },
+                    });
+                    if (signUpError) throw signUpError;
+                    // Sign in after signup
+                    const { error } = await supabase.auth.signInWithPassword({
+                      email: 'tom@demo.test',
+                      password: 'demo123456',
+                    });
+                    if (error) throw error;
+                  }
+                  navigate('/dashboard');
+                } catch (err: any) {
+                  toast({ title: 'Fout', description: err.message, variant: 'destructive' });
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            >
+              🧪 Demo: Inloggen als Tom
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
