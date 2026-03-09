@@ -1,9 +1,11 @@
+import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Upload } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -83,6 +85,51 @@ const DataInputTab = ({
   onCalculate,
 }: DataInputTabProps) => {
   const dist = parseFloat(stepDistance) || 1600;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleJsonImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const json = JSON.parse(ev.target?.result as string);
+        // Support array of steps or { steps: [...] } format
+        const steps: any[] = Array.isArray(json) ? json : (json.steps || json.data || []);
+        if (!steps.length) {
+          toast({ title: 'Fout', description: 'Geen stappen gevonden in JSON bestand.', variant: 'destructive' });
+          return;
+        }
+        const parsed: StepData[] = steps.map((s: any) => {
+          const distance = s.distance || s.afstand || dist;
+          const time = s.time || s.tijd || 0;
+          const speed = s.speed || s.snelheid || (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+          return {
+            speed,
+            lactate: s.lactate || s.lactaat || 0,
+            hr: s.hr || s.hartslag || s.heartrate || 0,
+            watt: s.watt || s.watts || s.power || 0,
+            distance,
+            time,
+          };
+        });
+        // Also fill meta fields if present in JSON
+        if (json.athlete || json.atleet) setAthleteName(json.athlete || json.atleet);
+        if (json.date || json.datum) setTestDate(json.date || json.datum);
+        if (json.restingLactate || json.rustlactaat) setRestingLactate(String(json.restingLactate || json.rustlactaat));
+        if (json.stepDistance || json.afstand) setStepDistance(String(json.stepDistance || json.afstand));
+
+        setTestData(parsed);
+        toast({ title: 'Geïmporteerd', description: `${parsed.length} stappen geladen uit JSON.` });
+      } catch {
+        toast({ title: 'Fout', description: 'Ongeldig JSON bestand.', variant: 'destructive' });
+      }
+    };
+    reader.readAsText(file);
+    // Reset so same file can be re-imported
+    e.target.value = '';
+  };
 
   const loadExample = () => {
     setAthleteName('Voorbeeld Atleet');
@@ -139,6 +186,10 @@ const DataInputTab = ({
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <CardTitle className="text-lg">Testgegevens invoeren</CardTitle>
           <div className="flex gap-2 flex-wrap">
+            <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+              <Upload className="h-3.5 w-3.5 mr-1" /> JSON
+            </Button>
+            <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
             <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld</Button>
             <Button variant="secondary" size="sm" onClick={loadTestData}>🧪 Testdata</Button>
             <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
