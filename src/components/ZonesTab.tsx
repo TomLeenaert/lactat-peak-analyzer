@@ -20,8 +20,18 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
     );
   }
 
-  const zones = getZones(results);
   const { speeds, hrs, watts, lt1, lt2, coeffs } = results;
+  if (!lt1 || !lt2 || !coeffs || !Array.isArray(coeffs)) {
+    return (
+      <Card>
+        <CardContent className="text-center text-muted-foreground py-12">
+          <p>Geen berekende resultaten beschikbaar. Ga naar het Data-tabblad en klik op "Berekenen".</p>
+        </CardContent>
+      </Card>
+    );
+  }
+  const zones = getZones(results);
+
   const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
 
