@@ -5,6 +5,8 @@ export interface StepData {
   lactate: number;
   hr: number;
   watt: number;
+  distance?: number; // meters per step (from protocol)
+  time?: number; // seconds to complete the step
 }
 
 export interface LT1Results {
