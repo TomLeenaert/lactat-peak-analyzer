@@ -39,13 +39,22 @@ const AthleteTest = () => {
       const { data, error } = await supabase.from('test_results').select('*').eq('id', testId!).single();
       if (error) throw error;
       // Restore state from saved data
-      if (data.steps_json) setTestData(data.steps_json as unknown as StepData[]);
+      const steps = data.steps_json as unknown as StepData[];
+      if (steps) setTestData(steps);
       if (data.protocol_json) setProtocol(data.protocol_json as unknown as ProtocolSettings);
-      if (data.results_json) {
+      setTestDate(data.test_date);
+
+      // Auto-calculate from steps if we have data
+      if (steps && steps.filter(r => r.speed > 0 && r.lactate > 0).length >= 4) {
+        const calcResult = calculate(steps, 0);
+        if (typeof calcResult !== 'string') {
+          setResults(calcResult);
+          setActiveTab('results');
+        }
+      } else if (data.results_json && Object.keys(data.results_json as object).length > 0) {
         setResults(data.results_json as unknown as CalculationResults);
         setActiveTab('results');
       }
-      setTestDate(data.test_date);
       return data;
     },
     enabled: !!testId,
