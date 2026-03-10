@@ -6,11 +6,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Calendar, Activity, TrendingUp, BarChart3 } from 'lucide-react';
 import type { CalculationResults } from '@/lib/lactate-math';
 
 const AthleteDetail = () => {
@@ -21,7 +21,6 @@ const AthleteDetail = () => {
   const { toast } = useToast();
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', birth_date: '', sport: '', notes: '' });
-  const [viewingTest, setViewingTest] = useState<any>(null);
 
   const { data: athlete, isLoading } = useQuery({
     queryKey: ['athlete', id],
@@ -88,33 +87,112 @@ const AthleteDetail = () => {
     setEditOpen(true);
   };
 
+  // Derive summary stats from tests
+  const latestTest = tests[0];
+  const latestResults = latestTest?.results_json as any;
+  const lastTestDate = latestTest?.test_date;
+
+  // Get latest valid LT values
+  const latestLt1 = latestResults?.lt1Speed != null ? formatPace(latestResults.lt1Speed) : null;
+  const latestLt2 = latestResults?.lt2Speed != null ? formatPace(latestResults.lt2Speed) : null;
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="max-w-[900px] mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="gap-1.5 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
+            <span className="text-sm">Alle atleten</span>
           </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">{athlete.name}</h1>
-            <p className="text-sm text-muted-foreground">{athlete.sport || 'Geen sport'}{athlete.birth_date ? ` · ${athlete.birth_date}` : ''}</p>
-          </div>
+          <div className="flex-1" />
           <Button variant="outline" size="sm" onClick={openEdit}>
             <Pencil className="h-4 w-4 mr-2" />Bewerken
           </Button>
         </div>
       </header>
 
-      <main className="max-w-[900px] mx-auto px-4 py-6">
-        {athlete.notes && (
-          <Card className="mb-6">
-            <CardContent className="py-4">
-              <p className="text-sm text-muted-foreground">{athlete.notes}</p>
+      <main className="max-w-[900px] mx-auto px-4 py-6 space-y-6">
+        {/* Profile header card */}
+        <Card>
+          <CardContent className="py-5">
+            <div className="flex items-start gap-4">
+              <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <span className="text-xl font-bold text-primary">
+                  {athlete.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl font-bold truncate">{athlete.name}</h1>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
+                  {athlete.sport && (
+                    <span className="flex items-center gap-1">
+                      <Activity className="h-3.5 w-3.5" />
+                      {athlete.sport}
+                    </span>
+                  )}
+                  {athlete.birth_date && (
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {athlete.birth_date}
+                    </span>
+                  )}
+                </div>
+                {athlete.notes && (
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{athlete.notes}</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Summary stat cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Card>
+            <CardContent className="py-4 px-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">Totaal tests</p>
+              <p className="text-2xl font-bold">{tests.length}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 px-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">Laatste test</p>
+              <p className="text-sm font-semibold">{lastTestDate || <span className="text-muted-foreground font-normal">—</span>}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 px-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">T2mmol</p>
+              {latestLt1 ? (
+                <p className="text-sm font-semibold text-green-600">{latestLt1} /km</p>
+              ) : (
+                <p className="text-sm text-muted-foreground/50 italic">Niet berekend</p>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 px-4 text-center">
+              <p className="text-xs text-muted-foreground mb-1">T4mmol</p>
+              {latestLt2 ? (
+                <p className="text-sm font-semibold text-orange-600">{latestLt2} /km</p>
+              ) : (
+                <p className="text-sm text-muted-foreground/50 italic">Niet berekend</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Evolution placeholder */}
+        {tests.length === 1 && (
+          <Card className="border-dashed">
+            <CardContent className="py-8 text-center">
+              <BarChart3 className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
+              <p className="text-sm text-muted-foreground">Voeg meer testen toe om de evolutie van drempels te zien.</p>
             </CardContent>
           </Card>
         )}
 
-        <div className="flex items-center justify-between mb-4">
+        {/* Test history */}
+        <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Testhistoriek</h2>
           <Button onClick={() => navigate(`/athlete/${id}/test`)}>
             <Plus className="h-4 w-4 mr-2" />Nieuwe test
@@ -122,9 +200,11 @@ const AthleteDetail = () => {
         </div>
 
         {tests.length === 0 ? (
-          <Card>
+          <Card className="border-dashed">
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">Nog geen tests. Start een nieuwe test!</p>
+              <TrendingUp className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+              <p className="text-muted-foreground mb-1">Nog geen tests uitgevoerd.</p>
+              <p className="text-sm text-muted-foreground/70">Start een nieuwe lactaattest om drempels te berekenen.</p>
             </CardContent>
           </Card>
         ) : (
@@ -134,8 +214,8 @@ const AthleteDetail = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Datum</TableHead>
-                    <TableHead>LT1</TableHead>
-                    <TableHead>LT2</TableHead>
+                    <TableHead>T2mmol</TableHead>
+                    <TableHead>T4mmol</TableHead>
                     <TableHead>Stappen</TableHead>
                     <TableHead className="w-10"></TableHead>
                   </TableRow>
@@ -146,9 +226,19 @@ const AthleteDetail = () => {
                     const steps = t.steps_json as any[];
                     return (
                       <TableRow key={t.id} className="cursor-pointer" onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}>
-                        <TableCell>{t.test_date}</TableCell>
-                        <TableCell>{r?.lt1Speed != null ? `${formatPace(r.lt1Speed)} /km` : '—'}</TableCell>
-                        <TableCell>{r?.lt2Speed != null ? `${formatPace(r.lt2Speed)} /km` : '—'}</TableCell>
+                        <TableCell className="font-medium">{t.test_date}</TableCell>
+                        <TableCell>
+                          {r?.lt1Speed != null
+                            ? <span className="text-green-600 font-medium">{formatPace(r.lt1Speed)} /km</span>
+                            : <span className="text-muted-foreground/40 italic text-sm">—</span>
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {r?.lt2Speed != null
+                            ? <span className="text-orange-600 font-medium">{formatPace(r.lt2Speed)} /km</span>
+                            : <span className="text-muted-foreground/40 italic text-sm">—</span>
+                          }
+                        </TableCell>
                         <TableCell>{steps?.length ?? '—'}</TableCell>
                         <TableCell>
                           <Button
