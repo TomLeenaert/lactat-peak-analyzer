@@ -11,7 +11,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Plus, Pencil, Trash2, Calendar, Activity, TrendingUp, BarChart3 } from 'lucide-react';
-import type { CalculationResults } from '@/lib/lactate-math';
+
+interface StoredThresholdResults {
+  lt1Speed?: number;
+  lt2Speed?: number;
+  lt1?: { best?: number };
+  lt2?: { best?: number };
+}
+
+const getStoredResults = (value: unknown): StoredThresholdResults | null => {
+  if (typeof value !== 'object' || value === null) return null;
+  return value as StoredThresholdResults;
+};
 
 const AthleteDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -89,12 +100,14 @@ const AthleteDetail = () => {
 
   // Derive summary stats from tests
   const latestTest = tests[0];
-  const latestResults = latestTest?.results_json as any;
+  const latestResults = getStoredResults(latestTest?.results_json);
   const lastTestDate = latestTest?.test_date;
 
   // Get latest valid LT values
-  const latestLt1 = latestResults?.lt1Speed != null ? formatPace(latestResults.lt1Speed) : null;
-  const latestLt2 = latestResults?.lt2Speed != null ? formatPace(latestResults.lt2Speed) : null;
+  const latestLt1Speed = latestResults?.lt1?.best ?? latestResults?.lt1Speed ?? null;
+  const latestLt2Speed = latestResults?.lt2?.best ?? latestResults?.lt2Speed ?? null;
+  const latestLt1 = latestLt1Speed != null ? formatPace(latestLt1Speed) : null;
+  const latestLt2 = latestLt2Speed != null ? formatPace(latestLt2Speed) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -203,8 +216,11 @@ const AthleteDetail = () => {
           <Card className="border-dashed">
             <CardContent className="py-12 text-center">
               <TrendingUp className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-muted-foreground mb-1">Nog geen tests uitgevoerd.</p>
-              <p className="text-sm text-muted-foreground/70">Start een nieuwe lactaattest om drempels te berekenen.</p>
+              <p className="text-lg font-semibold text-foreground mb-1">Nog geen tests uitgevoerd.</p>
+              <p className="text-sm text-muted-foreground/70">Start een nieuwe lactaattest om drempels, zones en evolutie zichtbaar te maken.</p>
+              <div className="mx-auto mt-5 max-w-md rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground">
+                Na de eerste test kun je hier meteen tempozones, lactaatcurve en vergelijkingen over meerdere testmomenten tonen.
+              </div>
             </CardContent>
           </Card>
         ) : (
@@ -222,20 +238,22 @@ const AthleteDetail = () => {
                 </TableHeader>
                 <TableBody>
                   {tests.map(t => {
-                    const r = t.results_json as any;
-                    const steps = t.steps_json as any[];
+                    const r = getStoredResults(t.results_json);
+                    const steps = Array.isArray(t.steps_json) ? t.steps_json : [];
+                    const rowLt1Speed = r?.lt1?.best ?? r?.lt1Speed ?? null;
+                    const rowLt2Speed = r?.lt2?.best ?? r?.lt2Speed ?? null;
                     return (
                       <TableRow key={t.id} className="cursor-pointer" onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}>
                         <TableCell className="font-medium">{t.test_date}</TableCell>
                         <TableCell>
-                          {r?.lt1Speed != null
-                            ? <span className="text-green-600 font-medium">{formatPace(r.lt1Speed)} /km</span>
+                          {rowLt1Speed != null
+                            ? <span className="text-green-600 font-medium">{formatPace(rowLt1Speed)} /km</span>
                             : <span className="text-muted-foreground/40 italic text-sm">—</span>
                           }
                         </TableCell>
                         <TableCell>
-                          {r?.lt2Speed != null
-                            ? <span className="text-orange-600 font-medium">{formatPace(r.lt2Speed)} /km</span>
+                          {rowLt2Speed != null
+                            ? <span className="text-orange-600 font-medium">{formatPace(rowLt2Speed)} /km</span>
                             : <span className="text-muted-foreground/40 italic text-sm">—</span>
                           }
                         </TableCell>

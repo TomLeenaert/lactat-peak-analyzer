@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useToast } from '@/hooks/use-toast';
 import { Plus, LogOut, Users, Trash2 } from 'lucide-react';
 
+const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
+
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -72,7 +74,7 @@ const Dashboard = () => {
       setNewAthlete({ name: '', birth_date: '', sport: '', notes: '' });
       toast({ title: 'Atleet toegevoegd' });
     },
-    onError: (err: any) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
+    onError: (err: unknown) => toast({ title: 'Fout', description: getErrorMessage(err), variant: 'destructive' }),
   });
 
   // Delete athlete
@@ -148,7 +150,16 @@ const Dashboard = () => {
           <Card>
             <CardContent className="py-12 text-center">
               <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">Nog geen atleten. Voeg je eerste atleet toe!</p>
+              <p className="text-lg font-semibold text-foreground">Nog geen atleten.</p>
+              <p className="mt-2 text-muted-foreground">Voeg je eerste atleet toe en bouw vanaf daar je testhistoriek op.</p>
+              <div className="mx-auto mt-6 max-w-md rounded-2xl border border-dashed border-border p-4 text-left">
+                <p className="text-sm font-medium text-foreground">Start hier</p>
+                <ol className="mt-3 space-y-2 text-sm text-muted-foreground">
+                  <li>1. Voeg een atleet toe met naam, sport en optionele notities.</li>
+                  <li>2. Open de atleet en start een nieuwe lactaattest.</li>
+                  <li>3. Bewaar de resultaten om evolutie doorheen het seizoen te tonen.</li>
+                </ol>
+              </div>
             </CardContent>
           </Card>
         ) : (

@@ -265,10 +265,28 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   // LT2: Modified Dmax
   let lt2_moddmax: number | null = null;
   let modStartIdx = 0;
-  for (let i = 1; i < lactates.length; i++) {
-    if (lactates[i] - lactates[i - 1] > 0.4) {
-      modStartIdx = Math.max(0, i - 1);
-      break;
+
+  // Statistische adaptieve startpuntdetectie
+  const bslnPoints = lactates.filter(l => l < restLac + 1.0);
+  if (bslnPoints.length >= 3) {
+    const bslnMean = bslnPoints.reduce((a, b) => a + b, 0) / bslnPoints.length;
+    const bslnSD = Math.sqrt(
+      bslnPoints.reduce((s, l) => s + (l - bslnMean) ** 2, 0) / bslnPoints.length
+    );
+    const trigger = bslnMean + Math.max(2 * bslnSD, 0.2);
+    for (let i = 1; i < lactates.length; i++) {
+      if (lactates[i] > trigger) {
+        modStartIdx = Math.max(0, i - 1);
+        break;
+      }
+    }
+  } else {
+    // Fallback: vaste drempel van 0.4 mmol/L stijging per stap
+    for (let i = 1; i < lactates.length; i++) {
+      if (lactates[i] - lactates[i - 1] > 0.4) {
+        modStartIdx = Math.max(0, i - 1);
+        break;
+      }
     }
   }
   const modStartSpeed = speeds[modStartIdx];
@@ -303,8 +321,8 @@ export function getZones(results: CalculationResults): ZoneData[] {
   return [
     { name: 'Zone 1', label: 'Herstel', color: '#60a5fa', from: 0, to: lt1s * 0.85, desc: 'Zeer licht, actief herstel' },
     { name: 'Zone 2', label: 'Aeroob (Endurance)', color: '#34d399', from: lt1s * 0.85, to: lt1s, desc: 'Duurloop, vetverbranding, basis' },
-    { name: 'Zone 3', label: 'Tempo', color: '#fbbf24', from: lt1s, to: lt2s, desc: 'Stevig tempo, marathon/HM-tempo' },
-    { name: 'Zone 4', label: 'Drempel', color: '#f97316', from: lt2s * 0.95, to: lt2s * 1.05, desc: 'Rond anaerobe drempel, 10K-tempo' },
-    { name: 'Zone 5', label: 'VO₂max', color: '#ef4444', from: lt2s * 1.05, to: maxSpeed * 1.1, desc: 'Intervallen, maximale inspanning' },
+    { name: 'Zone 3', label: 'Tempo', color: '#fbbf24', from: lt1s, to: lt2s * 0.95, desc: 'Stevig tempo, marathon/HM-tempo' },
+    { name: 'Zone 4', label: 'Drempel', color: '#f97316', from: lt2s * 0.95, to: lt2s, desc: 'Rond anaerobe drempel, 10K-tempo' },
+    { name: 'Zone 5', label: 'VO₂max', color: '#ef4444', from: lt2s, to: maxSpeed * 1.1, desc: 'Intervallen, maximale inspanning' },
   ];
 }

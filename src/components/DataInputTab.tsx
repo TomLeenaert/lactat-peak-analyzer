@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DEMO_ATHLETE, DEMO_STEPS } from '@/lib/demo-data';
 import { formatPace, type StepData } from '@/lib/lactate-math';
 import { Trash2, Plus, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -22,6 +23,33 @@ interface DataInputTabProps {
   setStepIncrement: (v: string) => void;
   onCalculate: () => void;
 }
+
+type ImportRow = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+
+const getNumber = (row: ImportRow, ...keys: string[]): number => {
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === 'number') return value;
+  }
+  return 0;
+};
+
+const getString = (row: Record<string, unknown>, ...keys: string[]): string | undefined => {
+  for (const key of keys) {
+    const value = row[key];
+    if (typeof value === 'string' && value) return value;
+  }
+  return undefined;
+};
+
+const findFirstArray = (row: Record<string, unknown>): unknown[] => {
+  for (const value of Object.values(row)) {
+    if (Array.isArray(value)) return value;
+  }
+  return [];
+};
 
 /** Convert seconds to mm:ss string */
 const secsToTimeStr = (secs: number): string => {
@@ -54,17 +82,6 @@ const calcSpeed = (distanceM: number, timeSec: number): number => {
   return (distanceM / 1000) / (timeSec / 3600);
 };
 
-const EXAMPLE_DATA: StepData[] = [
-  { speed: 9, lactate: 0.9, hr: 128, watt: 180, distance: 1600, time: 640 },
-  { speed: 10, lactate: 1.0, hr: 138, watt: 210, distance: 1600, time: 576 },
-  { speed: 11, lactate: 1.2, hr: 148, watt: 240, distance: 1600, time: 524 },
-  { speed: 12, lactate: 1.5, hr: 155, watt: 270, distance: 1600, time: 480 },
-  { speed: 13, lactate: 2.1, hr: 163, watt: 300, distance: 1600, time: 443 },
-  { speed: 14, lactate: 3.0, hr: 171, watt: 330, distance: 1600, time: 411 },
-  { speed: 15, lactate: 4.5, hr: 178, watt: 360, distance: 1600, time: 384 },
-  { speed: 16, lactate: 7.2, hr: 186, watt: 390, distance: 1600, time: 360 },
-];
-
 const TEST_DATA: StepData[] = [
   { speed: 13.19, lactate: 1.8, hr: 140, watt: 260, distance: 1600, time: 437 },
   { speed: 13.69, lactate: 1.7, hr: 146, watt: 275, distance: 1600, time: 421 },
@@ -93,29 +110,46 @@ const DataInputTab = ({
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const json = JSON.parse(ev.target?.result as string);
+        const parsedJson: unknown = JSON.parse(ev.target?.result as string);
+        const json = isRecord(parsedJson) ? parsedJson : {};
         // Support many possible key names for the steps array
-        const steps: any[] = Array.isArray(json)
-          ? json
+        const rawSteps = Array.isArray(parsedJson)
+          ? parsedJson
           : (json.steps || json.data || json.stappen || json.testen || json.results || json.resultaten || json.inspanningstesten || json.rows || json.metingen ||
-             // Fallback: find first array property in the object
-             Object.values(json).find((v: any) => Array.isArray(v)) || []) as any[];
+             findFirstArray(json));
+        const steps = Array.isArray(rawSteps) ? rawSteps : [];
         if (!steps.length) {
           toast({ title: 'Fout', description: 'Geen stappen gevonden in JSON bestand.', variant: 'destructive' });
           return;
         }
-        const parsed: StepData[] = steps.map((s: any) => {
-          const distance = s.distance || s.afstand || dist;
-          const time = s.time || s.tijd || 0;
-          const speed = s.speed || s.snelheid || (time > 0 ? (distance / 1000) / (time / 3600) : 0);
-          return { speed, lactate: s.lactate || s.lactaat || 0, hr: s.hr || s.hartslag || s.heartrate || 0, watt: s.watt || s.watts || s.power || 0, distance, time };
+        const normalizedRows = steps.filter(isRecord);
+        const importedSteps: StepData[] = normalizedRows.map((row) => {
+          const distance = getNumber(row, 'distance', 'afstand') || dist;
+          const time = getNumber(row, 'time', 'tijd');
+          const speed = getNumber(row, 'speed', 'snelheid') || (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+          return {
+            speed,
+            lactate: getNumber(row, 'lactate', 'lactaat'),
+            hr: getNumber(row, 'hr', 'hartslag', 'heartrate'),
+            watt: getNumber(row, 'watt', 'watts', 'power'),
+            distance,
+            time,
+          };
         });
-        if (json.athlete || json.atleet) setAthleteName(json.athlete || json.atleet);
-        if (json.date || json.datum) setTestDate(json.date || json.datum);
-        if (json.restingLactate || json.rustlactaat) setRestingLactate(String(json.restingLactate || json.rustlactaat));
-        if (json.stepDistance || json.afstand) setStepDistance(String(json.stepDistance || json.afstand));
-        setTestData(parsed);
-        toast({ title: 'Geïmporteerd', description: `${parsed.length} stappen geladen uit JSON.` });
+        if (importedSteps.length === 0) {
+          toast({ title: 'Fout', description: 'Geen bruikbare stappen gevonden in JSON bestand.', variant: 'destructive' });
+          return;
+        }
+        const athlete = getString(json, 'athlete', 'atleet');
+        const date = getString(json, 'date', 'datum');
+        const resting = getString(json, 'restingLactate', 'rustlactaat') || String(getNumber(json, 'restingLactate', 'rustlactaat') || '');
+        const distance = getString(json, 'stepDistance', 'afstand') || String(getNumber(json, 'stepDistance', 'afstand') || '');
+        if (athlete) setAthleteName(athlete);
+        if (date) setTestDate(date);
+        if (resting) setRestingLactate(resting);
+        if (distance) setStepDistance(distance);
+        setTestData(importedSteps);
+        toast({ title: 'Geïmporteerd', description: `${importedSteps.length} stappen geladen uit JSON.` });
       } catch {
         toast({ title: 'Fout', description: 'Ongeldig JSON bestand.', variant: 'destructive' });
       }
@@ -142,12 +176,12 @@ const DataInputTab = ({
   };
 
   const loadExample = () => {
-    setAthleteName('Voorbeeld Atleet');
-    setTestDate('2026-03-08');
-    setRestingLactate('1.0');
+    setAthleteName(DEMO_ATHLETE.name);
+    setTestDate(DEMO_ATHLETE.testDate);
+    setRestingLactate(String(DEMO_ATHLETE.restingLactate));
     setStepDistance('1600');
     setStepIncrement('1');
-    setTestData([...EXAMPLE_DATA]);
+    setTestData([...DEMO_STEPS]);
   };
 
   const loadTestData = () => {

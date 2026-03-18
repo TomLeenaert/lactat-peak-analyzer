@@ -1,0 +1,355 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import './Landing.css';
+
+const COPY = {
+  annText: 'New: AI-powered threshold detection with heart rate zones - ',
+  annLink: 'read more ->',
+  navHow: 'How it works',
+  navFeat: 'Features',
+  navPrice: 'Pricing',
+  navTest: 'Testimonials',
+  navBook: 'Book demo',
+  navStart: 'Get started ->',
+  eyebrow: 'Ditch subscriptions. Pay €9.95 per test. Get thresholds and zones instantly.',
+  heroTitleA: 'Know your thresholds.',
+  heroTitleB: 'Own every workout.',
+  heroDesc:
+    'LacTest turns your field test data into a full analysis report with aerobic and anaerobic threshold, 5 training zones and a coach-ready PDF.',
+  cmdLabel: 'start',
+  cmdText: 'lactest.app -> analyse -> export.pdf',
+  cta1: 'Start your analysis ->',
+  cta2: 'View live demo',
+  statsKicker: 'Proven results',
+  statsTitleA: 'Elite-grade analysis',
+  statsTitleB: 'in under a minute.',
+  statsSub: 'Every test gets the right method, zones and report output.',
+  featKicker: "What's included",
+  featTitleA: 'Everything to coach smarter,',
+  featTitleB: 'in one test report.',
+  featLead: 'You run the field test. LacTest does the rest from polynomial fit to coach-ready PDF.',
+  quote:
+    'Since using LacTest our analysis workflow is 3x faster. The athlete gets the same report as a lab test in 60 seconds.',
+  quoteTitle: 'Head of Performance, Athletics Club East Flanders',
+  quoteOrg: 'Verified coach',
+  cmpKicker: 'Comparison',
+  cmpTitleA: 'Lab-level insight.',
+  cmpTitleB: 'Without lab-level cost.',
+  cmpLead: 'A professional threshold test often costs EUR 300-500 and several business days. LacTest does it for EUR 9.95 in seconds.',
+  ctaTitleA: 'Stop guessing.',
+  ctaTitleB: 'Start training with data.',
+  ctaDesc: 'Your first analysis in under 5 minutes. Pay only when exporting.',
+  ctaBtn: 'Start free analysis ->',
+  ctaNote: 'EUR 9.95 only at report download - no subscription',
+  sceneTitle: 'New lactate test',
+  sceneAthlete: 'Sarah Vermeulen - Running',
+  analyse: 'Analyse thresholds',
+  analysing: 'Analysing...',
+  rpAero: 'Aerobic threshold',
+  rpAna: 'Anaerobic threshold',
+  rpFit: 'Excellent',
+  exportLabel: 'Report ready - Generate PDF',
+  exportBtn: 'Download PDF',
+  zl: 'Z1 Recovery',
+  footer: 'Made for athletes',
+} as const;
+
+const ROWS = [
+  ['7:04 /km', '1.2', '128'],
+  ['6:19 /km', '1.4', '136'],
+  ['5:43 /km', '1.8', '145'],
+  ['5:11 /km', '2.4', '154'],
+  ['4:48 /km', '3.1', '162'],
+  ['4:27 /km', '4.0', '169'],
+  ['4:03 /km', '6.2', '178'],
+  ['3:38 /km', '9.4', '187'],
+];
+
+const Landing = () => {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  const [showEntry, setShowEntry] = useState(false);
+  const [rowsVisible, setRowsVisible] = useState(0);
+  const [showAnalyse, setShowAnalyse] = useState(false);
+  const [loadingAnalyse, setLoadingAnalyse] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [drawCurve, setDrawCurve] = useState(false);
+  const [showDots, setShowDots] = useState(false);
+  const [showThresh1, setShowThresh1] = useState(false);
+  const [showThresh2, setShowThresh2] = useState(false);
+  const [showZones, setShowZones] = useState(false);
+  const [showExport, setShowExport] = useState(false);
+
+  const t = COPY;
+
+  useEffect(() => {
+    if (!loading && user) navigate('/dashboard', { replace: true });
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const timers: number[] = [];
+
+    const clearAndReset = () => {
+      setShowEntry(false);
+      setRowsVisible(0);
+      setShowAnalyse(false);
+      setLoadingAnalyse(false);
+      setShowResults(false);
+      setDrawCurve(false);
+      setShowDots(false);
+      setShowThresh1(false);
+      setShowThresh2(false);
+      setShowZones(false);
+      setShowExport(false);
+    };
+
+    const schedule = (ms: number, fn: () => void) => {
+      const id = window.setTimeout(fn, ms);
+      timers.push(id);
+    };
+
+    const run = () => {
+      clearAndReset();
+      let at = 0;
+      schedule(at, () => setShowEntry(true));
+      at += 200;
+
+      ROWS.forEach((_, i) => {
+        schedule(at + i * 320, () => setRowsVisible(i + 1));
+      });
+      at += ROWS.length * 320 + 400;
+
+      schedule(at, () => setShowAnalyse(true));
+      at += 900;
+
+      schedule(at, () => setLoadingAnalyse(true));
+      at += 1400;
+
+      schedule(at, () => {
+        setShowEntry(false);
+        setShowResults(true);
+      });
+      at += 400;
+
+      schedule(at, () => setDrawCurve(true));
+      at += 800;
+
+      schedule(at, () => setShowDots(true));
+      at += 400;
+
+      schedule(at, () => setShowThresh1(true));
+      at += 400;
+
+      schedule(at, () => setShowThresh2(true));
+      at += 500;
+
+      schedule(at, () => setShowZones(true));
+      at += 600;
+
+      schedule(at, () => setShowExport(true));
+      at += 2800;
+
+      schedule(at, run);
+    };
+
+    schedule(800, run);
+
+    return () => {
+      timers.forEach((id) => window.clearTimeout(id));
+    };
+  }, []);
+
+  return (
+    <div className="landing-page">
+      <nav className="lp-nav">
+        <a href="#" className="lp-nav-logo">Lac<span className="lp-nav-logo-dot">.</span>Test</a>
+        <div className="lp-nav-links">
+          <a className="lp-nav-link" href="#how">{t.navHow}</a>
+          <a className="lp-nav-link" href="#features">{t.navFeat}</a>
+          <a className="lp-nav-link" href="#pricing">{t.navPrice}</a>
+          <a className="lp-nav-link" href="#testimonials">{t.navTest}</a>
+        </div>
+        <div className="lp-nav-right">
+          <button className="lp-btn-demo" onClick={() => navigate('/demo')}>{t.navBook}</button>
+          <button className="lp-btn-start" onClick={() => navigate('/auth')}>{t.navStart}</button>
+        </div>
+      </nav>
+
+      <section className="lp-hero-wrap" id="how">
+        <div className="lp-hero">
+          <div className="lp-hero-left">
+            <div className="lp-hero-eyebrow">
+              <span className="lp-hero-eyebrow-dot" />
+              <span>{t.eyebrow}</span>
+            </div>
+            <h1 className="lp-h1">
+              {t.heroTitleA}
+              <br />
+              <em>{t.heroTitleB}</em>
+            </h1>
+            <p className="lp-hero-desc">{t.heroDesc}</p>
+            <div className="lp-hero-cmd">
+              <span className="lp-hero-cmd-label">{t.cmdLabel}</span>
+              <span className="lp-hero-cmd-text">{t.cmdText}</span>
+            </div>
+            <div className="lp-hero-actions">
+              <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
+              <button className="lp-hero-cta-secondary" onClick={() => navigate('/demo')}>{t.cta2}</button>
+            </div>
+          </div>
+
+          <div className="lp-demo-window" id="demo-live">
+            <div className="lp-demo-chrome">
+              <div className="lp-demo-dots">
+                <div className="lp-demo-dot red" />
+                <div className="lp-demo-dot yellow" />
+                <div className="lp-demo-dot green" />
+              </div>
+              <div className="lp-demo-urlbar">lactest.app/analyse</div>
+            </div>
+            <div className="lp-demo-body">
+              <div className="lp-demo-sidebar">
+                <div className="lp-demo-sidebar-item active">A</div>
+                <div className="lp-demo-sidebar-item">U</div>
+                <div className="lp-demo-sidebar-item">R</div>
+                <div className="lp-sidebar-spacer" />
+                <div className="lp-demo-sidebar-item">S</div>
+              </div>
+              <div className="lp-demo-main">
+                <div className={`lp-demo-scene ${showEntry ? 'visible' : ''}`}>
+                  <div className="lp-scene-title">{t.sceneTitle}<span className="lp-scene-subtitle">{t.sceneAthlete}</span></div>
+                  <table className="lp-data-table">
+                    <thead>
+                      <tr><th>Tempo</th><th>Lactaat</th><th>HR</th></tr>
+                    </thead>
+                    <tbody>
+                      {ROWS.map((row, i) => (
+                        <tr key={row[0]} className={`lp-data-row ${i < rowsVisible ? 'show' : ''}`}>
+                          <td className="lp-td-pace">{row[0]}</td>
+                          <td>{row[1]}</td>
+                          <td className="lp-td-hr">{row[2]}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button className={`lp-analyse-btn ${showAnalyse ? 'show' : ''} ${loadingAnalyse ? 'loading' : ''}`}>
+                    {loadingAnalyse ? `... ${t.analysing}` : t.analyse}
+                  </button>
+                  <div className={`lp-loading-bar ${loadingAnalyse ? 'show' : ''}`}>
+                    <div className="lp-loading-bar-fill" style={{ width: loadingAnalyse ? '100%' : '0%' }} />
+                  </div>
+                </div>
+
+                <div className={`lp-demo-scene ${showResults ? 'visible' : ''}`}>
+                  <div className="lp-results-header">
+                    <div className="lp-pill-wrap">
+                      <div className="lp-result-pill"><span className="lp-rp-label">{t.rpAero}</span><span className="lp-rp-val teal">5:06 /km</span><span className="lp-rp-sub">~153 bpm</span></div>
+                      <div className="lp-result-pill"><span className="lp-rp-label">{t.rpAna}</span><span className="lp-rp-val orange">4:14 /km</span><span className="lp-rp-sub">~172 bpm</span></div>
+                      <div className="lp-result-pill"><span className="lp-rp-label">R2</span><span className="lp-rp-val purple">0.999</span><span className="lp-rp-sub">{t.rpFit}</span></div>
+                    </div>
+                  </div>
+                  <svg className="lp-chart" viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="30" y1="75" x2="350" y2="75" className="lp-obla-orange" />
+                    <line x1="30" y1="99" x2="350" y2="99" className="lp-obla-green" />
+                    <g className={`lp-chart-thresh ${showThresh1 ? 'show' : ''}`}>
+                      <line x1="186" y1="10" x2="186" y2="115" />
+                      <text x="189" y="18">Aerobic 5:06</text>
+                    </g>
+                    <g className={`lp-chart-thresh2 ${showThresh2 ? 'show' : ''}`}>
+                      <line x1="248" y1="10" x2="248" y2="115" />
+                      <text x="251" y="18">Anaerobic 4:14</text>
+                    </g>
+                    <path
+                      className={`lp-chart-curve ${drawCurve ? 'draw' : ''}`}
+                      d="M40,112 C60,110 80,108 100,105 C118,102 132,98 148,93 C160,88 168,83 178,77 C186,72 192,67 200,60 C214,48 226,36 240,24 C252,14 264,8 276,5 C288,3 300,3 312,4"
+                    />
+                    <g style={{ opacity: showDots ? 1 : 0 }} className="lp-chart-dots">
+                      <circle cx="40" cy="112" r="3" /><circle cx="70" cy="110" r="3" /><circle cx="100" cy="105" r="3" /><circle cx="132" cy="97" r="3" />
+                      <circle cx="165" cy="86" r="3" /><circle cx="200" cy="62" r="3" /><circle cx="240" cy="24" r="3" /><circle cx="280" cy="5" r="3" />
+                    </g>
+                  </svg>
+                  <div className={`lp-zone-strip ${showZones ? '' : 'hidden'}`}>
+                    <div style={{ flex: 3.5, background: '#4FC3F7' }} />
+                    <div style={{ flex: 2, background: '#29B6F6' }} />
+                    <div style={{ flex: 1.5, background: '#FFA726' }} />
+                    <div style={{ flex: 1, background: '#FF7043' }} />
+                    <div style={{ flex: 1, background: '#EF5350' }} />
+                  </div>
+                  <div className="lp-zone-labels"><span>{t.zl}</span><span>Z5 VO2max</span></div>
+                  <div className={`lp-export-row ${showExport ? 'show' : ''}`}>
+                    <span>{t.exportLabel}</span>
+                    <button>{t.exportBtn}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="lp-stats-section">
+        <div className="lp-center-head">
+          <div className="lp-section-kicker">{t.statsKicker}</div>
+          <h2>{t.statsTitleA}<br />{t.statsTitleB}</h2>
+          <p>{t.statsSub}</p>
+        </div>
+        <div className="lp-stats-grid">
+          <div className="lp-stat-item"><div className="lp-stat-num">5K+</div><div className="lp-stat-label">Analyses completed</div></div>
+          <div className="lp-stat-item"><div className="lp-stat-num">R2 0.99</div><div className="lp-stat-label">Average curve fit</div></div>
+          <div className="lp-stat-item"><div className="lp-stat-num">500+</div><div className="lp-stat-label">Coaches and clubs</div></div>
+          <div className="lp-stat-item"><div className="lp-stat-num">3</div><div className="lp-stat-label">Calculation methods</div></div>
+        </div>
+      </div>
+
+      <section className="lp-section" id="features">
+        <div className="lp-section-kicker">{t.featKicker}</div>
+        <h2>{t.featTitleA}<br />{t.featTitleB}</h2>
+        <p className="lp-section-lead">{t.featLead}</p>
+        <div className="lp-features-grid">
+          <div className="lp-feature-card"><div className="lp-feat-icon">1</div><h3>Full lactate curve</h3><p>Polynomial fit with R2 score, data points, and OBLA reference lines.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">2</div><h3>Thresholds from 3 methods</h3><p>OBLA baseline, OBLA 2.0/4.0, and Modified Dmax side by side.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">3</div><h3>5 zones from your thresholds</h3><p>Pace, heart rate, and power per zone, ready to use immediately.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">4</div><h3>Heart-rate vs pace chart</h3><p>Visualize training load and fatigue progression across the test.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">5</div><h3>Professional PDF report</h3><p>Coach-ready report with charts, thresholds, and zones.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">6</div><h3>AI coaching note</h3><p>Personalized training recommendation based on your athlete profile.</p></div>
+        </div>
+      </section>
+
+      <section className="lp-testimonial" id="testimonials">
+        <div className="lp-testimonial-inner">
+          <p className="lp-quote">"{t.quote}"</p>
+          <p className="lp-quote-title">{t.quoteTitle}</p>
+          <p className="lp-quote-org">{t.quoteOrg}</p>
+        </div>
+      </section>
+
+      <section className="lp-section" id="pricing">
+        <div className="lp-section-kicker">{t.cmpKicker}</div>
+        <h2>{t.cmpTitleA}<br />{t.cmpTitleB}</h2>
+        <p className="lp-section-lead">{t.cmpLead}</p>
+        <div className="lp-compare-grid">
+          <div>Criteria</div><div>Lab test</div><div>LacTest</div><div>Spreadsheet</div>
+          <div>Cost</div><div>EUR 300-500</div><div>EUR 9.95</div><div>EUR 0 + manual work</div>
+          <div>Turnaround</div><div>1-3 business days</div><div>{'<'}60 sec</div><div>2-4 hours</div>
+        </div>
+      </section>
+
+      <section className="lp-cta" id="start">
+        <h2>{t.ctaTitleA}<br />{t.ctaTitleB}</h2>
+        <p>{t.ctaDesc}</p>
+        <button onClick={() => navigate('/auth')}>{t.ctaBtn}</button>
+        <small>{t.ctaNote}</small>
+      </section>
+
+      <footer className="lp-footer">
+        <div>LacTest</div>
+        <div className="lp-footer-links"><a href="#">About</a><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
+        <div>{new Date().getFullYear()} LacTest - {t.footer}</div>
+      </footer>
+    </div>
+  );
+};
+
+export default Landing;

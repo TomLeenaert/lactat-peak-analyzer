@@ -48,12 +48,17 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
           <CardTitle className="text-lg">Trainingszones (5-zone model)</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="bg-accent/10 border border-primary/20 rounded-lg p-3 mb-4 text-xs leading-relaxed">
-            Zones gebaseerd op je individuele LT1 en LT2 waarden (Seiler, 2010).
+          <div className="rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-background to-accent/10 p-4 mb-5">
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">5-zone model</p>
+            <p className="text-sm mt-1 text-foreground/90">Zones gebaseerd op je individuele LT1- en LT2-drempelwaarden.</p>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-emerald-500/10 px-3 py-1 font-semibold text-emerald-700">LT1 {formatPace(lt1.best)} /km</span>
+              <span className="rounded-full bg-orange-500/10 px-3 py-1 font-semibold text-orange-700">LT2 {formatPace(lt2.best)} /km</span>
+            </div>
           </div>
 
           {/* Zone bar */}
-          <div className="flex rounded-md overflow-hidden h-7 mb-4">
+          <div className="flex rounded-xl overflow-hidden h-9 mb-5 border border-border/60 shadow-inner">
             {zones.map(z => {
               const width = Math.max(((z.to - z.from) / totalRange) * 100, 5);
               return (
@@ -62,14 +67,14 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
                   className="flex items-center justify-center text-[10px] font-semibold text-white"
                   style={{ width: `${width}%`, background: z.color, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
                 >
-                  {z.name}
+                  {z.name.replace('Zone ', 'Z')}
                 </div>
               );
             })}
           </div>
 
           {/* Zone cards - mobile friendly */}
-          <div className="space-y-2">
+          <div className="grid gap-3 md:grid-cols-2">
             {zones.map(z => {
               const hrFrom = interpolateHR(z.from, speeds, hrs);
               const hrTo = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
@@ -78,18 +83,20 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
               const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
               const lacTo = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
               return (
-                <div key={z.name} className="border border-border rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-3 h-3 rounded-sm shrink-0" style={{ background: z.color }} />
-                    <strong className="text-sm">{z.name}</strong>
-                    <span className="text-xs text-muted-foreground">{z.label}</span>
+                <div key={z.name} className="rounded-2xl border border-border/70 bg-card/70 p-4 shadow-sm">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full shrink-0" style={{ background: z.color }} />
+                      <strong className="text-sm">{z.name}</strong>
+                    </div>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{z.label}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-2">{z.desc}</p>
+                  <p className="text-xs text-muted-foreground mb-3">{z.desc}</p>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                    <div><span className="text-muted-foreground">Tempo:</span> <span className="font-mono">{formatPace(z.to)}–{formatPace(z.from)}</span></div>
-                    <div><span className="text-muted-foreground">HR:</span> <span className="font-mono">{hrFrom}–{hrTo}</span></div>
-                    {hasWatts && <div><span className="text-muted-foreground">Watt:</span> <span className="font-mono">{wattFrom}–{wattTo}</span></div>}
-                    <div><span className="text-muted-foreground">Lac:</span> <span className="font-mono">{lacFrom}–{lacTo}</span></div>
+                    <div><span className="text-muted-foreground">Tempo:</span> <span className="font-mono">{formatPace(z.to)}-{formatPace(z.from)}</span></div>
+                    <div><span className="text-muted-foreground">HR:</span> <span className="font-mono">{hrFrom}-{hrTo}</span></div>
+                    {hasWatts && <div><span className="text-muted-foreground">Watt:</span> <span className="font-mono">{wattFrom}-{wattTo}</span></div>}
+                    <div><span className="text-muted-foreground">Lac:</span> <span className="font-mono">{lacFrom}-{lacTo}</span></div>
                   </div>
                 </div>
               );
