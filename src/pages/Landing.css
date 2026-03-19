@@ -678,6 +678,87 @@
   font-size: 14px;
 }
 
+/* ── How it works stepper ── */
+.lp-how-section {
+  border-top: 1px solid var(--border);
+}
+
+.lp-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  position: relative;
+  padding-top: 12px;
+}
+
+.lp-stepper-track {
+  position: absolute;
+  top: 31px; /* vertically centered on the dots */
+  left: calc(12.5% + 8px);
+  right: calc(12.5% + 8px);
+  height: 1px;
+  background: linear-gradient(90deg, var(--purple), var(--teal));
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.lp-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.lp-step-dot {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 4px var(--bg), 0 0 0 5px rgba(102, 68, 255, 0.35);
+}
+
+.lp-step-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lp-step-img-icon {
+  font-size: 44px;
+  opacity: 0.35;
+}
+
+.lp-step-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.lp-step-desc {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0;
+  line-height: 1.65;
+}
+
 .lp-testimonial {
   background: var(--bg2);
   border-top: 1px solid var(--border);
@@ -795,5 +876,20 @@
   .lp-testimonial,
   .lp-cta {
     padding: 50px 20px;
+  }
+
+  .lp-stepper {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .lp-stepper-track {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .lp-stepper {
+    grid-template-columns: 1fr;
   }
 }

@@ -284,6 +284,52 @@ const Landing = () => {
       </section>
 
 
+      {/* ── How it works ── */}
+      <section className="lp-section lp-how-section" id="how-it-works">
+        <div className="lp-center-head">
+          <div className="lp-section-kicker">Hoe het werkt</div>
+          <h2>Van veldtest naar<br /><em>volledig rapport</em></h2>
+        </div>
+        <div className="lp-stepper">
+          <div className="lp-stepper-track" />
+          {[
+            {
+              num: 1,
+              title: 'Stel je protocol in',
+              desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.',
+              icon: '⚙️',
+            },
+            {
+              num: 2,
+              title: 'Doe de veldtest',
+              desc: 'Laat je atleet lopen en meet het lactaat na elke stap. Voer alles in via je mobiele app — geen papier meer.',
+              icon: '🏃',
+            },
+            {
+              num: 3,
+              title: 'LacTest berekent alles',
+              desc: 'Relax. De volledige lactaatcurve, drempels en zones zijn klaar in minder dan 10 seconden.',
+              icon: '📊',
+            },
+            {
+              num: 4,
+              title: 'Download je rapport',
+              desc: 'Exporteer een professioneel PDF met curve, zones en trainingsaanbevelingen — klaar voor coach en atleet.',
+              icon: '📄',
+            },
+          ].map(step => (
+            <div key={step.num} className="lp-step">
+              <div className="lp-step-dot">{step.num}</div>
+              <div className="lp-step-img">
+                <span className="lp-step-img-icon">{step.icon}</span>
+              </div>
+              <h3 className="lp-step-title">{step.title}</h3>
+              <p className="lp-step-desc">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="lp-section" id="features">
         <div className="lp-section-kicker">{t.featKicker}</div>
         <h2>{t.featTitleA}<br />{t.featTitleB}</h2>
