@@ -70,18 +70,35 @@ const Auth = () => {
   if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      {/* Language toggle */}
-      <div className="absolute top-5 right-6">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Top nav matching Landing */}
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 10,
+        background: 'rgba(12, 13, 17, 0.90)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 24px', height: '58px',
+      }}>
+        <a href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '17px' }}>
+          Lac<span style={{ color: '#6644ff' }}>.</span>Test
+        </a>
         <button
           onClick={() => setLang(lang === 'nl' ? 'en' : 'nl')}
-          className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1 rounded border border-border hover:border-foreground/30"
+          style={{
+            fontSize: '11px', fontWeight: 600,
+            color: 'rgba(255,255,255,0.38)',
+            background: 'none', border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '6px', padding: '5px 10px', cursor: 'pointer',
+          }}
         >
           {lang === 'nl' ? 'EN' : 'NL'}
         </button>
-      </div>
+      </nav>
 
-      <Card className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-md" style={{ background: 'hsl(228 12% 9%)', border: '1px solid rgba(255,255,255,0.07)' }}>
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">{t('auth.title')}</CardTitle>
           <CardDescription>
@@ -133,11 +150,12 @@ const Auth = () => {
               </button>
             </p>
           </div>
-          <div className="mt-6 pt-4 border-t">
+          <div className="mt-6 pt-4 border-t border-border/40">
             <div className="space-y-3">
               <Button
                 variant="outline"
                 className="w-full"
+                style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'transparent' }}
                 disabled={submitting}
                 onClick={async () => {
                   setSubmitting(true);
@@ -176,6 +194,7 @@ const Auth = () => {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

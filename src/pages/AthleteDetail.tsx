@@ -10,7 +10,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, Pencil, Trash2, Calendar, Activity, TrendingUp, BarChart3 } from 'lucide-react';
+import AppNav from '@/components/AppNav';
+import { Plus, Pencil, Trash2, Calendar, Activity, TrendingUp, BarChart3 } from 'lucide-react';
 
 interface StoredThresholdResults {
   lt1Speed?: number;
@@ -85,8 +86,8 @@ const AthleteDetail = () => {
     },
   });
 
-  if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><p>Laden...</p></div>;
-  if (!athlete) return <div className="min-h-screen bg-background flex items-center justify-center"><p>Atleet niet gevonden</p></div>;
+  if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Laden...</p></div>;
+  if (!athlete) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Atleet niet gevonden</p></div>;
 
   const openEdit = () => {
     setEditForm({
@@ -109,20 +110,25 @@ const AthleteDetail = () => {
   const latestLt1 = latestLt1Speed != null ? formatPace(latestLt1Speed) : null;
   const latestLt2 = latestLt2Speed != null ? formatPace(latestLt2Speed) : null;
 
+  const editButton = (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={openEdit}
+      style={{ fontSize: '12px', height: '30px', borderColor: 'rgba(255,255,255,0.15)' }}
+    >
+      <Pencil className="h-3 w-3 mr-1.5" />Bewerken
+    </Button>
+  );
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="max-w-[900px] mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="gap-1.5 text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="text-sm">Alle atleten</span>
-          </Button>
-          <div className="flex-1" />
-          <Button variant="outline" size="sm" onClick={openEdit}>
-            <Pencil className="h-4 w-4 mr-2" />Bewerken
-          </Button>
-        </div>
-      </header>
+      <AppNav
+        backTo="/dashboard"
+        backLabel="Alle atleten"
+        title={athlete.name}
+        rightContent={editButton}
+      />
 
       <main className="max-w-[900px] mx-auto px-4 py-6 space-y-6">
         {/* Profile header card */}

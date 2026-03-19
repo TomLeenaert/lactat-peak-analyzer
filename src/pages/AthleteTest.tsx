@@ -9,10 +9,11 @@ import DataInputTab from '@/components/DataInputTab';
 import ResultsTab from '@/components/ResultsTab';
 import ZonesTab from '@/components/ZonesTab';
 import ScienceTab from '@/components/ScienceTab';
+import AppNav from '@/components/AppNav';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 const AthleteTest = () => {
   const { id: athleteId, testId } = useParams<{ id: string; testId?: string }>();
@@ -127,25 +128,26 @@ const AthleteTest = () => {
     onError: (err: any) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
   });
 
+  const saveButton = results ? (
+    <Button
+      onClick={() => saveTest.mutate()}
+      disabled={saveTest.isPending}
+      size="sm"
+      style={{ background: '#6644ff', border: 'none', color: '#fff', fontSize: '13px' }}
+    >
+      <Save className="h-3.5 w-3.5 mr-1.5" />
+      {saveTest.isPending ? 'Opslaan...' : 'Opslaan'}
+    </Button>
+  ) : undefined;
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="max-w-[900px] mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/athlete/${athleteId}`)}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">
-              {testId ? 'Test bekijken' : 'Nieuwe test'} — {athlete?.name || ''}
-            </h1>
-          </div>
-          {results && (
-            <Button onClick={() => saveTest.mutate()} disabled={saveTest.isPending}>
-              <Save className="h-4 w-4 mr-2" />{saveTest.isPending ? 'Opslaan...' : 'Opslaan'}
-            </Button>
-          )}
-        </div>
-      </header>
+      <AppNav
+        backTo={`/athlete/${athleteId}`}
+        backLabel="Alle atleten"
+        title={`${testId ? 'Test bekijken' : 'Nieuwe test'}${athlete?.name ? ` — ${athlete.name}` : ''}`}
+        rightContent={saveButton}
+      />
 
       <main className="max-w-[900px] mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>

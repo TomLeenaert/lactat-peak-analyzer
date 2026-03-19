@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, LogOut, Users, Trash2 } from 'lucide-react';
+import { Plus, Users, Trash2 } from 'lucide-react';
+import AppNav from '@/components/AppNav';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
@@ -92,32 +93,27 @@ const Dashboard = () => {
   const [editingClub, setEditingClub] = useState(false);
   const [clubNameInput, setClubNameInput] = useState('');
 
+  const navTitle = editingClub ? undefined : (profile?.club_name || 'Mijn Club');
+
+  const navRight = editingClub ? (
+    <form onSubmit={e => { e.preventDefault(); updateClubName.mutate(clubNameInput); setEditingClub(false); }} className="flex gap-2">
+      <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} className="h-7 w-36 text-sm" placeholder="Clubnaam" />
+      <Button type="submit" size="sm" variant="outline" className="h-7 text-xs">Opslaan</Button>
+    </form>
+  ) : (
+    <button
+      onClick={() => { setClubNameInput(profile?.club_name || ''); setEditingClub(true); }}
+      title="Klik om clubnaam te wijzigen"
+      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.38)', fontSize: '12px', padding: '4px 8px' }}
+    >
+      <Users size={13} style={{ display: 'inline', marginRight: '5px' }} />
+      {profile?.club_name || 'Mijn Club'}
+    </button>
+  );
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="max-w-[900px] mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Users className="h-5 w-5 text-primary" />
-            {editingClub ? (
-              <form onSubmit={e => { e.preventDefault(); updateClubName.mutate(clubNameInput); setEditingClub(false); }} className="flex gap-2">
-                <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} className="h-8 w-48" placeholder="Clubnaam" />
-                <Button type="submit" size="sm" variant="outline">Opslaan</Button>
-              </form>
-            ) : (
-              <h1
-                className="text-lg font-semibold cursor-pointer hover:text-primary"
-                onClick={() => { setClubNameInput(profile?.club_name || ''); setEditingClub(true); }}
-                title="Klik om clubnaam te wijzigen"
-              >
-                {profile?.club_name || 'Mijn Club'}
-              </h1>
-            )}
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => signOut().then(() => navigate('/auth'))}>
-            <LogOut className="h-4 w-4 mr-2" />Uitloggen
-          </Button>
-        </div>
-      </header>
+      <AppNav title={navTitle} rightContent={navRight} />
 
       <main className="max-w-[900px] mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
