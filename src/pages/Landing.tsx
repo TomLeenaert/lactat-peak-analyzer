@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import './Landing.css';
 
 const COPY = {
@@ -68,7 +67,6 @@ const ROWS = [
 
 const Landing = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
 
   const [showEntry, setShowEntry] = useState(false);
   const [rowsVisible, setRowsVisible] = useState(0);
@@ -83,10 +81,6 @@ const Landing = () => {
   const [showExport, setShowExport] = useState(false);
 
   const t = COPY;
-
-  useEffect(() => {
-    if (!loading && user) navigate('/dashboard', { replace: true });
-  }, [user, loading, navigate]);
 
   useEffect(() => {
     const timers: number[] = [];
@@ -289,19 +283,6 @@ const Landing = () => {
         </div>
       </section>
 
-      <div className="lp-stats-section">
-        <div className="lp-center-head">
-          <div className="lp-section-kicker">{t.statsKicker}</div>
-          <h2>{t.statsTitleA}<br />{t.statsTitleB}</h2>
-          <p>{t.statsSub}</p>
-        </div>
-        <div className="lp-stats-grid">
-          <div className="lp-stat-item"><div className="lp-stat-num">5K+</div><div className="lp-stat-label">Analyses completed</div></div>
-          <div className="lp-stat-item"><div className="lp-stat-num">R2 0.99</div><div className="lp-stat-label">Average curve fit</div></div>
-          <div className="lp-stat-item"><div className="lp-stat-num">500+</div><div className="lp-stat-label">Coaches and clubs</div></div>
-          <div className="lp-stat-item"><div className="lp-stat-num">3</div><div className="lp-stat-label">Calculation methods</div></div>
-        </div>
-      </div>
 
       <section className="lp-section" id="features">
         <div className="lp-section-kicker">{t.featKicker}</div>
