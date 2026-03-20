@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import stepGetSetImg from '@/assets/step-getset.jpg';
 import stepTestImg from '@/assets/step-test.png';
 import stepAnalyzeImg from '@/assets/step-analyze.jpg';
+import stepTrainImg from '@/assets/step-train.png';
 
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
