@@ -25,3 +25,8 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# Environment variables — gebruik .env.example als template, commit nooit .env zelf
+.env
+.env.production
+.env.staging
