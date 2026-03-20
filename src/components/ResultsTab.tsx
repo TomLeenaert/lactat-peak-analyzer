@@ -1,40 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { type CalculationResults, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
+import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
 
 interface ResultsTabProps {
   results: CalculationResults | null;
 }
-
-const MethodTag = ({ type, children }: { type: 'obla' | 'dmax' | 'bsln'; children: React.ReactNode }) => {
-  const colors = {
-    obla: 'bg-primary/10 text-primary',
-    dmax: 'bg-warning/15 text-warning',
-    bsln: 'bg-green-500/10 text-green-600',
-  };
-  return <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mr-1 ${colors[type]}`}>{children}</span>;
-};
-
-const ResultBox = ({ variant, label, value, detail }: { variant: 'success' | 'warning' | 'info'; label: string; value: string; detail: string }) => {
-  const colors = {
-    success: 'bg-primary/15 border-primary/25',
-    warning: 'bg-warning/15 border-warning/25',
-    info: 'bg-muted-foreground/15 border-muted-foreground/25',
-  };
-  return (
-    <div className={`p-3 sm:p-4 rounded-lg mb-3 border ${colors[variant]}`}>
-      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{label}</div>
-      <div className="text-xl sm:text-2xl font-bold break-all">{value}</div>
-      <div className="text-xs sm:text-sm text-muted-foreground mt-1">{detail}</div>
-    </div>
-  );
-};
-
-const formatThreshold = (val: number | null): string => {
-  if (!val) return 'n.v.t.';
-  return `${formatPace(val)} /km`;
-};
 
 const ResultsTab = ({ results }: ResultsTabProps) => {
   if (!results) {
@@ -47,7 +17,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
     );
   }
 
-  const { lt1, lt2, speeds, hrs, watts, coeffs, r2 } = results;
+  const { lt1, lt2, speeds, hrs, watts, coeffs } = results;
   if (!coeffs || !Array.isArray(coeffs)) {
     return (
       <Card>
@@ -57,53 +27,93 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
       </Card>
     );
   }
-  const [a, b, c, d] = coeffs;
+
+  const zones = getZones(results);
   const hasWatts = watts.some(w => w > 0);
+  const totalRange = zones[zones.length - 1].to - zones[0].from;
 
   return (
     <div className="space-y-4">
+
+      {/* Lactaatcurve */}
       <Card>
-        <CardHeader><CardTitle>Lactaatcurve</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-lg">Lactaatcurve</CardTitle></CardHeader>
         <CardContent>
           <LactateChart results={results} />
-          <p className="text-sm text-muted-foreground mt-2">Punten = meetwaarden. Doorgetrokken lijn = 3e-graads polynoomfit. Stippellijnen = drempels.</p>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4">
-        <Card>
-          <CardHeader><CardTitle>Threshold 2 mmol — Aerobe Drempel</CardTitle></CardHeader>
-          <CardContent>
-            <ResultBox
-              variant="success"
-              label="Beste schatting (Baseline+0.5)"
-              value={`${formatPace(lt1.best)} /km`}
-              detail={`HR: ~${interpolateHR(lt1.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt1.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt1.best).toFixed(1)} mmol/L`}
-            />
-            <div className="text-sm space-y-2 mt-4">
-              <p><MethodTag type="obla">OBLA 2.0</MethodTag> {formatThreshold(lt1.obla)}</p>
-              <p><MethodTag type="bsln">Baseline+0.5</MethodTag> {formatThreshold(lt1.bsln)}</p>
-              <p><MethodTag type="dmax">Log-Log</MethodTag> {formatThreshold(lt1.loglog)}</p>
-            </div>
-          </CardContent>
-        </Card>
+      {/* LT1 + LT2 samenvatting */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/8 p-4">
+          <p className="text-xs uppercase tracking-wider text-emerald-600 mb-1">Aerobe drempel</p>
+          <p className="text-2xl font-bold">{formatPace(lt1.best)} /km</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            ~{interpolateHR(lt1.best, speeds, hrs)} bpm · {polyEval(coeffs, lt1.best).toFixed(1)} mmol/L
+          </p>
+        </div>
+        <div className="rounded-xl border border-orange-500/25 bg-orange-500/8 p-4">
+          <p className="text-xs uppercase tracking-wider text-orange-600 mb-1">Anaerobe drempel</p>
+          <p className="text-2xl font-bold">{formatPace(lt2.best)} /km</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            ~{interpolateHR(lt2.best, speeds, hrs)} bpm · {polyEval(coeffs, lt2.best).toFixed(1)} mmol/L
+          </p>
+        </div>
+      </div>
 
-        <Card>
-          <CardHeader><CardTitle>Threshold 4 mmol — Anaerobe Drempel</CardTitle></CardHeader>
-          <CardContent>
-            <ResultBox
-              variant="warning"
-              label="Beste schatting (Modified Dmax)"
-              value={`${formatPace(lt2.best)} /km`}
-              detail={`HR: ~${interpolateHR(lt2.best, speeds, hrs)} bpm${hasWatts ? ` · ~${interpolateWatt(lt2.best, speeds, watts)}W` : ''} · Lactaat: ${polyEval(coeffs, lt2.best).toFixed(1)} mmol/L`}
-            />
-            <div className="text-sm space-y-2 mt-4">
-              <p><MethodTag type="obla">OBLA 4.0</MethodTag> {formatThreshold(lt2.obla)}</p>
-              <p><MethodTag type="dmax">Dmax</MethodTag> {formatThreshold(lt2.dmax)}</p>
-              <p><MethodTag type="dmax">Mod. Dmax</MethodTag> {formatThreshold(lt2.moddmax)}</p>
+      {/* Zone bar */}
+      <div className="flex rounded-xl overflow-hidden h-8 border border-border/60 shadow-inner">
+        {zones.map(z => {
+          const width = Math.max(((z.to - z.from) / totalRange) * 100, 5);
+          return (
+            <div
+              key={z.name}
+              className="flex items-center justify-center text-[10px] font-bold text-white"
+              style={{ width: `${width}%`, background: z.color, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}
+            >
+              {z.name.replace('Zone ', 'Z')}
             </div>
-          </CardContent>
-        </Card>
+          );
+        })}
+      </div>
+
+      {/* Zones — verticaal, één per rij */}
+      <div className="space-y-2">
+        {zones.map(z => {
+          const hrFrom = interpolateHR(z.from, speeds, hrs);
+          const hrTo   = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
+          const wFrom  = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
+          const wTo    = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
+          const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
+          const lacTo   = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
+          return (
+            <div
+              key={z.name}
+              className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/60 px-4 py-3"
+              style={{ borderLeft: `4px solid ${z.color}` }}
+            >
+              {/* Zone naam + label */}
+              <div className="w-28 shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: z.color }} />
+                  <span className="font-bold text-sm">{z.name}</span>
+                </div>
+                <span className="text-[11px] text-muted-foreground ml-4">{z.label}</span>
+              </div>
+
+              {/* Beschrijving */}
+              <p className="text-xs text-muted-foreground hidden sm:block flex-1">{z.desc}</p>
+
+              {/* Waarden */}
+              <div className="ml-auto text-right shrink-0 space-y-0.5">
+                <p className="text-xs font-mono font-semibold">{formatPace(z.to)} – {formatPace(z.from)} /km</p>
+                {hrFrom > 0 && <p className="text-xs text-muted-foreground font-mono">{hrFrom} – {hrTo} bpm</p>}
+                {hasWatts && <p className="text-xs text-muted-foreground font-mono">{wFrom} – {wTo} W</p>}
+                <p className="text-xs text-muted-foreground font-mono">{lacFrom} – {lacTo} mmol/L</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
     </div>
