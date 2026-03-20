@@ -9,6 +9,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Demo from "./pages/Demo";
 import Auth from "./pages/Auth";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Dashboard from "./pages/Dashboard";
 import AthleteDetail from "./pages/AthleteDetail";
 import AthleteTest from "./pages/AthleteTest";
@@ -30,6 +32,8 @@ const App = () => (
               <Route path="/demo" element={<Demo />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/athlete/:id" element={<ProtectedRoute><AthleteDetail /></ProtectedRoute>} />
               <Route path="/athlete/:id/test" element={<ProtectedRoute><AthleteTest /></ProtectedRoute>} />
