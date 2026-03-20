@@ -235,14 +235,7 @@ const Card = ({ children }: { children: React.ReactNode }) => (
 const Demo = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>(0);
-  const AUTO_ADVANCE = [5500, 4500, 6000, 0]; // ms per step (0 = no auto-advance on last)
-
-  useEffect(() => {
-    const delay = AUTO_ADVANCE[step];
-    if (!delay) return;
-    const t = window.setTimeout(() => setStep(s => Math.min(s + 1, 3) as Step), delay);
-    return () => clearTimeout(t);
-  }, [step]);
+  // No auto-advance — user navigates manually
 
   const panels = [
     <StepAthlete active={step === 0} />,
@@ -371,12 +364,12 @@ const Demo = () => {
             <button
               onClick={() => setStep(s => Math.min(s + 1, 3) as Step)}
               style={{
-                padding: '10px 22px', borderRadius: '8px', fontSize: '14px', fontWeight: 600,
+                padding: '11px 28px', borderRadius: '8px', fontSize: '15px', fontWeight: 700,
                 background: 'linear-gradient(135deg,#6644ff,#8866ff)', border: 'none',
-                color: '#fff', cursor: 'pointer',
+                color: '#fff', cursor: 'pointer', boxShadow: '0 4px 20px rgba(102,68,255,0.35)',
               }}
             >
-              Volgende →
+              Volgende stap →
             </button>
           ) : (
             <button
