@@ -267,7 +267,7 @@ const Landing = () => {
             <p className="lp-hero-desc">{t.heroDesc}</p>
 <div className="lp-hero-actions">
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
-              <button className="lp-hero-cta-secondary" onClick={() => { const el = document.getElementById('how-it-works'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}>{t.cta2}</button>
+              <button className="lp-hero-cta-secondary" onClick={() => navigate('/demo')}>{t.cta2}</button>
             </div>
           </div>
 
