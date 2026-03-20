@@ -141,8 +141,8 @@ const COPY = {
 const STEP_PHOTOS = [
   // Get set: coach discussing with athlete on athletics track
   stepGetSetImg,
-  // Test: woman running alone on athletics track
-  'https://images.unsplash.com/photo-1461897104016-0b3b00b1ea56?w=600&h=420&fit=crop&auto=format&q=80',
+  // Test: woman running alone on athletics track at night (Jadon Johnson via Unsplash)
+  'https://images.unsplash.com/photo-1726195221456-7e104a23bbff?w=600&h=420&fit=crop&auto=format&q=80',
   // Analyze: athlete sitting on red tartan track checking smartwatch (Anastasia Polyakova)
   'https://images.unsplash.com/photo-1738498356408-e3550c87417e?w=600&h=420&fit=crop&auto=format&q=80',
   // Train: group of young athletes sprinting in race on red track with coaches watching (Peter Robbins)
