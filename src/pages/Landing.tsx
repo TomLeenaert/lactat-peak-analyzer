@@ -32,6 +32,7 @@ const COPY = {
       { title: 'Wetenschappelijke drempelanalyse', desc: 'Meerdere gevalideerde methoden gecombineerd tot één duidelijk resultaat. Geen black box. Robuuste, evidence-based resultaten.' },
       { title: '5 kant-en-klare trainingszones', desc: 'Directe zones voor tempo, hartslag en vermogen. Train met precisie vanaf dag één.' },
       { title: 'Betaal per gebruik. Geen abonnement.', desc: 'Betaal enkel wanneer je een test uitvoert. Simpel. Transparant. Schaalt met jou.' },
+      { title: 'Gebouwd voor echte tests', desc: 'Ontworpen voor coaches, clubs en atleten. Geen labomstandigheden nodig. Werkt waar je traint.' },
     ],
     cmpKicker: 'Vergelijking',
     cmpTitleA: 'Lab-niveau inzicht.',
