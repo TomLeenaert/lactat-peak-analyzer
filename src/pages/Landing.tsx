@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import stepGetSetImg from '@/assets/step-getset.jpg';
+import stepTestImg from '@/assets/step-test.png';
 
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
@@ -141,8 +142,8 @@ const COPY = {
 const STEP_PHOTOS = [
   // Get set: coach discussing with athlete on athletics track
   stepGetSetImg,
-  // Test: man in blue tank top running on track field during daytime (Capstone Events via Unsplash)
-  'https://images.unsplash.com/photo-1598012268972-217e6036c419?w=600&h=420&fit=crop&auto=format&q=80',
+  // Test: man jogging alone on athletics track
+  stepTestImg,
   // Analyze: athlete sitting on red tartan track checking smartwatch (Anastasia Polyakova)
   'https://images.unsplash.com/photo-1738498356408-e3550c87417e?w=600&h=420&fit=crop&auto=format&q=80',
   // Train: group of young athletes sprinting in race on red track with coaches watching (Peter Robbins)
