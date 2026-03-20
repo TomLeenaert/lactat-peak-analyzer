@@ -66,12 +66,12 @@ const COPY = {
     howTitle: 'Get set.',
     howTitleEm: 'Test. Analyze. Train.',
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
-    stepHero: ['Your test. Your protocol.', 'Measure what matters.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
+    stepHero: ['Your test. Your protocol.', 'Measure.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
       { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.' },
-      { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap. Voer alles in via je mobiele app — geen papier meer.' },
-      { title: 'Directe resultaten', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.' },
-      { title: 'Train met data', desc: 'Exporteer een professioneel PDF-rapport met curve, zones en trainingsaanbevelingen — klaar voor coach en atleet.' },
+      { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap.' },
+      { title: 'Directe resultaten', desc: 'Voer alles in via je mobiele app. Geen papier meer.' },
+      { title: 'Train met data', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden. Klaar voor coach en atleet.' },
     ],
   },
   en: {
@@ -131,12 +131,12 @@ const COPY = {
     howTitle: 'Get set.',
     howTitleEm: 'Test. Analyze. Train.',
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
-    stepHero: ['Your test. Your protocol.', 'Measure what matters.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
+    stepHero: ['Your test. Your protocol.', 'Measure.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
       { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. LacTest automatically generates all test steps.' },
-      { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step. Enter everything via your mobile app — no paper needed.' },
-      { title: 'Instant results', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds.' },
-      { title: 'Train with data', desc: 'Export a professional PDF report with curve, zones and training recommendations — ready for coach and athlete.' },
+      { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step.' },
+      { title: 'Instant results', desc: 'Enter everything via your mobile app. No paper needed.' },
+      { title: 'Train with data', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds. Ready for coach and athlete.' },
     ],
   },
 };
