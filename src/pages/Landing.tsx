@@ -61,11 +61,12 @@ const COPY = {
     howTitle: 'Get set.',
     howTitleEm: 'Test. Analyze. Train.',
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
+    stepHero: ['Your test. Your protocol.', 'Measure what matters.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
-      { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.', icon: '⚙️' },
-      { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap. Voer alles in via je mobiele app — geen papier meer.', icon: '🏃' },
-      { title: 'Directe resultaten', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.', icon: '📊' },
-      { title: 'Train met data', desc: 'Exporteer een professioneel PDF-rapport met curve, zones en trainingsaanbevelingen — klaar voor coach en atleet.', icon: '📄' },
+      { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.' },
+      { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap. Voer alles in via je mobiele app — geen papier meer.' },
+      { title: 'Directe resultaten', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.' },
+      { title: 'Train met data', desc: 'Exporteer een professioneel PDF-rapport met curve, zones en trainingsaanbevelingen — klaar voor coach en atleet.' },
     ],
   },
   en: {
@@ -125,14 +126,22 @@ const COPY = {
     howTitle: 'Get set.',
     howTitleEm: 'Test. Analyze. Train.',
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
+    stepHero: ['Your test. Your protocol.', 'Measure what matters.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
-      { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. LacTest automatically generates all test steps.', icon: '⚙️' },
-      { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step. Enter everything via your mobile app — no paper needed.', icon: '🏃' },
-      { title: 'Instant results', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds.', icon: '📊' },
-      { title: 'Train with data', desc: 'Export a professional PDF report with curve, zones and training recommendations — ready for coach and athlete.', icon: '📄' },
+      { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. LacTest automatically generates all test steps.' },
+      { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step. Enter everything via your mobile app — no paper needed.' },
+      { title: 'Instant results', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds.' },
+      { title: 'Train with data', desc: 'Export a professional PDF report with curve, zones and training recommendations — ready for coach and athlete.' },
     ],
   },
 };
+
+const STEP_PHOTOS = [
+  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=420&fit=crop&auto=format&q=80',
+  'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&h=420&fit=crop&auto=format&q=80',
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=420&fit=crop&auto=format&q=80',
+  'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&h=420&fit=crop&auto=format&q=80',
+];
 
 const ROWS = [
   ['7:04 /km', '1.2', '128'],
@@ -375,10 +384,11 @@ const Landing = () => {
             <div key={i} className="lp-step">
               <div className="lp-step-dot">{t.stepLabels[i]}</div>
               <div className="lp-step-img">
-                <span className="lp-step-img-icon">{step.icon}</span>
+                <img src={STEP_PHOTOS[i]} alt={step.title} className="lp-step-photo" loading="lazy" />
               </div>
               <h3 className="lp-step-title">{step.title}</h3>
               <p className="lp-step-desc">{step.desc}</p>
+              <p className="lp-step-hero">{t.stepHero[i]}</p>
             </div>
           ))}
         </div>
