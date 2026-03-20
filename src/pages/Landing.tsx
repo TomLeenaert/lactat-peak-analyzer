@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import stepGetSetImg from '@/assets/step-getset.jpg';
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
 
