@@ -58,13 +58,14 @@ const COPY = {
     footerTerms: 'Gebruiksvoorwaarden',
     footerContact: 'Contact',
     howKicker: 'Hoe het werkt',
-    howTitle: 'Van veldtest naar',
-    howTitleEm: 'volledig rapport',
+    howTitle: 'Get set.',
+    howTitleEm: 'Test. Analyze. Train.',
+    stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
     steps: [
       { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.', icon: '⚙️' },
       { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap. Voer alles in via je mobiele app — geen papier meer.', icon: '🏃' },
-      { title: 'LacTest berekent alles', desc: 'Relax. De volledige lactaatcurve, drempels en zones zijn klaar in minder dan 10 seconden.', icon: '📊' },
-      { title: 'Download je rapport', desc: 'Exporteer een professioneel PDF met curve, zones en trainingsaanbevelingen — klaar voor coach en atleet.', icon: '📄' },
+      { title: 'Directe resultaten', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.', icon: '📊' },
+      { title: 'Train met data', desc: 'Exporteer een professioneel PDF-rapport met curve, zones en trainingsaanbevelingen — klaar voor coach en atleet.', icon: '📄' },
     ],
   },
   en: {
@@ -121,13 +122,14 @@ const COPY = {
     footerTerms: 'Terms of use',
     footerContact: 'Contact',
     howKicker: 'How it works',
-    howTitle: 'From field test to',
-    howTitleEm: 'full report',
+    howTitle: 'Get set.',
+    howTitleEm: 'Test. Analyze. Train.',
+    stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
     steps: [
       { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. LacTest automatically generates all test steps.', icon: '⚙️' },
       { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step. Enter everything via your mobile app — no paper needed.', icon: '🏃' },
-      { title: 'LacTest calculates everything', desc: 'Relax. The full lactate curve, thresholds and zones are ready in under 10 seconds.', icon: '📊' },
-      { title: 'Download your report', desc: 'Export a professional PDF with curve, zones and training recommendations — ready for coach and athlete.', icon: '📄' },
+      { title: 'Instant results', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds.', icon: '📊' },
+      { title: 'Train with data', desc: 'Export a professional PDF report with curve, zones and training recommendations — ready for coach and athlete.', icon: '📄' },
     ],
   },
 };
@@ -371,7 +373,7 @@ const Landing = () => {
           <div className="lp-stepper-track" />
           {t.steps.map((step, i) => (
             <div key={i} className="lp-step">
-              <div className="lp-step-dot">{i + 1}</div>
+              <div className="lp-step-dot">{t.stepLabels[i]}</div>
               <div className="lp-step-img">
                 <span className="lp-step-img-icon">{step.icon}</span>
               </div>

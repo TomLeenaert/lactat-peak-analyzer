@@ -709,7 +709,7 @@
 
 .lp-stepper-track {
   position: absolute;
-  top: 31px; /* vertically centered on the dots */
+  top: 15px; /* vertically centered on the pill dots */
   left: calc(12.5% + 8px);
   right: calc(12.5% + 8px);
   height: 1px;
@@ -728,13 +728,17 @@
 }
 
 .lp-step-dot {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+  width: auto;
+  align-self: flex-start;
+  height: 30px;
+  border-radius: 15px;
+  padding: 0 14px;
   background: var(--purple);
   color: #fff;
-  font-size: 16px;
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
