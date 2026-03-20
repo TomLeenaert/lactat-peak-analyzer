@@ -106,51 +106,6 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader><CardTitle>Polynoomfit & Details</CardTitle></CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 gap-3">
-            <ResultBox
-              variant="info"
-              label="Polynoomvergelijking"
-              value=""
-              detail={`y = ${a.toFixed(6)}x³ ${b >= 0 ? '+' : ''}${b.toFixed(5)}x² ${c >= 0 ? '+' : ''}${c.toFixed(4)}x ${d >= 0 ? '+' : ''}${d.toFixed(3)}`}
-            />
-            <ResultBox
-              variant="info"
-              label="R² (Coëfficiënt van determinatie)"
-              value={r2.toFixed(4)}
-              detail={r2 > 0.98 ? '✅ Uitstekende fit' : r2 > 0.95 ? '✅ Goede fit' : r2 > 0.90 ? '⚠️ Acceptabele fit' : '❌ Slechte fit — controleer data'}
-            />
-          </div>
-
-          <h4 className="text-base font-semibold mb-2 mt-4">Ruwe data vs. polynoomfit</h4>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tempo</TableHead>
-                <TableHead>Gemeten</TableHead>
-                <TableHead>Fit</TableHead>
-                <TableHead>Verschil</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {speeds.map((s, i) => {
-                const fitted = polyEval(coeffs, s);
-                const diff = results.lactates[i] - fitted;
-                return (
-                  <TableRow key={i}>
-                    <TableCell className="font-mono">{formatPace(s)} /km</TableCell>
-                    <TableCell className="font-mono">{results.lactates[i].toFixed(1)}</TableCell>
-                    <TableCell className="font-mono">{fitted.toFixed(2)}</TableCell>
-                    <TableCell className="font-mono">{diff >= 0 ? '+' : ''}{diff.toFixed(2)}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   );
 };
