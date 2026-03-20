@@ -97,6 +97,7 @@ const COPY = {
       { title: 'Science-based threshold analysis', desc: 'Multiple validated methods combined into one clear outcome. No black box. Just robust, evidence-based results.' },
       { title: '5 ready-to-use training zones', desc: 'Instant zones for pace, heart rate and power. Train with precision from day one.' },
       { title: 'Pay per use. No subscription.', desc: 'Only pay when you run a test. Simple. Transparent. Scales with you.' },
+      { title: 'Built for real-world testing', desc: 'Designed for coaches, clubs and athletes. No lab conditions required. Works where you actually train.' },
     ],
     cmpKicker: 'Comparison',
     cmpTitleA: 'Lab-level insight.',
