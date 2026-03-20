@@ -137,10 +137,14 @@ const COPY = {
 };
 
 const STEP_PHOTOS = [
-  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=420&fit=crop&auto=format&q=80',
-  'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&h=420&fit=crop&auto=format&q=80',
-  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=420&fit=crop&auto=format&q=80',
-  'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&h=420&fit=crop&auto=format&q=80',
+  // Get set: athletic coach giving instructions to athlete
+  'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&h=420&fit=crop&auto=format&q=80',
+  // Test: single runner alone on tartan track
+  'https://images.unsplash.com/photo-1471295253337-3ceaaedca402?w=600&h=420&fit=crop&auto=format&q=80',
+  // Analyze: coach entering results on smartphone
+  'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=420&fit=crop&auto=format&q=80',
+  // Train: group of athletes training on track, coach watching
+  'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=420&fit=crop&auto=format&q=80',
 ];
 
 const ROWS = [
