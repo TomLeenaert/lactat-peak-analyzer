@@ -111,29 +111,16 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
               />
             </div>
             {protocol.allOutEnabled && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label>Afstand (meter)</Label>
-                  <Input
-                    type="number"
-                    step="100"
-                    value={protocol.allOutDistance}
-                    onChange={e => update('allOutDistance', parseInt(e.target.value) || 800)}
-                    placeholder="bv. 800"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Typisch: 800m of 1000m</p>
-                </div>
-                <div>
-                  <Label>Max duur (seconden)</Label>
-                  <Input
-                    type="number"
-                    step="10"
-                    value={protocol.allOutDuration}
-                    onChange={e => update('allOutDuration', parseInt(e.target.value) || 180)}
-                    placeholder="bv. 180"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Veiligheidsgrens, typisch 3-5 min</p>
-                </div>
+              <div>
+                <Label>Afstand (meter)</Label>
+                <Input
+                  type="number"
+                  step="100"
+                  value={protocol.allOutDistance}
+                  onChange={e => update('allOutDistance', parseInt(e.target.value) || 800)}
+                  placeholder="bv. 800"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Typisch: 800m of 1000m</p>
               </div>
             )}
           </div>
@@ -162,7 +149,7 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
                   <div className="flex-1">
                     <span className="font-semibold text-sm text-destructive">All-out</span>
                   </div>
-                  <span className="text-xs text-destructive font-mono">{protocol.allOutDistance}m (max {protocol.allOutDuration}s)</span>
+                  <span className="text-xs text-destructive font-mono">{protocol.allOutDistance}m</span>
                 </div>
               )}
             </div>
@@ -189,7 +176,7 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
           <ProtocolStep num="3" title={`Stappen van ${protocol.stepDistance}m`} desc={`Loop ${protocol.stepDistance}m per stap. Start op ${formatPace(protocol.startSpeed)} /km, verhoog het tempo met ${protocol.paceIncrementSec}s per stap. Na elke stap: 30s pauze voor bloedafname.`} />
           <ProtocolStep num="4" title="Bloedafname" desc="Reinig de prikplaats met alcohol. Prik, veeg eerste druppel weg, test de tweede druppel. Noteer: lactaat (mmol/L), hartslag (einde stap), RPE (1-10)." />
           {protocol.allOutEnabled && (
-            <ProtocolStep num="5" title={`All-out: ${protocol.allOutDistance}m`} desc={`Na de laatste reguliere stap: maximale inspanning over ${protocol.allOutDistance}m (max ${protocol.allOutDuration}s). Meet hartslag en lactaat direct na afloop en na 1 min rust.`} />
+            <ProtocolStep num="5" title={`All-out: ${protocol.allOutDistance}m`} desc={`Na de laatste reguliere stap: maximale inspanning over ${protocol.allOutDistance}m. Meet hartslag en lactaat direct na afloop en na 1 min rust.`} />
           )}
           <ProtocolStep num={protocol.allOutEnabled ? '6' : '5'} title="Cooling down" desc="10–15 min uitlopen op lage intensiteit. Eventueel nog een laatste lactaatmeting na 5 min cooldown." />
         </CardContent>

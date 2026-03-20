@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DEMO_ATHLETE, DEMO_STEPS } from '@/lib/demo-data';
 import { formatPace, type StepData } from '@/lib/lactate-math';
 import { Trash2, Plus, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -82,15 +81,6 @@ const calcSpeed = (distanceM: number, timeSec: number): number => {
   return (distanceM / 1000) / (timeSec / 3600);
 };
 
-const TEST_DATA: StepData[] = [
-  { speed: 13.19, lactate: 1.8, hr: 140, watt: 260, distance: 1600, time: 437 },
-  { speed: 13.69, lactate: 1.7, hr: 146, watt: 275, distance: 1600, time: 421 },
-  { speed: 14.12, lactate: 1.3, hr: 152, watt: 290, distance: 1600, time: 408 },
-  { speed: 14.88, lactate: 2.7, hr: 160, watt: 310, distance: 1600, time: 387 },
-  { speed: 15.06, lactate: 2.3, hr: 164, watt: 320, distance: 1600, time: 382 },
-  { speed: 15.72, lactate: 3.8, hr: 167, watt: 340, distance: 1600, time: 366 },
-  { speed: 16.29, lactate: 5.8, hr: 176, watt: 360, distance: 1600, time: 354 },
-];
 
 const DataInputTab = ({
   testData, setTestData,
@@ -175,24 +165,6 @@ const DataInputTab = ({
     e.target.value = '';
   };
 
-  const loadExample = () => {
-    setAthleteName(DEMO_ATHLETE.name);
-    setTestDate(DEMO_ATHLETE.testDate);
-    setRestingLactate(String(DEMO_ATHLETE.restingLactate));
-    setStepDistance('1600');
-    setStepIncrement('1');
-    setTestData([...DEMO_STEPS]);
-  };
-
-  const loadTestData = () => {
-    setAthleteName('Testatleet 1600m');
-    setTestDate('2026-03-08');
-    setRestingLactate('1.3');
-    setStepDistance('1600');
-    setStepIncrement('0.5');
-    setTestData([...TEST_DATA]);
-  };
-
   const clearData = () => {
     setAthleteName('');
     setTestDate(new Date().toISOString().split('T')[0]);
@@ -234,8 +206,6 @@ const DataInputTab = ({
               <Upload className="h-3.5 w-3.5 mr-1" /> JSON
             </Button>
             <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
-            <Button variant="secondary" size="sm" onClick={loadExample}>📥 Voorbeeld</Button>
-            <Button variant="secondary" size="sm" onClick={loadTestData}>🧪 Testdata</Button>
             <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
           </div>
         </div>
@@ -285,47 +255,46 @@ const DataInputTab = ({
 
         {/* Step data - mobile card layout */}
         <h4 className="text-base font-semibold pt-2">Stapgegevens</h4>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {testData.map((row, i) => {
             const rowDist = row.distance || dist;
             return (
               <div key={i} className="border border-border rounded-lg p-3 bg-muted/30">
+                {/* Header row */}
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-primary">Stap {i + 1}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{rowDist}m</span>
-                    {row.speed > 0 && (
-                      <span className="text-xs font-mono text-muted-foreground">
-                        → {formatPace(row.speed)} /km · {row.speed.toFixed(1)} km/u
-                      </span>
+                    <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</span>
+                    {row.speed > 0 ? (
+                      <span className="text-xs font-mono font-semibold text-foreground">{formatPace(row.speed)} /km</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">{rowDist}m</span>
                     )}
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => removeRow(i)}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
                   </div>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => removeRow(i)}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                {/* Core fields: Tijd + Lactaat side by side (big, easy to tap) */}
+                <div className="grid grid-cols-2 gap-2 mb-2">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Tijd (mm:ss)</Label>
+                    <Label className="text-xs text-muted-foreground">⏱ Tijd (mm:ss)</Label>
                     <Input
-                      className="font-mono"
+                      className="font-mono text-base h-11"
                       value={secsToTimeStr(row.time || 0)}
                       onChange={e => updateRowTime(i, e.target.value)}
                       placeholder="5:30"
+                      inputMode="numeric"
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Lactaat</Label>
-                    <Input type="number" step="0.1" className="font-mono" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} placeholder="mmol/L" />
+                    <Label className="text-xs text-muted-foreground">🩸 Lactaat</Label>
+                    <Input type="number" step="0.1" className="font-mono text-base h-11" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} placeholder="mmol/L" inputMode="decimal" />
                   </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Hartslag</Label>
-                    <Input type="number" className="font-mono" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} placeholder="bpm" />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Watt (optioneel)</Label>
-                    <Input type="number" className="font-mono" value={row.watt || ''} onChange={e => updateRow(i, 'watt', e.target.value)} placeholder="W" />
-                  </div>
+                </div>
+                {/* Secondary: HR only (Watt hidden for runners) */}
+                <div>
+                  <Label className="text-xs text-muted-foreground">💓 Hartslag (bpm)</Label>
+                  <Input type="number" className="font-mono h-9" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} placeholder="bpm" inputMode="numeric" />
                 </div>
               </div>
             );
