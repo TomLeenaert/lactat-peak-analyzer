@@ -403,23 +403,6 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="lp-section" id="pricing">
-        <div className="lp-section-kicker">{t.cmpKicker}</div>
-        <h2>{t.cmpTitleA}<br />{t.cmpTitleB}</h2>
-        <p className="lp-section-lead">{t.cmpLead}</p>
-        <div className="lp-compare-grid">
-          {t.cmpHeaders.map(h => <div key={h}>{h}</div>)}
-          {t.cmpRows.map(row => row.map((cell, i) => <div key={i}>{cell}</div>))}
-        </div>
-      </section>
-
-      <section className="lp-cta" id="start">
-        <h2>{t.ctaTitleA}<br />{t.ctaTitleB}</h2>
-        <p>{t.ctaDesc}</p>
-        <button onClick={() => navigate('/auth')}>{t.ctaBtn}</button>
-        <small>{t.ctaNote}</small>
-      </section>
-
       <footer className="lp-footer">
         <div>LacTest</div>
         <div className="lp-footer-links">
