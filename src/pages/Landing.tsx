@@ -141,9 +141,8 @@ const COPY = {
 const STEP_PHOTOS = [
   // Get set: coach discussing with athlete on athletics track
   stepGetSetImg,
-  // Test: aerial drone view of athlete running laps on athletics track
-  // Test: aerial drone view of athlete running laps on athletics track (Peter Robbins via Unsplash)
-  'https://images.unsplash.com/photo-1714176966782-854fa86faf1a?w=600&h=420&fit=crop&auto=format&q=80',
+  // Test: woman running alone on athletics track
+  'https://images.unsplash.com/photo-1461897104016-0b3b00b1ea56?w=600&h=420&fit=crop&auto=format&q=80',
   // Analyze: athlete sitting on red tartan track checking smartwatch (Anastasia Polyakova)
   'https://images.unsplash.com/photo-1738498356408-e3550c87417e?w=600&h=420&fit=crop&auto=format&q=80',
   // Train: group of young athletes sprinting in race on red track with coaches watching (Peter Robbins)
