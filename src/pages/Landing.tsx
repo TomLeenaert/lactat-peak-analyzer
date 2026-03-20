@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import stepGetSetImg from '@/assets/step-getset.jpg';
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
 
@@ -137,8 +138,8 @@ const COPY = {
 };
 
 const STEP_PHOTOS = [
-  // Get set: relay runner crouched at starting blocks on red tartan track (Braden Collum)
-  'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&h=420&fit=crop&auto=format&q=80',
+  // Get set: coach discussing with athlete on athletics track
+  stepGetSetImg,
   // Test: close-up of runner's legs in action on red tartan track (Jakob Owens)
   'https://images.unsplash.com/photo-1547941126-3d5322b218b0?w=600&h=420&fit=crop&auto=format&q=80',
   // Analyze: athlete sitting on red tartan track checking smartwatch (Anastasia Polyakova)
