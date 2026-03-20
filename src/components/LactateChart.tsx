@@ -85,17 +85,17 @@ const LactateChart = ({ results }: LactateChartProps) => {
               <Label value="OBLA 4.0" position="right" offset={8} fill="hsl(25, 95%, 53%)" fontSize={10} />
             </ReferenceLine>
 
-            {/* LT1 vertical */}
+            {/* Aerobe drempel */}
             {lt1.best >= xMin && lt1.best <= xMax && (
               <ReferenceLine x={lt1.best} stroke="hsl(160, 60%, 50%)" strokeDasharray="8 4" strokeWidth={1.5}>
-                <Label value={`LT1 Aerobe ${formatPace(lt1.best)}`} position="top" offset={8} fill="hsl(160, 60%, 50%)" fontSize={11} fontWeight="bold" />
+                <Label value={`Aerobe ${formatPace(lt1.best)}`} position="top" offset={8} fill="hsl(160, 60%, 50%)" fontSize={11} fontWeight="bold" />
               </ReferenceLine>
             )}
 
-            {/* LT2 vertical */}
+            {/* Anaerobe drempel */}
             {lt2.best >= xMin && lt2.best <= xMax && (
               <ReferenceLine x={lt2.best} stroke="hsl(25, 85%, 50%)" strokeDasharray="8 4" strokeWidth={1.5}>
-                <Label value={`LT2 Anaerobe ${formatPace(lt2.best)}`} position="top" offset={8} fill="hsl(25, 85%, 50%)" fontSize={11} fontWeight="bold" />
+                <Label value={`Anaerobe ${formatPace(lt2.best)}`} position="top" offset={8} fill="hsl(25, 85%, 50%)" fontSize={11} fontWeight="bold" />
               </ReferenceLine>
             )}
 
@@ -125,7 +125,7 @@ const LactateChart = ({ results }: LactateChartProps) => {
         </ResponsiveContainer>
       </div>
       <p className="text-xs text-muted-foreground text-center mt-2">
-        Punten = meetwaarden. Doorgetrokken lijn = 3e-graads polynoomfit. Verticale stippellijnen = LT1/LT2. Horizontale lijnen = OBLA referentie.
+        Punten = meetwaarden · Lijn = polynoomfit · Verticale lijnen = aerobe/anaerobe drempel · Horizontale lijnen = OBLA referentie
       </p>
     </div>
   );
