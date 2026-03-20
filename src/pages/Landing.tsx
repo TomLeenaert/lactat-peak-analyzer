@@ -148,8 +148,8 @@ const STEP_PHOTOS = [
   stepTestImg,
   // Analyze: coach entering lactate data on smartphone on athletics track
   stepAnalyzeImg,
-  // Train: group of young athletes sprinting in race on red track with coaches watching (Peter Robbins)
-  'https://images.unsplash.com/photo-1714176966782-854fa86faf1a?w=600&h=420&fit=crop&auto=format&q=80',
+  // Train: zones visual from the app
+  stepTrainImg,
 ];
 
 const ROWS = [
