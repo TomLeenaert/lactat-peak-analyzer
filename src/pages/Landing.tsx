@@ -3,55 +3,43 @@ import { useNavigate } from 'react-router-dom';
 import './Landing.css';
 
 const COPY = {
-  annText: 'New: AI-powered threshold detection with heart rate zones - ',
-  annLink: 'read more ->',
-  navHow: 'How it works',
-  navFeat: 'Features',
-  navPrice: 'Pricing',
-  navTest: 'Testimonials',
-  navBook: 'Book demo',
-  navStart: 'Get started ->',
-  eyebrow: 'Ditch subscriptions. Pay €9.95 per test. Get thresholds and zones instantly.',
-  heroTitleA: 'Know your thresholds.',
-  heroTitleB: 'Own every workout.',
+  navHow: 'Hoe het werkt',
+  navFeat: 'Mogelijkheden',
+  navPrice: 'Vergelijking',
+  navStart: 'Start gratis ->',
+  eyebrow: 'Geen abonnement. Betaal €9.95 per test. Drempels en zones in seconden.',
+  heroTitleA: 'Ken je drempels.',
+  heroTitleB: 'Train met data.',
   heroDesc:
-    'LacTest turns your field test data into a full analysis report with aerobic and anaerobic threshold, 5 training zones and a coach-ready PDF.',
+    'LacTest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel, 5 trainingszones en een coach-klaar PDF.',
   cmdLabel: 'start',
-  cmdText: 'lactest.app -> analyse -> export.pdf',
-  cta1: 'Start your analysis ->',
-  cta2: 'View live demo',
-  statsKicker: 'Proven results',
-  statsTitleA: 'Elite-grade analysis',
-  statsTitleB: 'in under a minute.',
-  statsSub: 'Every test gets the right method, zones and report output.',
-  featKicker: "What's included",
-  featTitleA: 'Everything to coach smarter,',
-  featTitleB: 'in one test report.',
-  featLead: 'You run the field test. LacTest does the rest from polynomial fit to coach-ready PDF.',
-  quote:
-    'Since using LacTest our analysis workflow is 3x faster. The athlete gets the same report as a lab test in 60 seconds.',
-  quoteTitle: 'Head of Performance, Athletics Club East Flanders',
-  quoteOrg: 'Verified coach',
-  cmpKicker: 'Comparison',
-  cmpTitleA: 'Lab-level insight.',
-  cmpTitleB: 'Without lab-level cost.',
-  cmpLead: 'A professional threshold test often costs EUR 300-500 and several business days. LacTest does it for EUR 9.95 in seconds.',
-  ctaTitleA: 'Stop guessing.',
-  ctaTitleB: 'Start training with data.',
-  ctaDesc: 'Your first analysis in under 5 minutes. Pay only when exporting.',
-  ctaBtn: 'Start free analysis ->',
-  ctaNote: 'EUR 9.95 only at report download - no subscription',
-  sceneTitle: 'New lactate test',
-  sceneAthlete: 'Sarah Vermeulen - Running',
-  analyse: 'Analyse thresholds',
-  analysing: 'Analysing...',
-  rpAero: 'Aerobic threshold',
-  rpAna: 'Anaerobic threshold',
-  rpFit: 'Excellent',
-  exportLabel: 'Report ready - Generate PDF',
+  cmdText: 'lactest.app -> analyseer -> export.pdf',
+  cta1: 'Start je analyse ->',
+  cta2: 'Bekijk demo',
+  featKicker: 'Wat is inbegrepen',
+  featTitleA: 'Alles om slimmer te coachen,',
+  featTitleB: 'in één testrapport.',
+  featLead: 'Jij doet de veldtest. LacTest doet de rest — van polynoomfit tot coach-klaar PDF.',
+  cmpKicker: 'Vergelijking',
+  cmpTitleA: 'Lab-niveau inzicht.',
+  cmpTitleB: 'Zonder lab-niveau kosten.',
+  cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. LacTest doet het voor €9.95 in seconden.',
+  ctaTitleA: 'Stop met gokken.',
+  ctaTitleB: 'Train op basis van data.',
+  ctaDesc: 'Je eerste analyse in minder dan 5 minuten. Betaal enkel bij export.',
+  ctaBtn: 'Start gratis analyse ->',
+  ctaNote: '€9.95 enkel bij rapport-download — geen abonnement',
+  sceneTitle: 'Nieuwe lactaattest',
+  sceneAthlete: 'Sarah Vermeulen - Lopen',
+  analyse: 'Analyseer drempels',
+  analysing: 'Berekenen...',
+  rpAero: 'Aerobe drempel',
+  rpAna: 'Anaerobe drempel',
+  rpFit: 'Uitstekend',
+  exportLabel: 'Rapport klaar — genereer PDF',
   exportBtn: 'Download PDF',
-  zl: 'Z1 Recovery',
-  footer: 'Made for athletes',
+  zl: 'Z1 Herstel',
+  footer: 'Gemaakt voor atleten',
 } as const;
 
 const ROWS = [
@@ -160,13 +148,11 @@ const Landing = () => {
       <nav className="lp-nav">
         <a href="#" className="lp-nav-logo">Lac<span className="lp-nav-logo-dot">.</span>Test</a>
         <div className="lp-nav-links">
-          <a className="lp-nav-link" href="#how">{t.navHow}</a>
+          <a className="lp-nav-link" href="#how-it-works">{t.navHow}</a>
           <a className="lp-nav-link" href="#features">{t.navFeat}</a>
           <a className="lp-nav-link" href="#pricing">{t.navPrice}</a>
-          <a className="lp-nav-link" href="#testimonials">{t.navTest}</a>
         </div>
         <div className="lp-nav-right">
-          <button className="lp-btn-demo" onClick={() => navigate('/demo')}>{t.navBook}</button>
           <button className="lp-btn-start" onClick={() => navigate('/auth')}>{t.navStart}</button>
         </div>
       </nav>
@@ -190,7 +176,7 @@ const Landing = () => {
             </div>
             <div className="lp-hero-actions">
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
-              <button className="lp-hero-cta-secondary" onClick={() => navigate('/demo')}>{t.cta2}</button>
+              <button className="lp-hero-cta-secondary" onClick={() => { const el = document.getElementById('how-it-works'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}>{t.cta2}</button>
             </div>
           </div>
 
@@ -335,20 +321,12 @@ const Landing = () => {
         <h2>{t.featTitleA}<br />{t.featTitleB}</h2>
         <p className="lp-section-lead">{t.featLead}</p>
         <div className="lp-features-grid">
-          <div className="lp-feature-card"><div className="lp-feat-icon">1</div><h3>Full lactate curve</h3><p>Polynomial fit with R2 score, data points, and OBLA reference lines.</p></div>
-          <div className="lp-feature-card"><div className="lp-feat-icon">2</div><h3>Thresholds from 3 methods</h3><p>OBLA baseline, OBLA 2.0/4.0, and Modified Dmax side by side.</p></div>
-          <div className="lp-feature-card"><div className="lp-feat-icon">3</div><h3>5 zones from your thresholds</h3><p>Pace, heart rate, and power per zone, ready to use immediately.</p></div>
-          <div className="lp-feature-card"><div className="lp-feat-icon">4</div><h3>Heart-rate vs pace chart</h3><p>Visualize training load and fatigue progression across the test.</p></div>
-          <div className="lp-feature-card"><div className="lp-feat-icon">5</div><h3>Professional PDF report</h3><p>Coach-ready report with charts, thresholds, and zones.</p></div>
-          <div className="lp-feature-card"><div className="lp-feat-icon">6</div><h3>AI coaching note</h3><p>Personalized training recommendation based on your athlete profile.</p></div>
-        </div>
-      </section>
-
-      <section className="lp-testimonial" id="testimonials">
-        <div className="lp-testimonial-inner">
-          <p className="lp-quote">"{t.quote}"</p>
-          <p className="lp-quote-title">{t.quoteTitle}</p>
-          <p className="lp-quote-org">{t.quoteOrg}</p>
+          <div className="lp-feature-card"><div className="lp-feat-icon">1</div><h3>Volledige lactaatcurve</h3><p>Polynoomfit met R²-score, datapunten en OBLA-referentielijnen.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">2</div><h3>Drempels via 3 methoden</h3><p>OBLA basislijn, OBLA 2.0/4.0 en Modified Dmax naast elkaar.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">3</div><h3>5 zones op basis van je drempels</h3><p>Tempo, hartslag en vermogen per zone — direct bruikbaar.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">4</div><h3>Hartslag vs. tempografiek</h3><p>Visualiseer trainingsbelasting en vermoeidheidsprogressie doorheen de test.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">5</div><h3>Professioneel PDF-rapport</h3><p>Coach-klaar rapport met grafieken, drempels en zones.</p></div>
+          <div className="lp-feature-card"><div className="lp-feat-icon">6</div><h3>AI-coachingsnota</h3><p>Gepersonaliseerde trainingsaanbeveling op basis van het atleetprofiel.</p></div>
         </div>
       </section>
 
@@ -357,9 +335,9 @@ const Landing = () => {
         <h2>{t.cmpTitleA}<br />{t.cmpTitleB}</h2>
         <p className="lp-section-lead">{t.cmpLead}</p>
         <div className="lp-compare-grid">
-          <div>Criteria</div><div>Lab test</div><div>LacTest</div><div>Spreadsheet</div>
-          <div>Cost</div><div>EUR 300-500</div><div>EUR 9.95</div><div>EUR 0 + manual work</div>
-          <div>Turnaround</div><div>1-3 business days</div><div>{'<'}60 sec</div><div>2-4 hours</div>
+          <div>Criterium</div><div>Labtest</div><div>LacTest</div><div>Spreadsheet</div>
+          <div>Kostprijs</div><div>€300–500</div><div>€9.95</div><div>€0 + manueel werk</div>
+          <div>Doorlooptijd</div><div>1–3 werkdagen</div><div>{'<'}60 sec</div><div>2–4 uur</div>
         </div>
       </section>
 
@@ -372,8 +350,12 @@ const Landing = () => {
 
       <footer className="lp-footer">
         <div>LacTest</div>
-        <div className="lp-footer-links"><a href="#">About</a><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
-        <div>{new Date().getFullYear()} LacTest - {t.footer}</div>
+        <div className="lp-footer-links">
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Gebruiksvoorwaarden</a>
+          <a href="mailto:tom@lactest.app">Contact</a>
+        </div>
+        <div>&copy; {new Date().getFullYear()} LacTest — {t.footer}</div>
       </footer>
     </div>
   );

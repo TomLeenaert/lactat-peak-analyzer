@@ -150,48 +150,6 @@ const Auth = () => {
               </button>
             </p>
           </div>
-          <div className="mt-6 pt-4 border-t border-border/40">
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full"
-                style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'transparent' }}
-                disabled={submitting}
-                onClick={async () => {
-                  setSubmitting(true);
-                  try {
-                    const { error: signInError } = await supabase.auth.signInWithPassword({
-                      email: 'tom@demo.test',
-                      password: 'demo123456',
-                    });
-                    if (signInError) {
-                      const { error: signUpError } = await supabase.auth.signUp({
-                        email: 'tom@demo.test',
-                        password: 'demo123456',
-                        options: { data: { full_name: 'Tom' } },
-                      });
-                      if (signUpError) throw signUpError;
-                      const { error } = await supabase.auth.signInWithPassword({
-                        email: 'tom@demo.test',
-                        password: 'demo123456',
-                      });
-                      if (error) throw error;
-                    }
-                    navigate('/dashboard');
-                  } catch (err: unknown) {
-                    toast({ title: t('auth.error'), description: getErrorMessage(err), variant: 'destructive' });
-                  } finally {
-                    setSubmitting(false);
-                  }
-                }}
-              >
-                {t('auth.demoLogin')}
-              </Button>
-              <Button variant="ghost" className="w-full" onClick={() => navigate('/demo')}>
-                {t('auth.publicDemo')}
-              </Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
       </div>
