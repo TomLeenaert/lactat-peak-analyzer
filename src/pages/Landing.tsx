@@ -240,7 +240,6 @@ const Landing = () => {
         <div className="lp-nav-links">
           <a className="lp-nav-link" href="#how-it-works">{t.navHow}</a>
           <a className="lp-nav-link" href="#features">{t.navFeat}</a>
-          <a className="lp-nav-link" href="#pricing">{t.navPrice}</a>
         </div>
         <div className="lp-nav-right">
           <button
