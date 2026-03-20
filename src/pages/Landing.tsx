@@ -137,14 +137,14 @@ const COPY = {
 };
 
 const STEP_PHOTOS = [
-  // Get set: athletic coach giving instructions to athlete
-  'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&h=420&fit=crop&auto=format&q=80',
-  // Test: single runner alone on tartan track
-  'https://images.unsplash.com/photo-1471295253337-3ceaaedca402?w=600&h=420&fit=crop&auto=format&q=80',
-  // Analyze: coach entering results on smartphone
-  'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=420&fit=crop&auto=format&q=80',
-  // Train: group of athletes training on track, coach watching
-  'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=420&fit=crop&auto=format&q=80',
+  // Get set: relay runner crouched at starting blocks on red tartan track (Braden Collum)
+  'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&h=420&fit=crop&auto=format&q=80',
+  // Test: close-up of runner's legs in action on red tartan track (Jakob Owens)
+  'https://images.unsplash.com/photo-1547941126-3d5322b218b0?w=600&h=420&fit=crop&auto=format&q=80',
+  // Analyze: athlete sitting on red tartan track checking smartwatch (Anastasia Polyakova)
+  'https://images.unsplash.com/photo-1738498356408-e3550c87417e?w=600&h=420&fit=crop&auto=format&q=80',
+  // Train: group of young athletes sprinting in race on red track with coaches watching (Peter Robbins)
+  'https://images.unsplash.com/photo-1714176966782-854fa86faf1a?w=600&h=420&fit=crop&auto=format&q=80',
 ];
 
 const ROWS = [
