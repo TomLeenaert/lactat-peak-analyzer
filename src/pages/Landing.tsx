@@ -249,7 +249,6 @@ const Landing = () => {
           >
             {lang === 'nl' ? 'EN' : 'NL'}
           </button>
-          <button className="lp-btn-start" onClick={() => navigate('/auth')}>{t.navStart}</button>
         </div>
       </nav>
 
@@ -266,11 +265,7 @@ const Landing = () => {
               <em>{t.heroTitleB}</em>
             </h1>
             <p className="lp-hero-desc">{t.heroDesc}</p>
-            <div className="lp-hero-cmd">
-              <span className="lp-hero-cmd-label">{t.cmdLabel}</span>
-              <span className="lp-hero-cmd-text">{t.cmdText}</span>
-            </div>
-            <div className="lp-hero-actions">
+<div className="lp-hero-actions">
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
               <button className="lp-hero-cta-secondary" onClick={() => { const el = document.getElementById('how-it-works'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}>{t.cta2}</button>
             </div>
