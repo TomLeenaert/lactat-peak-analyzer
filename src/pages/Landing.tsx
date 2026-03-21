@@ -256,7 +256,12 @@ const Landing = () => {
   return (
     <div className="landing-page">
       <nav className="lp-nav">
-        <a href="#" className="lp-nav-logo">Lac<span className="lp-nav-logo-dot">.</span>Test</a>
+        <a href="#" className="lp-nav-logo" style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+          Lac<span className="lp-nav-logo-dot">.</span>Test
+          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(102,68,255,0.6)', letterSpacing: '0.5px' }}>
+            v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
+          </span>
+        </a>
         <div className="lp-nav-links">
           <a className="lp-nav-link" href="#how-it-works">{t.navHow}</a>
           <a className="lp-nav-link" href="#features">{t.navFeat}</a>
