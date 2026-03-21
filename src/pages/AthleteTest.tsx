@@ -13,6 +13,7 @@ import AppNav from '@/components/AppNav';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Save } from 'lucide-react';
 
 const AthleteTest = () => {
@@ -20,6 +21,7 @@ const AthleteTest = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [activeTab, setActiveTab] = useState('protocol');
   const [protocol, setProtocol] = useState<ProtocolSettings>(DEFAULT_PROTOCOL);
@@ -91,7 +93,27 @@ const AthleteTest = () => {
     toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen klaargezet.` });
   }, [protocol, toast]);
 
-  const onCalculate = useCallback(() => {
+  const onCalculate = useCallback(async () => {
+    // Bestaande test bekijken: geen token verbruiken
+    if (!testId) {
+      // Verbruik 1 token via RPC
+      const { data: tokenUsed, error } = await supabase.rpc('use_token');
+      if (error) {
+        toast({ title: 'Fout', description: error.message, variant: 'destructive' });
+        return;
+      }
+      if (!tokenUsed) {
+        toast({
+          title: 'Geen tokens meer',
+          description: 'Je hebt geen analysetokens meer. Contacteer Tom om tokens bij te kopen.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      // Token verbruikt — refresh de balance in AppNav
+      queryClient.invalidateQueries({ queryKey: ['profile-nav'] });
+    }
+
     const result = calculate(testData, parseFloat(restingLactate) || 0);
     if (typeof result === 'string') {
       toast({ title: 'Fout', description: result, variant: 'destructive' });
@@ -100,7 +122,7 @@ const AthleteTest = () => {
     setResults(result);
     setActiveTab('results');
     toast({ title: 'Berekening voltooid' });
-  }, [testData, restingLactate, toast]);
+  }, [testData, restingLactate, testId, toast, queryClient]);
 
   // Save test results
   const saveTest = useMutation({

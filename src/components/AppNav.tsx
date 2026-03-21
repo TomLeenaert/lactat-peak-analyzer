@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ArrowLeft } from 'lucide-react';
+import { LogOut, ArrowLeft, Coins } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AppNavProps {
   /** If provided, shows a back arrow instead of the logo */
@@ -14,9 +16,29 @@ interface AppNavProps {
   hideSignOut?: boolean;
 }
 
+const ADMIN_EMAIL = 'tomleenaert@gmail.com';
+
 const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavProps) => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile-nav'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('tokens')
+        .eq('user_id', user!.id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user && !hideSignOut,
+    staleTime: 10_000,
+  });
+
+  const tokens = profile?.tokens ?? null;
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   return (
     <nav
@@ -87,6 +109,42 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
       {/* Right side */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {rightContent}
+
+        {/* Token balance */}
+        {!hideSignOut && tokens !== null && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '5px',
+            padding: '4px 10px', borderRadius: '20px',
+            background: tokens === 0
+              ? 'rgba(239,68,68,0.12)'
+              : 'rgba(102,68,255,0.12)',
+            border: `1px solid ${tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
+            fontSize: '12px', fontWeight: 600,
+            color: tokens === 0 ? '#f87171' : '#a090ff',
+            cursor: 'default',
+          }}
+          title={tokens === 0 ? 'Geen tokens meer — koop tokens om analyses te doen' : `${tokens} analyse${tokens === 1 ? '' : 's'} beschikbaar`}
+          >
+            <Coins size={12} />
+            {tokens}
+          </div>
+        )}
+
+        {/* Admin link */}
+        {isAdmin && (
+          <button
+            onClick={() => navigate('/admin')}
+            style={{
+              color: 'rgba(255,255,255,0.38)', background: 'none', border: 'none',
+              cursor: 'pointer', fontSize: '12px', padding: '6px 8px', borderRadius: '6px',
+            }}
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.75)')}
+            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.38)')}
+          >
+            Admin
+          </button>
+        )}
+
         {!hideSignOut && (
           <button
             onClick={() => signOut().then(() => navigate('/auth'))}
