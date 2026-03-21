@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import stepGetSetImg from '@/assets/step-getset.jpg';
+import stepTestImg from '@/assets/step-test.png';
+import stepAnalyzeImg from '@/assets/step-analyze.jpg';
+import stepTrainImg from '@/assets/step-train.png';
+
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
 
@@ -18,16 +23,16 @@ const COPY = {
     cta1: 'Start je analyse →',
     cta2: 'Bekijk demo',
     featKicker: 'Wat is inbegrepen',
-    featTitleA: 'Alles om slimmer te coachen,',
-    featTitleB: 'in één testrapport.',
-    featLead: 'Jij doet de veldtest. LacTest doet de rest — van polynoomfit tot coach-klaar PDF.',
+    featTitleA: 'Alles om slimmer te coachen.',
+    featTitleB: 'Sneller. Wetenschappelijk.',
+    featLead: 'Eén veldtest wordt een compleet prestatierapport. Gebouwd voor coaches die duidelijkheid willen, geen complexiteit.',
     feat: [
-      { title: 'Volledige lactaatcurve', desc: 'Polynoomfit met R²-score, datapunten en OBLA-referentielijnen.' },
-      { title: 'Drempels via 3 methoden', desc: 'OBLA basislijn, OBLA 2.0/4.0 en Modified Dmax naast elkaar.' },
-      { title: '5 zones op basis van je drempels', desc: 'Tempo, hartslag en vermogen per zone — direct bruikbaar.' },
-      { title: 'Hartslag vs. tempografiek', desc: 'Visualiseer trainingsbelasting en vermoeidheidsprogressie doorheen de test.' },
-      { title: 'Professioneel PDF-rapport', desc: 'Coach-klaar rapport met grafieken, drempels en zones.' },
-      { title: 'AI-coachingsnota', desc: 'Gepersonaliseerde trainingsaanbeveling op basis van het atleetprofiel.' },
+      { title: 'Mobiel. Op de piste.', desc: 'Voer je test uit en analyseer direct vanaf je telefoon. Geen lab. Geen spreadsheets. Geen gedoe.' },
+      { title: 'Volledige lactaatcurve', desc: 'Nauwkeurige curve met datapunten, modelfit en belangrijke referentiemarkers. Helder inzicht in de fysiologie van je atleet.' },
+      { title: 'Wetenschappelijke drempelanalyse', desc: 'Meerdere gevalideerde methoden gecombineerd tot één duidelijk resultaat. Geen black box. Robuuste, evidence-based resultaten.' },
+      { title: '5 kant-en-klare trainingszones', desc: 'Directe zones voor tempo, hartslag en vermogen. Train met precisie vanaf dag één.' },
+      { title: 'Betaal per gebruik. Geen abonnement.', desc: 'Betaal enkel wanneer je een test uitvoert. Simpel. Transparant. Schaalt met jou.' },
+      { title: 'Gebouwd voor echte tests', desc: 'Ontworpen voor coaches, clubs en atleten. Geen labomstandigheden nodig. Werkt waar je traint.' },
     ],
     cmpKicker: 'Vergelijking',
     cmpTitleA: 'Lab-niveau inzicht.',
@@ -61,12 +66,12 @@ const COPY = {
     howTitle: 'Get set.',
     howTitleEm: 'Test. Analyze. Train.',
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
-    stepHero: ['Your test. Your protocol.', 'Measure what matters.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
+    stepHero: ['Your test. Your protocol.', 'Measure.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
       { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.' },
-      { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap. Voer alles in via je mobiele app — geen papier meer.' },
-      { title: 'Directe resultaten', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.' },
-      { title: 'Train met data', desc: 'Exporteer een professioneel PDF-rapport met curve, zones en trainingsaanbevelingen — klaar voor coach en atleet.' },
+      { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap.' },
+      { title: 'Directe resultaten', desc: 'Voer alles in via je mobiele app. Geen papier meer.' },
+      { title: 'Train met data', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden. Klaar voor coach en atleet.' },
     ],
   },
   en: {
@@ -83,16 +88,16 @@ const COPY = {
     cta1: 'Start your analysis →',
     cta2: 'View demo',
     featKicker: "What's included",
-    featTitleA: 'Everything to coach smarter,',
-    featTitleB: 'in one test report.',
-    featLead: 'You run the field test. LacTest does the rest — from polynomial fit to coach-ready PDF.',
+    featTitleA: 'Everything you need to coach smarter.',
+    featTitleB: 'Faster. Scientifically.',
+    featLead: 'Turn one field test into a complete performance blueprint. Built for coaches who want clarity, not complexity.',
     feat: [
-      { title: 'Full lactate curve', desc: 'Polynomial fit with R² score, data points, and OBLA reference lines.' },
-      { title: 'Thresholds from 3 methods', desc: 'OBLA baseline, OBLA 2.0/4.0, and Modified Dmax side by side.' },
-      { title: '5 zones from your thresholds', desc: 'Pace, heart rate, and power per zone — ready to use immediately.' },
-      { title: 'Heart rate vs pace chart', desc: 'Visualize training load and fatigue progression across the test.' },
-      { title: 'Professional PDF report', desc: 'Coach-ready report with charts, thresholds, and zones.' },
-      { title: 'AI coaching note', desc: 'Personalised training recommendation based on your athlete profile.' },
+      { title: 'Mobile. On the track.', desc: 'Run and analyse your test directly from your phone. No lab. No spreadsheets. No friction.' },
+      { title: 'Full lactate curve', desc: 'Accurate curve with data points, model fit and key reference markers. Clear insight into your athlete\'s physiology.' },
+      { title: 'Science-based threshold analysis', desc: 'Multiple validated methods combined into one clear outcome. No black box. Just robust, evidence-based results.' },
+      { title: '5 ready-to-use training zones', desc: 'Instant zones for pace, heart rate and power. Train with precision from day one.' },
+      { title: 'Pay per use. No subscription.', desc: 'Only pay when you run a test. Simple. Transparent. Scales with you.' },
+      { title: 'Built for real-world testing', desc: 'Designed for coaches, clubs and athletes. No lab conditions required. Works where you actually train.' },
     ],
     cmpKicker: 'Comparison',
     cmpTitleA: 'Lab-level insight.',
@@ -126,25 +131,25 @@ const COPY = {
     howTitle: 'Get set.',
     howTitleEm: 'Test. Analyze. Train.',
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
-    stepHero: ['Your test. Your protocol.', 'Measure what matters.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
+    stepHero: ['Your test. Your protocol.', 'Measure.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
       { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. LacTest automatically generates all test steps.' },
-      { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step. Enter everything via your mobile app — no paper needed.' },
-      { title: 'Instant results', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds.' },
-      { title: 'Train with data', desc: 'Export a professional PDF report with curve, zones and training recommendations — ready for coach and athlete.' },
+      { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step.' },
+      { title: 'Instant results', desc: 'Enter everything via your mobile app. No paper needed.' },
+      { title: 'Train with data', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds. Ready for coach and athlete.' },
     ],
   },
 };
 
 const STEP_PHOTOS = [
-  // Get set: relay runner crouched at starting blocks on red tartan track (Braden Collum)
-  'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&h=420&fit=crop&auto=format&q=80',
-  // Test: close-up of runner's legs in action on red tartan track (Jakob Owens)
-  'https://images.unsplash.com/photo-1547941126-3d5322b218b0?w=600&h=420&fit=crop&auto=format&q=80',
-  // Analyze: athlete sitting on red tartan track checking smartwatch (Anastasia Polyakova)
-  'https://images.unsplash.com/photo-1738498356408-e3550c87417e?w=600&h=420&fit=crop&auto=format&q=80',
-  // Train: group of young athletes sprinting in race on red track with coaches watching (Peter Robbins)
-  'https://images.unsplash.com/photo-1714176966782-854fa86faf1a?w=600&h=420&fit=crop&auto=format&q=80',
+  // Get set: coach discussing with athlete on athletics track
+  stepGetSetImg,
+  // Test: man jogging alone on athletics track
+  stepTestImg,
+  // Analyze: coach entering lactate data on smartphone on athletics track
+  stepAnalyzeImg,
+  // Train: zones visual from the app
+  stepTrainImg,
 ];
 
 const ROWS = [

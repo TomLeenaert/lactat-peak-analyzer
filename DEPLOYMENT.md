@@ -41,7 +41,7 @@ Hierdoor worden alle migrations uit `supabase/migrations/` uitgevoerd op staging
 
 ### Stap 3 — Productie schema updaten
 ```bash
-supabase link --project-ref sjmwmcsuvcgebreubkge  # prod project ID
+supabase link --project-ref egpkewrqkworqvtijnyc  # prod project ID
 supabase db push
 ```
 
@@ -85,7 +85,7 @@ cp .env.example .env
 |-----------|-----------|---------|
 | `VITE_SUPABASE_URL` | prod URL | dev URL |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | prod anon key | dev anon key |
-| `VITE_SUPABASE_PROJECT_ID` | sjmwmcsuvcgebreubkge | <dev-id> |
+| `VITE_SUPABASE_PROJECT_ID` | egpkewrqkworqvtijnyc | <dev-id> |
 
 ---
 
