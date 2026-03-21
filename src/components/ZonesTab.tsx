@@ -44,7 +44,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
           <CardContent>
             <div className="w-full h-[280px] sm:h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={validHR} margin={{ top: 10, right: 10, bottom: 40, left: 0 }}>
+                <ComposedChart data={validHR} margin={{ top: 10, right: 20, bottom: 40, left: 40 }}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                   <XAxis dataKey="speed" type="number" domain={[xMin, xMax]} tickFormatter={(v: number) => formatPace(v)} tick={{ fontSize: 11 }}>
                     <Label value="Tempo (min/km)" position="bottom" offset={20} className="fill-muted-foreground text-xs" />

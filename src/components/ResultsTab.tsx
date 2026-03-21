@@ -44,7 +44,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
       </Card>
 
       {/* LT1 + LT2 samenvatting */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/8 p-4">
           <p className="text-xs uppercase tracking-wider text-emerald-600 mb-1">Aerobe drempel</p>
           <p className="text-2xl font-bold">{formatPace(lt1.best)} /km</p>
@@ -89,28 +89,27 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
           return (
             <div
               key={z.name}
-              className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/60 px-4 py-3"
+              className="rounded-xl border border-border/60 bg-card/60 px-4 py-3"
               style={{ borderLeft: `4px solid ${z.color}` }}
             >
-              {/* Zone naam + label */}
-              <div className="w-28 shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: z.color }} />
-                  <span className="font-bold text-sm">{z.name}</span>
+              {/* Top row: naam + waarden */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0 mt-0.5" style={{ background: z.color }} />
+                    <span className="font-bold text-sm">{z.name}</span>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground ml-4">{z.label}</span>
                 </div>
-                <span className="text-[11px] text-muted-foreground ml-4">{z.label}</span>
+                <div className="text-right shrink-0 space-y-0.5">
+                  <p className="text-xs font-mono font-semibold">{formatPace(z.to)} – {formatPace(z.from)} /km</p>
+                  {hrFrom > 0 && <p className="text-xs text-muted-foreground font-mono">{hrFrom} – {hrTo} bpm</p>}
+                  {hasWatts && <p className="text-xs text-muted-foreground font-mono">{wFrom} – {wTo} W</p>}
+                  <p className="text-xs text-muted-foreground font-mono">{lacFrom} – {lacTo} mmol/L</p>
+                </div>
               </div>
-
-              {/* Beschrijving */}
-              <p className="text-xs text-muted-foreground hidden sm:block flex-1">{z.desc}</p>
-
-              {/* Waarden */}
-              <div className="ml-auto text-right shrink-0 space-y-0.5">
-                <p className="text-xs font-mono font-semibold">{formatPace(z.to)} – {formatPace(z.from)} /km</p>
-                {hrFrom > 0 && <p className="text-xs text-muted-foreground font-mono">{hrFrom} – {hrTo} bpm</p>}
-                {hasWatts && <p className="text-xs text-muted-foreground font-mono">{wFrom} – {wTo} W</p>}
-                <p className="text-xs text-muted-foreground font-mono">{lacFrom} – {lacTo} mmol/L</p>
-              </div>
+              {/* Beschrijving onder op mobiel */}
+              <p className="text-xs text-muted-foreground mt-2 hidden sm:block">{z.desc}</p>
             </div>
           );
         })}

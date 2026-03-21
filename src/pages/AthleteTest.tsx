@@ -13,6 +13,7 @@ import AppNav from '@/components/AppNav';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Save } from 'lucide-react';
 
 const AthleteTest = () => {
@@ -20,6 +21,7 @@ const AthleteTest = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [activeTab, setActiveTab] = useState('protocol');
   const [protocol, setProtocol] = useState<ProtocolSettings>(DEFAULT_PROTOCOL);
@@ -91,7 +93,27 @@ const AthleteTest = () => {
     toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen klaargezet.` });
   }, [protocol, toast]);
 
-  const onCalculate = useCallback(() => {
+  const onCalculate = useCallback(async () => {
+    // Bestaande test bekijken: geen token verbruiken
+    if (!testId) {
+      // Verbruik 1 token via RPC
+      const { data: tokenUsed, error } = await supabase.rpc('use_token');
+      if (error) {
+        toast({ title: 'Fout', description: error.message, variant: 'destructive' });
+        return;
+      }
+      if (!tokenUsed) {
+        toast({
+          title: 'Geen tokens meer',
+          description: 'Je hebt geen analysetokens meer. Contacteer Tom om tokens bij te kopen.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      // Token verbruikt — refresh de balance in AppNav
+      queryClient.invalidateQueries({ queryKey: ['profile-nav'] });
+    }
+
     const result = calculate(testData, parseFloat(restingLactate) || 0);
     if (typeof result === 'string') {
       toast({ title: 'Fout', description: result, variant: 'destructive' });
@@ -100,7 +122,7 @@ const AthleteTest = () => {
     setResults(result);
     setActiveTab('results');
     toast({ title: 'Berekening voltooid' });
-  }, [testData, restingLactate, toast]);
+  }, [testData, restingLactate, testId, toast, queryClient]);
 
   // Save test results
   const saveTest = useMutation({
@@ -151,12 +173,27 @@ const AthleteTest = () => {
 
       <main className="max-w-[900px] mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted p-1">
-            <TabsTrigger value="protocol" className="flex-1 min-w-[100px]">📋 Protocol</TabsTrigger>
-            <TabsTrigger value="data" className="flex-1 min-w-[100px]">📊 Data</TabsTrigger>
-            <TabsTrigger value="results" className="flex-1 min-w-[100px]">🎯 Resultaten</TabsTrigger>
-            <TabsTrigger value="zones" className="flex-1 min-w-[100px]">🏃 Zones</TabsTrigger>
-            <TabsTrigger value="science" className="flex-1 min-w-[100px]">📚 Wetenschap</TabsTrigger>
+          <TabsList className="w-full grid grid-cols-5 h-auto bg-muted p-1">
+            <TabsTrigger value="protocol" className="text-xs sm:text-sm px-1 py-2">
+              <span className="sm:hidden">📋</span>
+              <span className="hidden sm:inline">📋 Protocol</span>
+            </TabsTrigger>
+            <TabsTrigger value="data" className="text-xs sm:text-sm px-1 py-2">
+              <span className="sm:hidden">📊</span>
+              <span className="hidden sm:inline">📊 Data</span>
+            </TabsTrigger>
+            <TabsTrigger value="results" className="text-xs sm:text-sm px-1 py-2">
+              <span className="sm:hidden">🎯</span>
+              <span className="hidden sm:inline">🎯 Resultaten</span>
+            </TabsTrigger>
+            <TabsTrigger value="zones" className="text-xs sm:text-sm px-1 py-2">
+              <span className="sm:hidden">🏃</span>
+              <span className="hidden sm:inline">🏃 Zones</span>
+            </TabsTrigger>
+            <TabsTrigger value="science" className="text-xs sm:text-sm px-1 py-2">
+              <span className="sm:hidden">📚</span>
+              <span className="hidden sm:inline">📚 Wetenschap</span>
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">

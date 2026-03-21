@@ -227,29 +227,29 @@ const DataInputTab = ({
         </div>
 
         {/* Meta fields */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <Label className="text-xs">Naam atleet</Label>
-            <Input value={athleteName} onChange={e => setAthleteName(e.target.value)} placeholder="Naam" />
+            <Input className="h-11" value={athleteName} onChange={e => setAthleteName(e.target.value)} placeholder="Naam" />
           </div>
           <div>
             <Label className="text-xs">Datum</Label>
-            <Input type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
+            <Input className="h-11" type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <Label className="text-xs">Rustlactaat</Label>
-            <Input type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="1.0" />
+            <Input className="h-11" type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="1.0" />
           </div>
           <div>
             <Label className="text-xs">Afstand (m)</Label>
-            <Input type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
+            <Input className="h-11" type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
           </div>
           <div>
             <Label className="text-xs">Increment</Label>
-            <Input type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
+            <Input className="h-11" type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
           </div>
         </div>
 
@@ -294,7 +294,7 @@ const DataInputTab = ({
                 {/* Secondary: HR only (Watt hidden for runners) */}
                 <div>
                   <Label className="text-xs text-muted-foreground">💓 Hartslag (bpm)</Label>
-                  <Input type="number" className="font-mono h-9" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} placeholder="bpm" inputMode="numeric" />
+                  <Input type="number" className="font-mono h-11" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} placeholder="bpm" inputMode="numeric" />
                 </div>
               </div>
             );
