@@ -94,6 +94,9 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
           <a
             href="/"
             style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: '7px',
               color: '#fff',
               textDecoration: 'none',
               fontSize: '17px',
@@ -101,6 +104,15 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
             }}
           >
             Lac<span style={{ color: '#6644ff' }}>.</span>Test
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              color: 'rgba(102,68,255,0.6)',
+              letterSpacing: '0.5px',
+              lineHeight: 1,
+            }}>
+              v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
+            </span>
           </a>
         )}
 
