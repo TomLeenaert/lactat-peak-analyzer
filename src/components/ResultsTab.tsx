@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
 
@@ -9,22 +8,32 @@ interface ResultsTabProps {
 const ResultsTab = ({ results }: ResultsTabProps) => {
   if (!results) {
     return (
-      <Card>
-        <CardContent className="text-center text-muted-foreground py-12">
-          <p>Voer eerst testgegevens in en klik op "Berekenen".</p>
-        </CardContent>
-      </Card>
+      <div style={{
+        border: '1px dashed rgba(255,255,255,0.08)',
+        borderRadius: '16px',
+        padding: '48px 24px',
+        textAlign: 'center',
+      }}>
+        <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.3)' }}>
+          Voer testgegevens in en klik op "Berekenen".
+        </p>
+      </div>
     );
   }
 
   const { lt1, lt2, speeds, hrs, watts, coeffs } = results;
   if (!coeffs || !Array.isArray(coeffs)) {
     return (
-      <Card>
-        <CardContent className="text-center text-muted-foreground py-12">
-          <p>Geen berekende resultaten beschikbaar. Ga naar het Data-tabblad en klik op "Berekenen".</p>
-        </CardContent>
-      </Card>
+      <div style={{
+        border: '1px dashed rgba(255,255,255,0.08)',
+        borderRadius: '16px',
+        padding: '48px 24px',
+        textAlign: 'center',
+      }}>
+        <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.3)' }}>
+          Geen berekende resultaten beschikbaar.
+        </p>
+      </div>
     );
   }
 
@@ -32,44 +41,124 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
   const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
 
+  const lt1HR = interpolateHR(lt1.best, speeds, hrs);
+  const lt2HR = interpolateHR(lt2.best, speeds, hrs);
+  const lt1Lac = polyEval(coeffs, lt1.best).toFixed(1);
+  const lt2Lac = polyEval(coeffs, lt2.best).toFixed(1);
+
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-      {/* Lactaatcurve */}
-      <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-lg">Lactaatcurve</CardTitle></CardHeader>
-        <CardContent>
-          <LactateChart results={results} />
-        </CardContent>
-      </Card>
-
-      {/* LT1 + LT2 samenvatting */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/8 p-4">
-          <p className="text-xs uppercase tracking-wider text-emerald-600 mb-1">Aerobe drempel</p>
-          <p className="text-2xl font-bold">{formatPace(lt1.best)} /km</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            ~{interpolateHR(lt1.best, speeds, hrs)} bpm · {polyEval(coeffs, lt1.best).toFixed(1)} mmol/L
+      {/* Threshold hero cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+        {/* LT1 */}
+        <div style={{
+          background: 'rgba(0,229,122,0.05)',
+          border: '1px solid rgba(0,229,122,0.25)',
+          borderRadius: '18px',
+          padding: '18px 14px',
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Glow */}
+          <div style={{
+            position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)',
+            width: '100px', height: '100px', borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(0,229,122,0.15) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#00e57a', opacity: 0.8, marginBottom: '10px' }}>
+            Aerobe drempel
           </p>
+          <p style={{ fontSize: '32px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '2px' }}>
+            {formatPace(lt1.best)}
+          </p>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>/km</p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {lt1HR > 0 && (
+              <span style={{
+                fontSize: '11px', fontWeight: 600, color: '#00e57a',
+                background: 'rgba(0,229,122,0.1)', padding: '3px 8px', borderRadius: '6px',
+              }}>{lt1HR} bpm</span>
+            )}
+            <span style={{
+              fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)',
+              background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: '6px',
+            }}>{lt1Lac} mmol/L</span>
+          </div>
         </div>
-        <div className="rounded-xl border border-orange-500/25 bg-orange-500/8 p-4">
-          <p className="text-xs uppercase tracking-wider text-orange-600 mb-1">Anaerobe drempel</p>
-          <p className="text-2xl font-bold">{formatPace(lt2.best)} /km</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            ~{interpolateHR(lt2.best, speeds, hrs)} bpm · {polyEval(coeffs, lt2.best).toFixed(1)} mmol/L
+
+        {/* LT2 */}
+        <div style={{
+          background: 'rgba(255,107,43,0.05)',
+          border: '1px solid rgba(255,107,43,0.25)',
+          borderRadius: '18px',
+          padding: '18px 14px',
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)',
+            width: '100px', height: '100px', borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,107,43,0.15) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#ff6b2b', opacity: 0.8, marginBottom: '10px' }}>
+            Anaerobe drempel
           </p>
+          <p style={{ fontSize: '32px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '2px' }}>
+            {formatPace(lt2.best)}
+          </p>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>/km</p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {lt2HR > 0 && (
+              <span style={{
+                fontSize: '11px', fontWeight: 600, color: '#ff6b2b',
+                background: 'rgba(255,107,43,0.1)', padding: '3px 8px', borderRadius: '6px',
+              }}>{lt2HR} bpm</span>
+            )}
+            <span style={{
+              fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)',
+              background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: '6px',
+            }}>{lt2Lac} mmol/L</span>
+          </div>
         </div>
       </div>
 
+      {/* Lactate curve */}
+      <div style={{
+        background: 'rgba(255,255,255,0.02)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        borderRadius: '16px',
+        padding: '16px',
+      }}>
+        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '12px' }}>
+          Lactaatcurve
+        </p>
+        <LactateChart results={results} />
+      </div>
+
       {/* Zone bar */}
-      <div className="flex rounded-xl overflow-hidden h-8 border border-border/60 shadow-inner">
+      <div style={{ borderRadius: '12px', overflow: 'hidden', height: '32px', display: 'flex', border: '1px solid rgba(255,255,255,0.06)' }}>
         {zones.map(z => {
           const width = Math.max(((z.to - z.from) / totalRange) * 100, 5);
           return (
             <div
               key={z.name}
-              className="flex items-center justify-center text-[10px] font-bold text-white"
-              style={{ width: `${width}%`, background: z.color, textShadow: '0 1px 2px rgba(0,0,0,0.4)' }}
+              style={{
+                width: `${width}%`,
+                background: z.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                fontWeight: 800,
+                color: '#fff',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                letterSpacing: '0.5px',
+              }}
             >
               {z.name.replace('Zone ', 'Z')}
             </div>
@@ -77,8 +166,8 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
         })}
       </div>
 
-      {/* Zones — verticaal, één per rij */}
-      <div className="space-y-2">
+      {/* Zone cards */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {zones.map(z => {
           const hrFrom = interpolateHR(z.from, speeds, hrs);
           const hrTo   = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
@@ -86,30 +175,55 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
           const wTo    = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
           const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
           const lacTo   = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
+
           return (
             <div
               key={z.name}
-              className="rounded-xl border border-border/60 bg-card/60 px-4 py-3"
-              style={{ borderLeft: `4px solid ${z.color}` }}
+              style={{
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderLeft: `4px solid ${z.color}`,
+                borderRadius: '12px',
+                padding: '12px 14px',
+              }}
             >
-              {/* Top row: naam + waarden */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="shrink-0">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0 mt-0.5" style={{ background: z.color }} />
-                    <span className="font-bold text-sm">{z.name}</span>
+              {/* Top row */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '2px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: z.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>{z.name}</span>
                   </div>
-                  <span className="text-[11px] text-muted-foreground ml-4">{z.label}</span>
+                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginLeft: '15px' }}>{z.label}</span>
                 </div>
-                <div className="text-right shrink-0 space-y-0.5">
-                  <p className="text-xs font-mono font-semibold">{formatPace(z.to)} – {formatPace(z.from)} /km</p>
-                  {hrFrom > 0 && <p className="text-xs text-muted-foreground font-mono">{hrFrom} – {hrTo} bpm</p>}
-                  {hasWatts && <p className="text-xs text-muted-foreground font-mono">{wFrom} – {wTo} W</p>}
-                  <p className="text-xs text-muted-foreground font-mono">{lacFrom} – {lacTo} mmol/L</p>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <p style={{ fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, color: '#fff', marginBottom: '2px' }}>
+                    {formatPace(z.to)} – {formatPace(z.from)} /km
+                  </p>
+                  {hrFrom > 0 && (
+                    <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>
+                      {hrFrom} – {hrTo} bpm
+                    </p>
+                  )}
+                  {hasWatts && (
+                    <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>
+                      {wFrom} – {wTo} W
+                    </p>
+                  )}
+                  <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)' }}>
+                    {lacFrom} – {lacTo} mmol/L
+                  </p>
                 </div>
               </div>
-              {/* Beschrijving onder op mobiel */}
-              <p className="text-xs text-muted-foreground mt-2 hidden sm:block">{z.desc}</p>
+              {/* Description — visible on larger screens */}
+              <p style={{
+                fontSize: '11px',
+                color: 'rgba(255,255,255,0.3)',
+                marginTop: '8px',
+                lineHeight: 1.5,
+              }} className="hidden sm:block">
+                {z.desc}
+              </p>
             </div>
           );
         })}

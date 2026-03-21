@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus, Upload } from 'lucide-react';
+import { Trash2, Plus, Upload, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import NumPad from '@/components/NumPad';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -24,6 +25,12 @@ interface DataInputTabProps {
 }
 
 type ImportRow = Record<string, unknown>;
+type EntryField = 'lactate' | 'hr';
+
+interface ActiveEntry {
+  row: number;
+  field: EntryField;
+}
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
@@ -50,7 +57,6 @@ const findFirstArray = (row: Record<string, unknown>): unknown[] => {
   return [];
 };
 
-/** Convert seconds to mm:ss string */
 const secsToTimeStr = (secs: number): string => {
   if (!secs || secs <= 0) return '';
   const m = Math.floor(secs / 60);
@@ -58,7 +64,6 @@ const secsToTimeStr = (secs: number): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
-/** Parse mm:ss string to seconds */
 const timeStrToSecs = (str: string): number => {
   const parts = str.replace(',', ':').replace('.', ':').split(':');
   if (parts.length === 2) {
@@ -68,17 +73,20 @@ const timeStrToSecs = (str: string): number => {
   }
   if (parts.length === 1) {
     const val = parseInt(parts[0]) || 0;
-    // If > 100, assume mmss format (e.g. 530 = 5:30)
     if (val > 100) return Math.floor(val / 100) * 60 + (val % 100);
-    return val * 60; // assume minutes
+    return val * 60;
   }
   return 0;
 };
 
-/** Calculate speed (km/h) from distance (m) and time (s) */
 const calcSpeed = (distanceM: number, timeSec: number): number => {
   if (!distanceM || !timeSec || timeSec <= 0) return 0;
   return (distanceM / 1000) / (timeSec / 3600);
+};
+
+const FIELD_CONFIG: Record<EntryField, { label: string; unit: string; color: string; maxValue: number; decimalPlaces: number }> = {
+  lactate: { label: 'Lactaat', unit: 'mmol/L', color: '#6644ff', maxValue: 25, decimalPlaces: 1 },
+  hr:      { label: 'Hartslag', unit: 'bpm',    color: '#ff6b2b', maxValue: 220, decimalPlaces: 0 },
 };
 
 
@@ -95,14 +103,61 @@ const DataInputTab = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
+  const [activeEntry, setActiveEntry] = useState<ActiveEntry | null>(null);
+  const [numPadValue, setNumPadValue] = useState('');
 
+  // ── NumPad helpers ───────────────────────────────────────────────────────
+  const openNumPad = (row: number, field: EntryField) => {
+    const current = field === 'lactate'
+      ? (testData[row].lactate ? String(testData[row].lactate) : '')
+      : (testData[row].hr ? String(testData[row].hr) : '');
+    setNumPadValue(current);
+    setActiveEntry({ row, field });
+  };
+
+  const confirmNumPad = () => {
+    if (!activeEntry) return;
+    const val = parseFloat(numPadValue) || 0;
+    const newData = [...testData];
+    newData[activeEntry.row] = { ...newData[activeEntry.row], [activeEntry.field]: val };
+    setTestData(newData);
+
+    // auto-advance: lactate → hr → next step lactate
+    const { row, field } = activeEntry;
+    if (field === 'lactate') {
+      setNumPadValue(newData[row].hr ? String(newData[row].hr) : '');
+      setActiveEntry({ row, field: 'hr' });
+    } else {
+      // try next step
+      const nextRow = row + 1;
+      if (nextRow < testData.length) {
+        setNumPadValue(newData[nextRow].lactate ? String(newData[nextRow].lactate) : '');
+        setActiveEntry({ row: nextRow, field: 'lactate' });
+      } else {
+        setActiveEntry(null);
+      }
+    }
+  };
+
+  const dismissNumPad = () => {
+    if (!activeEntry) return;
+    // save current value before dismissing
+    const val = parseFloat(numPadValue) || 0;
+    if (val > 0) {
+      const newData = [...testData];
+      newData[activeEntry.row] = { ...newData[activeEntry.row], [activeEntry.field]: val };
+      setTestData(newData);
+    }
+    setActiveEntry(null);
+  };
+
+  // ── JSON import ──────────────────────────────────────────────────────────
   const processJsonFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
         const parsedJson: unknown = JSON.parse(ev.target?.result as string);
         const json = isRecord(parsedJson) ? parsedJson : {};
-        // Support many possible key names for the steps array
         const rawSteps = Array.isArray(parsedJson)
           ? parsedJson
           : (json.steps || json.data || json.stappen || json.testen || json.results || json.resultaten || json.inspanningstesten || json.rows || json.metingen ||
@@ -196,87 +251,142 @@ const DataInputTab = ({
     setTestData(testData.filter((_, idx) => idx !== i));
   };
 
+  // ── Completion count ─────────────────────────────────────────────────────
+  const filledCount = testData.filter(r => r.lactate > 0).length;
+  const totalCount = testData.length;
+
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <CardTitle className="text-lg">Testgegevens invoeren</CardTitle>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-3.5 w-3.5 mr-1" /> JSON
-            </Button>
-            <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
-            <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
+    <>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <CardTitle className="text-lg">Testgegevens invoeren</CardTitle>
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+                <Upload className="h-3.5 w-3.5 mr-1" /> JSON
+              </Button>
+              <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
+              <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Drop zone */}
-        <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/50'}`}
-        >
-          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-          <p className="text-sm font-medium text-muted-foreground">
-            Sleep een JSON bestand hierheen of klik om te uploaden
-          </p>
-          <p className="text-xs text-muted-foreground/70 mt-1">.json</p>
-        </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Drop zone — desktop only */}
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`hidden sm:flex border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors flex-col items-center justify-center ${isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/50'}`}
+          >
+            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+            <p className="text-sm font-medium text-muted-foreground">
+              Sleep een JSON bestand hierheen of klik om te uploaden
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-1">.json</p>
+          </div>
 
-        {/* Meta fields */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <Label className="text-xs">Naam atleet</Label>
-            <Input className="h-11" value={athleteName} onChange={e => setAthleteName(e.target.value)} placeholder="Naam" />
+          {/* Meta fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Naam atleet</Label>
+              <Input className="h-11" value={athleteName} onChange={e => setAthleteName(e.target.value)} placeholder="Naam" />
+            </div>
+            <div>
+              <Label className="text-xs">Datum</Label>
+              <Input className="h-11" type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
+            </div>
           </div>
-          <div>
-            <Label className="text-xs">Datum</Label>
-            <Input className="h-11" type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <Label className="text-xs">Rustlactaat</Label>
-            <Input className="h-11" type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="1.0" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <Label className="text-xs">Rustlactaat</Label>
+              <Input className="h-11" type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="1.0" />
+            </div>
+            <div>
+              <Label className="text-xs">Afstand (m)</Label>
+              <Input className="h-11" type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
+            </div>
+            <div>
+              <Label className="text-xs">Increment</Label>
+              <Input className="h-11" type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
+            </div>
           </div>
-          <div>
-            <Label className="text-xs">Afstand (m)</Label>
-            <Input className="h-11" type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
-          </div>
-          <div>
-            <Label className="text-xs">Increment</Label>
-            <Input className="h-11" type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
-          </div>
-        </div>
 
-        {/* Step data - mobile card layout */}
-        <h4 className="text-base font-semibold pt-2">Stapgegevens</h4>
-        <div className="space-y-2">
-          {testData.map((row, i) => {
-            const rowDist = row.distance || dist;
-            return (
-              <div key={i} className="border border-border rounded-lg p-3 bg-muted/30">
-                {/* Header row */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</span>
-                    {row.speed > 0 ? (
-                      <span className="text-xs font-mono font-semibold text-foreground">{formatPace(row.speed)} /km</span>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">{rowDist}m</span>
-                    )}
+          {/* Progress indicator */}
+          {filledCount > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 14px',
+              background: 'rgba(102,68,255,0.08)',
+              border: '1px solid rgba(102,68,255,0.2)',
+              borderRadius: '10px',
+            }}>
+              <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px' }}>
+                <div style={{
+                  height: '100%',
+                  width: `${(filledCount / totalCount) * 100}%`,
+                  background: '#6644ff',
+                  borderRadius: '2px',
+                  transition: 'width 0.3s ease',
+                }} />
+              </div>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#a090ff', whiteSpace: 'nowrap' }}>
+                {filledCount}/{totalCount} stappen
+              </span>
+            </div>
+          )}
+
+          {/* Step cards */}
+          <h4 className="text-base font-semibold pt-2">Stapgegevens</h4>
+          <div className="space-y-2">
+            {testData.map((row, i) => {
+              const rowDist = row.distance || dist;
+              const hasLactate = row.lactate > 0;
+              const hasHR = row.hr > 0;
+
+              return (
+                <div
+                  key={i}
+                  style={{
+                    border: hasLactate ? '1px solid rgba(102,68,255,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '14px',
+                    padding: '12px',
+                    background: hasLactate ? 'rgba(102,68,255,0.05)' : 'rgba(255,255,255,0.02)',
+                    transition: 'border-color 0.2s',
+                  }}
+                >
+                  {/* Header */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{
+                        width: '28px', height: '28px', borderRadius: '50%',
+                        background: hasLactate ? 'rgba(102,68,255,0.25)' : 'rgba(255,255,255,0.06)',
+                        border: hasLactate ? '1px solid rgba(102,68,255,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '11px', fontWeight: 700,
+                        color: hasLactate ? '#a090ff' : 'rgba(255,255,255,0.4)',
+                        flexShrink: 0,
+                      }}>
+                        {hasLactate ? '✓' : i + 1}
+                      </div>
+                      {row.speed > 0 ? (
+                        <span style={{ fontSize: '13px', fontWeight: 600, fontFamily: 'monospace', color: '#fff' }}>
+                          {formatPace(row.speed)} /km
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>{rowDist}m</span>
+                      )}
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => removeRow(i)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => removeRow(i)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-                {/* Core fields: Tijd + Lactaat side by side (big, easy to tap) */}
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                  <div>
+
+                  {/* Tijd (text input — mm:ss) */}
+                  <div style={{ marginBottom: '8px' }}>
                     <Label className="text-xs text-muted-foreground">⏱ Tijd (mm:ss)</Label>
                     <Input
                       className="font-mono text-base h-11"
@@ -286,27 +396,222 @@ const DataInputTab = ({
                       inputMode="numeric"
                     />
                   </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">🩸 Lactaat</Label>
-                    <Input type="number" step="0.1" className="font-mono text-base h-11" value={row.lactate || ''} onChange={e => updateRow(i, 'lactate', e.target.value)} placeholder="mmol/L" inputMode="decimal" />
+
+                  {/* Lactaat + HR — tap to open NumPad on mobile */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    {/* Lactaat button */}
+                    <button
+                      onClick={() => openNumPad(i, 'lactate')}
+                      style={{
+                        height: '64px',
+                        borderRadius: '12px',
+                        border: hasLactate ? '1px solid rgba(102,68,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                        background: hasLactate ? 'rgba(102,68,255,0.1)' : 'rgba(255,255,255,0.03)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px',
+                        WebkitTapHighlightColor: 'transparent',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <span style={{ fontSize: '9px', fontWeight: 600, color: '#6644ff', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                        🩸 Lactaat
+                      </span>
+                      <span style={{
+                        fontSize: hasLactate ? '22px' : '15px',
+                        fontWeight: 800,
+                        color: hasLactate ? '#fff' : 'rgba(255,255,255,0.2)',
+                        fontFamily: 'monospace',
+                      }}>
+                        {hasLactate ? `${row.lactate}` : 'tikken'}
+                      </span>
+                      {hasLactate && (
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>mmol/L</span>
+                      )}
+                    </button>
+
+                    {/* HR button */}
+                    <button
+                      onClick={() => openNumPad(i, 'hr')}
+                      style={{
+                        height: '64px',
+                        borderRadius: '12px',
+                        border: hasHR ? '1px solid rgba(255,107,43,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                        background: hasHR ? 'rgba(255,107,43,0.08)' : 'rgba(255,255,255,0.03)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2px',
+                        WebkitTapHighlightColor: 'transparent',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <span style={{ fontSize: '9px', fontWeight: 600, color: '#ff6b2b', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                        💓 Hartslag
+                      </span>
+                      <span style={{
+                        fontSize: hasHR ? '22px' : '15px',
+                        fontWeight: 800,
+                        color: hasHR ? '#fff' : 'rgba(255,255,255,0.2)',
+                        fontFamily: 'monospace',
+                      }}>
+                        {hasHR ? `${row.hr}` : 'tikken'}
+                      </span>
+                      {hasHR && (
+                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>bpm</span>
+                      )}
+                    </button>
                   </div>
                 </div>
-                {/* Secondary: HR only (Watt hidden for runners) */}
-                <div>
-                  <Label className="text-xs text-muted-foreground">💓 Hartslag (bpm)</Label>
-                  <Input type="number" className="font-mono h-11" value={row.hr || ''} onChange={e => updateRow(i, 'hr', e.target.value)} placeholder="bpm" inputMode="numeric" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        <Button variant="secondary" size="sm" onClick={addRow} className="w-full">
-          <Plus className="h-4 w-4 mr-1" /> Stap toevoegen
-        </Button>
-        <Button className="w-full" onClick={onCalculate}>🧮 Berekenen</Button>
-      </CardContent>
-    </Card>
+          <Button variant="secondary" size="sm" onClick={addRow} className="w-full">
+            <Plus className="h-4 w-4 mr-1" /> Stap toevoegen
+          </Button>
+          <Button className="w-full" onClick={onCalculate} style={{ background: 'linear-gradient(135deg, #6644ff, #8866ff)', border: 'none' }}>
+            🧮 Berekenen
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* NumPad bottom sheet overlay */}
+      {activeEntry && (
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={dismissNumPad}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.7)',
+              zIndex: 100,
+              backdropFilter: 'blur(4px)',
+            }}
+          />
+
+          {/* Sheet */}
+          <div style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 101,
+            background: '#0e0f15',
+            borderTop: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '24px 24px 0 0',
+            padding: '20px 20px 40px',
+          }}>
+            {/* Handle */}
+            <div style={{
+              width: '40px', height: '4px', borderRadius: '2px',
+              background: 'rgba(255,255,255,0.15)',
+              margin: '0 auto 20px',
+            }} />
+
+            {/* Step indicator */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '16px',
+            }}>
+              <button
+                onClick={() => {
+                  if (activeEntry.row > 0) {
+                    setNumPadValue(activeEntry.field === 'lactate'
+                      ? (testData[activeEntry.row - 1].lactate ? String(testData[activeEntry.row - 1].lactate) : '')
+                      : (testData[activeEntry.row - 1].hr ? String(testData[activeEntry.row - 1].hr) : ''));
+                    setActiveEntry({ row: activeEntry.row - 1, field: activeEntry.field });
+                  }
+                }}
+                disabled={activeEntry.row === 0}
+                style={{
+                  width: '36px', height: '36px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                  color: activeEntry.row === 0 ? 'rgba(255,255,255,0.2)' : '#fff',
+                  cursor: activeEntry.row === 0 ? 'default' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
+                Stap {activeEntry.row + 1} van {testData.length}
+                {testData[activeEntry.row].speed > 0 && (
+                  <span style={{ marginLeft: '8px', color: 'rgba(255,255,255,0.3)' }}>
+                    · {formatPace(testData[activeEntry.row].speed)} /km
+                  </span>
+                )}
+              </span>
+
+              <button
+                onClick={() => {
+                  if (activeEntry.row < testData.length - 1) {
+                    setNumPadValue(activeEntry.field === 'lactate'
+                      ? (testData[activeEntry.row + 1].lactate ? String(testData[activeEntry.row + 1].lactate) : '')
+                      : (testData[activeEntry.row + 1].hr ? String(testData[activeEntry.row + 1].hr) : ''));
+                    setActiveEntry({ row: activeEntry.row + 1, field: activeEntry.field });
+                  }
+                }}
+                disabled={activeEntry.row === testData.length - 1}
+                style={{
+                  width: '36px', height: '36px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                  color: activeEntry.row === testData.length - 1 ? 'rgba(255,255,255,0.2)' : '#fff',
+                  cursor: activeEntry.row === testData.length - 1 ? 'default' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+
+            <NumPad
+              value={numPadValue}
+              onChange={setNumPadValue}
+              label={FIELD_CONFIG[activeEntry.field].label}
+              unit={FIELD_CONFIG[activeEntry.field].unit}
+              color={FIELD_CONFIG[activeEntry.field].color}
+              maxValue={FIELD_CONFIG[activeEntry.field].maxValue}
+              decimalPlaces={FIELD_CONFIG[activeEntry.field].decimalPlaces}
+            />
+
+            {/* Confirm button */}
+            <button
+              onClick={confirmNumPad}
+              style={{
+                marginTop: '12px',
+                width: '100%',
+                height: '60px',
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, #6644ff, #8866ff)',
+                border: 'none',
+                color: '#fff',
+                fontSize: '17px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <Check size={20} />
+              {activeEntry.row < testData.length - 1 ? 'Opslaan & volgende' : 'Opslaan'}
+            </button>
+          </div>
+        </>
+      )}
+    </>
   );
 };
 

@@ -10,6 +10,7 @@ import ResultsTab from '@/components/ResultsTab';
 import ZonesTab from '@/components/ZonesTab';
 import ScienceTab from '@/components/ScienceTab';
 import AppNav from '@/components/AppNav';
+import BottomNav from '@/components/BottomNav';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
@@ -41,13 +42,11 @@ const AthleteTest = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from('test_results').select('*').eq('id', testId!).single();
       if (error) throw error;
-      // Restore state from saved data
       const steps = data.steps_json as unknown as StepData[];
       if (steps) setTestData(steps);
       if (data.protocol_json) setProtocol(data.protocol_json as unknown as ProtocolSettings);
       setTestDate(data.test_date);
 
-      // Auto-calculate from steps if we have data
       if (steps && steps.filter(r => r.speed > 0 && r.lactate > 0).length >= 4) {
         const calcResult = calculate(steps, 0);
         if (typeof calcResult !== 'string') {
@@ -63,7 +62,6 @@ const AthleteTest = () => {
     enabled: !!testId,
   });
 
-  // Fetch athlete name
   const { data: athlete } = useQuery({
     queryKey: ['athlete', athleteId],
     queryFn: async () => {
@@ -94,9 +92,7 @@ const AthleteTest = () => {
   }, [protocol, toast]);
 
   const onCalculate = useCallback(async () => {
-    // Bestaande test bekijken: geen token verbruiken
     if (!testId) {
-      // Verbruik 1 token via RPC
       const { data: tokenUsed, error } = await supabase.rpc('use_token');
       if (error) {
         toast({ title: 'Fout', description: error.message, variant: 'destructive' });
@@ -110,7 +106,6 @@ const AthleteTest = () => {
         });
         return;
       }
-      // Token verbruikt — refresh de balance in AppNav
       queryClient.invalidateQueries({ queryKey: ['profile-nav'] });
     }
 
@@ -124,7 +119,6 @@ const AthleteTest = () => {
     toast({ title: 'Berekening voltooid' });
   }, [testData, restingLactate, testId, toast, queryClient]);
 
-  // Save test results
   const saveTest = useMutation({
     mutationFn: async () => {
       const payload = {
@@ -171,32 +165,29 @@ const AthleteTest = () => {
         rightContent={saveButton}
       />
 
-      <main className="max-w-[900px] mx-auto px-4 py-6">
+      {/* Desktop top tabs (hidden on mobile) */}
+      <main className="max-w-[900px] mx-auto px-4 py-6 pb-28 sm:pb-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-5 h-auto bg-muted p-1">
+          {/* Top tabs: visible on desktop only */}
+          <TabsList className="hidden sm:grid w-full grid-cols-5 h-auto bg-muted p-1">
             <TabsTrigger value="protocol" className="text-xs sm:text-sm px-1 py-2">
-              <span className="sm:hidden">📋</span>
-              <span className="hidden sm:inline">📋 Protocol</span>
+              📋 Protocol
             </TabsTrigger>
             <TabsTrigger value="data" className="text-xs sm:text-sm px-1 py-2">
-              <span className="sm:hidden">📊</span>
-              <span className="hidden sm:inline">📊 Data</span>
+              📊 Data
             </TabsTrigger>
             <TabsTrigger value="results" className="text-xs sm:text-sm px-1 py-2">
-              <span className="sm:hidden">🎯</span>
-              <span className="hidden sm:inline">🎯 Resultaten</span>
+              🎯 Resultaten
             </TabsTrigger>
             <TabsTrigger value="zones" className="text-xs sm:text-sm px-1 py-2">
-              <span className="sm:hidden">🏃</span>
-              <span className="hidden sm:inline">🏃 Zones</span>
+              🏃 Zones
             </TabsTrigger>
             <TabsTrigger value="science" className="text-xs sm:text-sm px-1 py-2">
-              <span className="sm:hidden">📚</span>
-              <span className="hidden sm:inline">📚 Wetenschap</span>
+              📚 Wetenschap
             </TabsTrigger>
           </TabsList>
 
-          <div className="mt-6">
+          <div className="sm:mt-6">
             <TabsContent value="protocol">
               <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
             </TabsContent>
@@ -217,6 +208,15 @@ const AthleteTest = () => {
           </div>
         </Tabs>
       </main>
+
+      {/* Mobile bottom nav */}
+      <div className="sm:hidden">
+        <BottomNav
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          hasResults={!!results}
+        />
+      </div>
     </div>
   );
 };

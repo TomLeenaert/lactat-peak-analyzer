@@ -6,12 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
-import { Plus, Pencil, Trash2, Calendar, Activity, TrendingUp, BarChart3 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Calendar, Activity, TrendingUp, BarChart3, ChevronRight } from 'lucide-react';
 
 interface StoredThresholdResults {
   lt1Speed?: number;
@@ -24,6 +22,9 @@ const getStoredResults = (value: unknown): StoredThresholdResults | null => {
   if (typeof value !== 'object' || value === null) return null;
   return value as StoredThresholdResults;
 };
+
+const getInitials = (name: string) =>
+  name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
 const AthleteDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -86,8 +87,16 @@ const AthleteDetail = () => {
     },
   });
 
-  if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Laden...</p></div>;
-  if (!athlete) return <div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Atleet niet gevonden</p></div>;
+  if (isLoading) return (
+    <div style={{ minHeight: '100vh', background: '#09090d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Laden...</p>
+    </div>
+  );
+  if (!athlete) return (
+    <div style={{ minHeight: '100vh', background: '#09090d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Atleet niet gevonden</p>
+    </div>
+  );
 
   const openEdit = () => {
     setEditForm({
@@ -99,30 +108,32 @@ const AthleteDetail = () => {
     setEditOpen(true);
   };
 
-  // Derive summary stats from tests
   const latestTest = tests[0];
   const latestResults = getStoredResults(latestTest?.results_json);
   const lastTestDate = latestTest?.test_date;
 
-  // Get latest valid LT values
   const latestLt1Speed = latestResults?.lt1?.best ?? latestResults?.lt1Speed ?? null;
   const latestLt2Speed = latestResults?.lt2?.best ?? latestResults?.lt2Speed ?? null;
   const latestLt1 = latestLt1Speed != null ? formatPace(latestLt1Speed) : null;
   const latestLt2 = latestLt2Speed != null ? formatPace(latestLt2Speed) : null;
 
   const editButton = (
-    <Button
-      variant="outline"
-      size="sm"
+    <button
       onClick={openEdit}
-      style={{ fontSize: '12px', height: '30px', borderColor: 'rgba(255,255,255,0.15)' }}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '6px',
+        fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
+        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '8px', padding: '6px 12px', cursor: 'pointer',
+        height: '30px',
+      }}
     >
-      <Pencil className="h-3 w-3 mr-1.5" />Bewerken
-    </Button>
+      <Pencil size={11} />Bewerken
+    </button>
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh', background: '#09090d' }}>
       <AppNav
         backTo="/dashboard"
         backLabel="Alle atleten"
@@ -130,156 +141,249 @@ const AthleteDetail = () => {
         rightContent={editButton}
       />
 
-      <main className="max-w-[900px] mx-auto px-4 py-6 space-y-6">
-        {/* Profile header card */}
-        <Card>
-          <CardContent className="py-5">
-            <div className="flex items-start gap-4">
-              <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="text-xl font-bold text-primary">
-                  {athlete.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold truncate">{athlete.name}</h1>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
-                  {athlete.sport && (
-                    <span className="flex items-center gap-1">
-                      <Activity className="h-3.5 w-3.5" />
-                      {athlete.sport}
-                    </span>
-                  )}
-                  {athlete.birth_date && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {athlete.birth_date}
-                    </span>
-                  )}
-                </div>
-                {athlete.notes && (
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{athlete.notes}</p>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '20px 16px 48px' }}>
 
-        {/* Summary stat cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <Card>
-            <CardContent className="py-4 px-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Totaal tests</p>
-              <p className="text-2xl font-bold">{tests.length}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-4 px-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">Laatste test</p>
-              <p className="text-sm font-semibold">{lastTestDate || <span className="text-muted-foreground font-normal">—</span>}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-4 px-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">T2mmol</p>
-              {latestLt1 ? (
-                <p className="text-sm font-semibold text-green-600">{latestLt1} /km</p>
-              ) : (
-                <p className="text-sm text-muted-foreground/50 italic">Niet berekend</p>
+        {/* Profile header */}
+        <div style={{
+          background: 'rgba(255,255,255,0.02)',
+          border: '1px solid rgba(255,255,255,0.07)',
+          borderRadius: '20px',
+          padding: '20px',
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '16px',
+        }}>
+          <div style={{
+            width: '52px', height: '52px', borderRadius: '14px', flexShrink: 0,
+            background: 'rgba(102,68,255,0.15)',
+            border: '1px solid rgba(102,68,255,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '18px', fontWeight: 800, color: '#a090ff',
+            letterSpacing: '-0.5px',
+          }}>
+            {getInitials(athlete.name)}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#fff', margin: '0 0 6px', letterSpacing: '-0.3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {athlete.name}
+            </h1>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              {athlete.sport && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+                  <Activity size={12} />{athlete.sport}
+                </span>
               )}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="py-4 px-4 text-center">
-              <p className="text-xs text-muted-foreground mb-1">T4mmol</p>
-              {latestLt2 ? (
-                <p className="text-sm font-semibold text-orange-600">{latestLt2} /km</p>
-              ) : (
-                <p className="text-sm text-muted-foreground/50 italic">Niet berekend</p>
+              {athlete.birth_date && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+                  <Calendar size={12} />{athlete.birth_date}
+                </span>
               )}
-            </CardContent>
-          </Card>
+            </div>
+            {athlete.notes && (
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)', marginTop: '8px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                {athlete.notes}
+              </p>
+            )}
+          </div>
         </div>
+
+        {/* Stats row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '16px' }}>
+          {/* Total tests */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '16px',
+            padding: '16px',
+            textAlign: 'center',
+          }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Totaal tests</p>
+            <p style={{ fontSize: '28px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px' }}>{tests.length}</p>
+          </div>
+          {/* Last test */}
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '16px',
+            padding: '16px',
+            textAlign: 'center',
+          }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Laatste test</p>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: lastTestDate ? '#fff' : 'rgba(255,255,255,0.2)' }}>
+              {lastTestDate || '—'}
+            </p>
+          </div>
+        </div>
+
+        {/* Threshold cards — only if we have data */}
+        {(latestLt1 || latestLt2) && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '16px' }}>
+            <div style={{
+              background: 'rgba(0,229,122,0.05)',
+              border: '1px solid rgba(0,229,122,0.2)',
+              borderRadius: '16px',
+              padding: '16px',
+              textAlign: 'center',
+            }}>
+              <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#00e57a', marginBottom: '8px', opacity: 0.8 }}>T2mmol</p>
+              {latestLt1 ? (
+                <p style={{ fontSize: '22px', fontWeight: 900, color: '#00e57a', lineHeight: 1, letterSpacing: '-0.5px' }}>{latestLt1}<span style={{ fontSize: '13px', fontWeight: 500, opacity: 0.6 }}> /km</span></p>
+              ) : (
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>—</p>
+              )}
+            </div>
+            <div style={{
+              background: 'rgba(255,107,43,0.05)',
+              border: '1px solid rgba(255,107,43,0.2)',
+              borderRadius: '16px',
+              padding: '16px',
+              textAlign: 'center',
+            }}>
+              <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#ff6b2b', marginBottom: '8px', opacity: 0.8 }}>T4mmol</p>
+              {latestLt2 ? (
+                <p style={{ fontSize: '22px', fontWeight: 900, color: '#ff6b2b', lineHeight: 1, letterSpacing: '-0.5px' }}>{latestLt2}<span style={{ fontSize: '13px', fontWeight: 500, opacity: 0.6 }}> /km</span></p>
+              ) : (
+                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>—</p>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Evolution placeholder */}
         {tests.length === 1 && (
-          <Card className="border-dashed">
-            <CardContent className="py-8 text-center">
-              <BarChart3 className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
-              <p className="text-sm text-muted-foreground">Voeg meer testen toe om de evolutie van drempels te zien.</p>
-            </CardContent>
-          </Card>
+          <div style={{
+            border: '1px dashed rgba(255,255,255,0.08)',
+            borderRadius: '16px',
+            padding: '24px',
+            textAlign: 'center',
+            marginBottom: '16px',
+          }}>
+            <BarChart3 size={28} style={{ color: 'rgba(255,255,255,0.15)', margin: '0 auto 8px' }} />
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>Voeg meer tests toe om de evolutie van drempels te zien.</p>
+          </div>
         )}
 
-        {/* Test history */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">Testhistoriek</h2>
-          <Button onClick={() => navigate(`/athlete/${id}/test`)}>
-            <Plus className="h-4 w-4 mr-2" />Nieuwe test
-          </Button>
+        {/* Test history header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: '17px', fontWeight: 800, color: '#fff', margin: 0 }}>Testhistoriek</h2>
+          <button
+            onClick={() => navigate(`/athlete/${id}/test`)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 14px',
+              background: 'linear-gradient(135deg, #6644ff, #8866ff)',
+              border: 'none', borderRadius: '10px',
+              color: '#fff', fontSize: '13px', fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            <Plus size={14} />Nieuwe test
+          </button>
         </div>
 
+        {/* Empty tests */}
         {tests.length === 0 ? (
-          <Card className="border-dashed">
-            <CardContent className="py-12 text-center">
-              <TrendingUp className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
-              <p className="text-lg font-semibold text-foreground mb-1">Nog geen tests uitgevoerd.</p>
-              <p className="text-sm text-muted-foreground/70">Start een nieuwe lactaattest om drempels, zones en evolutie zichtbaar te maken.</p>
-              <div className="mx-auto mt-5 max-w-md rounded-2xl border border-dashed border-border px-4 py-3 text-left text-sm text-muted-foreground">
-                Na de eerste test kun je hier meteen tempozones, lactaatcurve en vergelijkingen over meerdere testmomenten tonen.
-              </div>
-            </CardContent>
-          </Card>
+          <div style={{
+            border: '2px dashed rgba(255,255,255,0.07)',
+            borderRadius: '16px',
+            padding: '40px 24px',
+            textAlign: 'center',
+          }}>
+            <TrendingUp size={32} style={{ color: 'rgba(255,255,255,0.12)', margin: '0 auto 12px' }} />
+            <p style={{ fontSize: '16px', fontWeight: 700, color: '#fff', marginBottom: '6px' }}>Nog geen tests uitgevoerd.</p>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', lineHeight: 1.6, maxWidth: '300px', margin: '0 auto' }}>
+              Start een nieuwe lactaattest om drempels, zones en evolutie zichtbaar te maken.
+            </p>
+          </div>
         ) : (
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Datum</TableHead>
-                    <TableHead>T2mmol</TableHead>
-                    <TableHead>T4mmol</TableHead>
-                    <TableHead>Stappen</TableHead>
-                    <TableHead className="w-10"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tests.map(t => {
-                    const r = getStoredResults(t.results_json);
-                    const steps = Array.isArray(t.steps_json) ? t.steps_json : [];
-                    const rowLt1Speed = r?.lt1?.best ?? r?.lt1Speed ?? null;
-                    const rowLt2Speed = r?.lt2?.best ?? r?.lt2Speed ?? null;
-                    return (
-                      <TableRow key={t.id} className="cursor-pointer" onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}>
-                        <TableCell className="font-medium">{t.test_date}</TableCell>
-                        <TableCell>
-                          {rowLt1Speed != null
-                            ? <span className="text-green-600 font-medium">{formatPace(rowLt1Speed)} /km</span>
-                            : <span className="text-muted-foreground/40 italic text-sm">—</span>
-                          }
-                        </TableCell>
-                        <TableCell>
-                          {rowLt2Speed != null
-                            ? <span className="text-orange-600 font-medium">{formatPace(rowLt2Speed)} /km</span>
-                            : <span className="text-muted-foreground/40 italic text-sm">—</span>
-                          }
-                        </TableCell>
-                        <TableCell>{steps?.length ?? '—'}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={e => { e.stopPropagation(); if (confirm('Test verwijderen?')) deleteTest.mutate(t.id); }}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {tests.map(t => {
+              const r = getStoredResults(t.results_json);
+              const steps = Array.isArray(t.steps_json) ? t.steps_json : [];
+              const rowLt1Speed = r?.lt1?.best ?? r?.lt1Speed ?? null;
+              const rowLt2Speed = r?.lt2?.best ?? r?.lt2Speed ?? null;
+              const hasResults = rowLt1Speed != null || rowLt2Speed != null;
+
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    borderRadius: '14px',
+                    padding: '14px 16px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  {/* Date badge */}
+                  <div style={{
+                    background: 'rgba(102,68,255,0.1)',
+                    border: '1px solid rgba(102,68,255,0.2)',
+                    borderRadius: '10px',
+                    padding: '6px 10px',
+                    flexShrink: 0,
+                    textAlign: 'center',
+                  }}>
+                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#6644ff', margin: 0 }}>
+                      {t.test_date?.split('-').slice(1).join('/')}
+                    </p>
+                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                      {t.test_date?.split('-')[0]}
+                    </p>
+                  </div>
+
+                  {/* Thresholds */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    {hasResults ? (
+                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                        {rowLt1Speed != null && (
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#00e57a' }}>
+                            T2: {formatPace(rowLt1Speed)} /km
+                          </span>
+                        )}
+                        {rowLt2Speed != null && (
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#ff6b2b' }}>
+                            T4: {formatPace(rowLt2Speed)} /km
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>Geen resultaten</span>
+                    )}
+                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '3px' }}>
+                      {steps.length} stappen
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                    <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.2)' }} />
+                    <button
+                      onClick={e => { e.stopPropagation(); if (confirm('Test verwijderen?')) deleteTest.mutate(t.id); }}
+                      style={{
+                        width: '28px', height: '28px', borderRadius: '7px',
+                        background: 'rgba(239,68,68,0.07)',
+                        border: '1px solid rgba(239,68,68,0.15)',
+                        color: 'rgba(239,68,68,0.6)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         )}
       </main>
 
