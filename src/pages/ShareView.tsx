@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
+import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from '@/components/LactateChart';
 
 const ShareView = () => {
@@ -61,7 +61,7 @@ const ShareView = () => {
   }
 
   const { athleteName, testDate, results } = data;
-  const { lt1, lt2, speeds, hrs, watts, coeffs } = results;
+  const { lt1, lt2, speeds, hrs, coeffs } = results;
 
   if (!lt1 || !lt2 || !coeffs) {
     return (
@@ -72,7 +72,6 @@ const ShareView = () => {
   }
 
   const zones = getZones(results);
-  const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
   const lt1HR = interpolateHR(lt1.best, speeds, hrs);
   const lt2HR = interpolateHR(lt2.best, speeds, hrs);
@@ -179,8 +178,6 @@ const ShareView = () => {
           {zones.map(z => {
             const hrFrom = interpolateHR(z.from, speeds, hrs);
             const hrTo   = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
-            const wFrom  = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
-            const wTo    = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
             const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
             const lacTo   = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
 
@@ -202,7 +199,6 @@ const ShareView = () => {
                       {formatPace(z.to)} – {formatPace(z.from)} /km
                     </p>
                     {hrFrom > 0 && <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>{hrFrom} – {hrTo} bpm</p>}
-                    {hasWatts && <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>{wFrom} – {wTo} W</p>}
                     <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)' }}>{lacFrom} – {lacTo} mmol/L</p>
                   </div>
                 </div>

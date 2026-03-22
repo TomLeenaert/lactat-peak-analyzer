@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
+import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
 import { supabase } from '@/integrations/supabase/client';
 import { Share2, Check, Link } from 'lucide-react';
@@ -52,7 +52,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     );
   }
 
-  const { lt1, lt2, speeds, hrs, watts, coeffs } = results;
+  const { lt1, lt2, speeds, hrs, coeffs } = results;
   if (!coeffs || !Array.isArray(coeffs)) {
     return (
       <div style={{
@@ -69,7 +69,6 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   }
 
   const zones = getZones(results);
-  const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
 
   const lt1HR = interpolateHR(lt1.best, speeds, hrs);
@@ -202,8 +201,6 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
         {zones.map(z => {
           const hrFrom = interpolateHR(z.from, speeds, hrs);
           const hrTo   = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
-          const wFrom  = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
-          const wTo    = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
           const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
           const lacTo   = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
 
@@ -234,11 +231,6 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
                   {hrFrom > 0 && (
                     <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>
                       {hrFrom} – {hrTo} bpm
-                    </p>
-                  )}
-                  {hasWatts && (
-                    <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>
-                      {wFrom} – {wTo} W
                     </p>
                   )}
                   <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)' }}>
