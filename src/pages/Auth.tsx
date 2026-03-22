@@ -131,7 +131,7 @@ const Auth = () => {
           }}>💳</div>
         </div>
 
-        {/* Coach Access heading */}
+        {/* Heading */}
         <div style={{ marginBottom: '24px' }}>
           <h1 style={{
             fontFamily: 'Space Grotesk, sans-serif',
@@ -143,12 +143,12 @@ const Auth = () => {
             margin: '0 0 4px',
             lineHeight: 1,
           }}>
-            {isLogin ? 'Coach Access' : 'New Laboratory'}
+            {isLogin ? (lang === 'nl' ? 'Inloggen' : 'Sign in') : (lang === 'nl' ? 'Account aanmaken' : 'Create account')}
           </h1>
           <p style={{ fontSize: '13px', color: '#adaaaa', margin: 0, fontWeight: 400 }}>
             {isLogin
-              ? 'Secure credential login required.'
-              : 'Register your coach account.'}
+              ? (lang === 'nl' ? 'Log in met je e-mail en wachtwoord.' : 'Log in with your email and password.')
+              : (lang === 'nl' ? 'Maak een gratis coachaccount aan.' : 'Create a free coach account.')}
           </p>
         </div>
 
@@ -158,11 +158,11 @@ const Auth = () => {
           {!isLogin && (
             <div style={{ position: 'relative' }}>
               <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-                Full Name
+                {lang === 'nl' ? 'Naam' : 'Name'}
               </p>
               <input
                 style={inputStyle}
-                placeholder="Coach Name"
+                placeholder={lang === 'nl' ? 'Jouw naam' : 'Your name'}
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
                 required
@@ -174,12 +174,12 @@ const Auth = () => {
 
           <div style={{ position: 'relative' }}>
             <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-              Terminal ID / Email
+              E-mail
             </p>
             <input
               style={inputStyle}
               type="email"
-              placeholder="COACH_REF_0492"
+              placeholder="coach@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -191,7 +191,7 @@ const Auth = () => {
 
           <div style={{ position: 'relative' }}>
             <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-              Access Code
+              {lang === 'nl' ? 'Wachtwoord' : 'Password'}
             </p>
             <input
               style={inputStyle}
@@ -233,7 +233,11 @@ const Auth = () => {
               opacity: submitting ? 0.7 : 1,
             }}
           >
-            {submitting ? 'Processing...' : isLogin ? 'Initialize Session ›' : 'Register Laboratory ›'}
+            {submitting
+              ? (lang === 'nl' ? 'Even geduld...' : 'Please wait...')
+              : isLogin
+                ? (lang === 'nl' ? 'Inloggen →' : 'Sign in →')
+                : (lang === 'nl' ? 'Account aanmaken →' : 'Create account →')}
           </button>
         </form>
 
@@ -244,7 +248,7 @@ const Auth = () => {
               onClick={handleForgotPassword}
               style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#777575', background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              Forgot Calibration Keys?
+              {lang === 'nl' ? 'Wachtwoord vergeten?' : 'Forgot password?'}
             </button>
           )}
 
@@ -271,17 +275,12 @@ const Auth = () => {
               cursor: 'pointer',
             }}
           >
-            {isLogin ? 'Register New Laboratory' : 'Back to Coach Access'}
+            {isLogin
+              ? (lang === 'nl' ? 'Nog geen account? Registreer hier' : 'No account yet? Register here')
+              : (lang === 'nl' ? 'Al een account? Log in' : 'Already have an account? Sign in')}
           </button>
         </div>
 
-        {/* Footer status */}
-        <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00fdc1', boxShadow: '0 0 6px #00fdc1' }} />
-          <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#494847' }}>
-            Encrypted Satellite Uplink Active
-          </span>
-        </div>
 
         {/* Language toggle */}
         <div style={{ marginTop: '16px', textAlign: 'center' }}>
