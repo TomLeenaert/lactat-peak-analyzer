@@ -1,0 +1,44 @@
+name: Deploy Guard
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  guard:
+    name: Production Deploy Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build (production)
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL_PROD }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY_PROD }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID_PROD }}
+
+      - name: Notify success
+        if: success()
+        run: echo "✅ Build OK — Cloudflare Pages deployt nu naar mylactest.com"
+
+      - name: Notify failure
+        if: failure()
+        run: echo "❌ Build mislukt — deploy naar productie geblokkeerd"
