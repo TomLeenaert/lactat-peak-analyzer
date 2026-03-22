@@ -93,7 +93,7 @@ const Auth = () => {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-            <img src={logoSrc} alt="LacTest" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+            <img src={logoSrc} alt="LacTest" style={{ width: '40px', height: '40px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
             <span style={{
               fontFamily: 'Space Grotesk, sans-serif',
               fontWeight: 900,
