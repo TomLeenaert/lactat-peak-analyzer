@@ -3,13 +3,12 @@ import { formatPace } from '@/lib/lactate-math';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
-import { Plus, Pencil, Trash2, Calendar, Activity, TrendingUp, BarChart3, ChevronRight } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 interface StoredThresholdResults {
   lt1Speed?: number;
@@ -28,7 +27,6 @@ const getInitials = (name: string) =>
 
 const AthleteDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -87,304 +85,267 @@ const AthleteDetail = () => {
     },
   });
 
-  if (isLoading) return (
-    <div style={{ minHeight: '100vh', background: '#09090d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Laden...</p>
-    </div>
-  );
-  if (!athlete) return (
-    <div style={{ minHeight: '100vh', background: '#09090d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'rgba(255,255,255,0.4)' }}>Atleet niet gevonden</p>
+  if (isLoading || !athlete) return (
+    <div style={{ minHeight: '100vh', background: '#0e0e0e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#adaaaa', fontFamily: 'Space Grotesk, sans-serif' }}>Laden...</p>
     </div>
   );
 
   const openEdit = () => {
-    setEditForm({
-      name: athlete.name,
-      birth_date: athlete.birth_date || '',
-      sport: athlete.sport || '',
-      notes: athlete.notes || '',
-    });
+    setEditForm({ name: athlete.name, birth_date: athlete.birth_date || '', sport: athlete.sport || '', notes: athlete.notes || '' });
     setEditOpen(true);
   };
 
   const latestTest = tests[0];
   const latestResults = getStoredResults(latestTest?.results_json);
-  const lastTestDate = latestTest?.test_date;
-
   const latestLt1Speed = latestResults?.lt1?.best ?? latestResults?.lt1Speed ?? null;
   const latestLt2Speed = latestResults?.lt2?.best ?? latestResults?.lt2Speed ?? null;
-  const latestLt1 = latestLt1Speed != null ? formatPace(latestLt1Speed) : null;
-  const latestLt2 = latestLt2Speed != null ? formatPace(latestLt2Speed) : null;
+
+  // Avg tempo from all tests (simulated from lt2)
+  const avgTempo = latestLt2Speed ? formatPace(latestLt2Speed) : null;
 
   const editButton = (
-    <button
-      onClick={openEdit}
-      style={{
-        display: 'flex', alignItems: 'center', gap: '6px',
-        fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.5)',
-        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '8px', padding: '6px 12px', cursor: 'pointer',
-        height: '30px',
-      }}
-    >
-      <Pencil size={11} />Bewerken
+    <button onClick={openEdit} style={{
+      fontFamily: 'Space Grotesk, sans-serif', fontSize: '11px', fontWeight: 700,
+      letterSpacing: '0.1em', textTransform: 'uppercase',
+      color: '#bd9dff', background: 'rgba(189,157,255,0.1)',
+      border: '1px solid rgba(189,157,255,0.25)',
+      borderRadius: '2px', padding: '6px 14px', cursor: 'pointer',
+    }}>
+      Edit
     </button>
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#09090d' }}>
+    <div style={{ minHeight: '100vh', background: '#0e0e0e' }}>
       <AppNav
         backTo="/dashboard"
-        backLabel="Alle atleten"
-        title={athlete.name}
+        backLabel="Athletes"
+        title="LacTest"
         rightContent={editButton}
       />
 
-      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '20px 16px 48px' }}>
+      <main style={{ padding: '24px 24px 120px' }}>
 
-        {/* Profile header */}
+        {/* Athlete profile header */}
         <div style={{
-          background: 'rgba(255,255,255,0.02)',
-          border: '1px solid rgba(255,255,255,0.07)',
-          borderRadius: '20px',
-          padding: '20px',
+          background: '#131313',
+          borderRadius: '2px',
+          padding: '24px',
           marginBottom: '16px',
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '16px',
+          gap: '20px',
         }}>
+          {/* Avatar */}
           <div style={{
-            width: '52px', height: '52px', borderRadius: '14px', flexShrink: 0,
-            background: 'rgba(102,68,255,0.15)',
-            border: '1px solid rgba(102,68,255,0.3)',
+            width: '72px', height: '72px', flexShrink: 0,
+            background: '#201f1f',
+            border: '2px solid #bd9dff',
+            borderRadius: '4px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '18px', fontWeight: 800, color: '#a090ff',
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontSize: '24px', fontWeight: 900, color: '#bd9dff',
             letterSpacing: '-0.5px',
           }}>
             {getInitials(athlete.name)}
           </div>
+
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#fff', margin: '0 0 6px', letterSpacing: '-0.3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {athlete.sport && (
+              <span style={{
+                display: 'inline-block',
+                background: '#006c50', color: '#dfffef',
+                fontSize: '9px', fontWeight: 900,
+                fontFamily: 'Space Grotesk, sans-serif',
+                letterSpacing: '0.15em', textTransform: 'uppercase',
+                padding: '2px 8px', borderRadius: '2px', marginBottom: '6px',
+              }}>
+                {athlete.sport}
+              </span>
+            )}
+            <h1 style={{
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontSize: '26px', fontWeight: 900,
+              letterSpacing: '-0.5px', color: '#fff',
+              margin: '0 0 2px', lineHeight: 1.1,
+            }}>
               {athlete.name}
             </h1>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {athlete.sport && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-                  <Activity size={12} />{athlete.sport}
-                </span>
-              )}
-              {athlete.birth_date && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-                  <Calendar size={12} />{athlete.birth_date}
-                </span>
-              )}
-            </div>
             {athlete.notes && (
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)', marginTop: '8px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+              <p style={{ fontSize: '12px', color: '#adaaaa', margin: '4px 0 0', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700 }}>
                 {athlete.notes}
               </p>
             )}
           </div>
         </div>
 
-        {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '16px' }}>
-          {/* Total tests */}
+        {/* VO2 Max / key metric — large display */}
+        {latestLt2Speed && (
           <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.07)',
-            borderRadius: '16px',
-            padding: '16px',
-            textAlign: 'center',
-          }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Totaal tests</p>
-            <p style={{ fontSize: '28px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px' }}>{tests.length}</p>
-          </div>
-          {/* Last test */}
-          <div style={{
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.07)',
-            borderRadius: '16px',
-            padding: '16px',
-            textAlign: 'center',
-          }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Laatste test</p>
-            <p style={{ fontSize: '14px', fontWeight: 700, color: lastTestDate ? '#fff' : 'rgba(255,255,255,0.2)' }}>
-              {lastTestDate || '—'}
-            </p>
-          </div>
-        </div>
-
-        {/* Threshold cards — only if we have data */}
-        {(latestLt1 || latestLt2) && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '16px' }}>
-            <div style={{
-              background: 'rgba(0,229,122,0.05)',
-              border: '1px solid rgba(0,229,122,0.2)',
-              borderRadius: '16px',
-              padding: '16px',
-              textAlign: 'center',
-            }}>
-              <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#00e57a', marginBottom: '8px', opacity: 0.8 }}>T2mmol</p>
-              {latestLt1 ? (
-                <p style={{ fontSize: '22px', fontWeight: 900, color: '#00e57a', lineHeight: 1, letterSpacing: '-0.5px' }}>{latestLt1}<span style={{ fontSize: '13px', fontWeight: 500, opacity: 0.6 }}> /km</span></p>
-              ) : (
-                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>—</p>
-              )}
-            </div>
-            <div style={{
-              background: 'rgba(255,107,43,0.05)',
-              border: '1px solid rgba(255,107,43,0.2)',
-              borderRadius: '16px',
-              padding: '16px',
-              textAlign: 'center',
-            }}>
-              <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#ff6b2b', marginBottom: '8px', opacity: 0.8 }}>T4mmol</p>
-              {latestLt2 ? (
-                <p style={{ fontSize: '22px', fontWeight: 900, color: '#ff6b2b', lineHeight: 1, letterSpacing: '-0.5px' }}>{latestLt2}<span style={{ fontSize: '13px', fontWeight: 500, opacity: 0.6 }}> /km</span></p>
-              ) : (
-                <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>—</p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Evolution placeholder */}
-        {tests.length === 1 && (
-          <div style={{
-            border: '1px dashed rgba(255,255,255,0.08)',
-            borderRadius: '16px',
-            padding: '24px',
-            textAlign: 'center',
+            background: '#131313',
+            borderRadius: '2px',
+            padding: '20px 24px',
             marginBottom: '16px',
           }}>
-            <BarChart3 size={28} style={{ color: 'rgba(255,255,255,0.15)', margin: '0 auto 8px' }} />
-            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>Voeg meer tests toe om de evolutie van drempels te zien.</p>
+            <p style={{
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontSize: '9px', fontWeight: 700,
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: '#777575', marginBottom: '4px',
+            }}>
+              T4mmol Precision
+            </p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              <span style={{
+                fontFamily: 'Space Grotesk, sans-serif',
+                fontSize: '56px', fontWeight: 900,
+                color: '#00fdc1', lineHeight: 1,
+                letterSpacing: '-2px',
+                textShadow: '0 0 20px rgba(0,253,193,0.3)',
+              }}>
+                {formatPace(latestLt2Speed)}
+              </span>
+              <span style={{ fontSize: '14px', color: '#adaaaa', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600 }}>
+                min/km
+              </span>
+            </div>
           </div>
         )}
 
-        {/* Test history header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <h2 style={{ fontSize: '17px', fontWeight: 800, color: '#fff', margin: 0 }}>Testhistoriek</h2>
-          <button
-            onClick={() => navigate(`/athlete/${id}/test`)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              padding: '8px 14px',
-              background: 'linear-gradient(135deg, #6644ff, #8866ff)',
-              border: 'none', borderRadius: '10px',
-              color: '#fff', fontSize: '13px', fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            <Plus size={14} />Nieuwe test
-          </button>
-        </div>
-
-        {/* Empty tests */}
-        {tests.length === 0 ? (
-          <div style={{
-            border: '2px dashed rgba(255,255,255,0.07)',
-            borderRadius: '16px',
-            padding: '40px 24px',
-            textAlign: 'center',
-          }}>
-            <TrendingUp size={32} style={{ color: 'rgba(255,255,255,0.12)', margin: '0 auto 12px' }} />
-            <p style={{ fontSize: '16px', fontWeight: 700, color: '#fff', marginBottom: '6px' }}>Nog geen tests uitgevoerd.</p>
-            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', lineHeight: 1.6, maxWidth: '300px', margin: '0 auto' }}>
-              Start een nieuwe lactaattest om drempels, zones en evolutie zichtbaar te maken.
+        {/* Stats grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+          <div style={{ background: '#131313', borderRadius: '2px', padding: '16px' }}>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 6px' }}>Tests</p>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '36px', fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1, letterSpacing: '-1px' }}>
+              {tests.length}
+            </p>
+            {tests.length > 1 && (
+              <p style={{ fontSize: '11px', color: '#00fdc1', margin: '4px 0 0', fontWeight: 700 }}>↑ {tests.length - 1} sessies</p>
+            )}
+          </div>
+          <div style={{ background: '#131313', borderRadius: '2px', padding: '16px' }}>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 6px' }}>Avg Tempo</p>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '28px', fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1, letterSpacing: '-0.5px' }}>
+              {avgTempo ?? '—'}
+            </p>
+            <p style={{ fontSize: '11px', color: '#777575', margin: '4px 0 0', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              min/km
             </p>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {tests.map(t => {
-              const r = getStoredResults(t.results_json);
-              const steps = Array.isArray(t.steps_json) ? t.steps_json : [];
-              const rowLt1Speed = r?.lt1?.best ?? r?.lt1Speed ?? null;
-              const rowLt2Speed = r?.lt2?.best ?? r?.lt2Speed ?? null;
-              const hasResults = rowLt1Speed != null || rowLt2Speed != null;
+        </div>
 
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    borderRadius: '14px',
-                    padding: '14px 16px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    WebkitTapHighlightColor: 'transparent',
-                  }}
-                >
-                  {/* Date badge */}
-                  <div style={{
-                    background: 'rgba(102,68,255,0.1)',
-                    border: '1px solid rgba(102,68,255,0.2)',
-                    borderRadius: '10px',
-                    padding: '6px 10px',
-                    flexShrink: 0,
-                    textAlign: 'center',
-                  }}>
-                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#6644ff', margin: 0 }}>
-                      {t.test_date?.split('-').slice(1).join('/')}
-                    </p>
-                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-                      {t.test_date?.split('-')[0]}
-                    </p>
-                  </div>
+        {/* New test button */}
+        <button
+          onClick={() => navigate(`/athlete/${id}/test`)}
+          style={{
+            width: '100%',
+            height: '64px',
+            background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)',
+            border: 'none',
+            borderRadius: '2px',
+            color: '#fff',
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontWeight: 900,
+            fontSize: '16px',
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            marginBottom: '32px',
+            boxShadow: '0 8px 24px rgba(139,74,255,0.3)',
+          }}
+        >
+          + Nieuwe Test
+        </button>
 
-                  {/* Thresholds */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    {hasResults ? (
-                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                        {rowLt1Speed != null && (
-                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#00e57a' }}>
-                            T2: {formatPace(rowLt1Speed)} /km
-                          </span>
-                        )}
-                        {rowLt2Speed != null && (
-                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#ff6b2b' }}>
-                            T4: {formatPace(rowLt2Speed)} /km
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>Geen resultaten</span>
-                    )}
-                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '3px' }}>
-                      {steps.length} stappen
-                    </p>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                    <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.2)' }} />
-                    <button
-                      onClick={e => { e.stopPropagation(); if (confirm('Test verwijderen?')) deleteTest.mutate(t.id); }}
-                      style={{
-                        width: '28px', height: '28px', borderRadius: '7px',
-                        background: 'rgba(239,68,68,0.07)',
-                        border: '1px solid rgba(239,68,68,0.15)',
-                        color: 'rgba(239,68,68,0.6)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                        WebkitTapHighlightColor: 'transparent',
-                      }}
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
-                </button>
-              );
-            })}
+        {/* History */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '13px', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#fff', margin: 0 }}>
+              History
+            </h2>
+            <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#777575' }}>
+              Last {tests.length} tests
+            </span>
           </div>
-        )}
+
+          {tests.length === 0 ? (
+            <div style={{ background: '#131313', borderRadius: '2px', padding: '40px 24px', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '14px', color: '#adaaaa' }}>Nog geen tests uitgevoerd.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {tests.map(t => {
+                const r = getStoredResults(t.results_json);
+                const lt1Speed = r?.lt1?.best ?? r?.lt1Speed ?? null;
+                const lt2Speed = r?.lt2?.best ?? r?.lt2Speed ?? null;
+                const hasResults = lt1Speed != null || lt2Speed != null;
+                const steps = Array.isArray(t.steps_json) ? t.steps_json : [];
+
+                // Format date: "Feb 24, 2024" style
+                const dateStr = t.test_date ? new Date(t.test_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}
+                    style={{
+                      width: '100%', textAlign: 'left',
+                      background: '#131313',
+                      border: 'none',
+                      borderBottom: '1px solid #1a1919',
+                      padding: '16px 0',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#777575', margin: '0 0 4px' }}>
+                        {dateStr}
+                      </p>
+                      <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '15px', fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.2px' }}>
+                        {hasResults
+                          ? (lt2Speed ? `Lactate Threshold 2` : `Aerobic Threshold`)
+                          : `Test — ${steps.length} stappen`}
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                      {lt2Speed && (
+                        <div style={{ textAlign: 'right' }}>
+                          <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '18px', fontWeight: 900, color: '#00fdc1', margin: 0, lineHeight: 1 }}>
+                            {lt2Speed.toFixed(1)}
+                          </p>
+                          <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, color: '#777575', margin: 0, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                            mmol/L
+                          </p>
+                        </div>
+                      )}
+                      <span style={{ color: '#777575', fontSize: '18px' }}>›</span>
+                      <button
+                        onClick={e => { e.stopPropagation(); if (confirm('Test verwijderen?')) deleteTest.mutate(t.id); }}
+                        style={{
+                          width: '28px', height: '28px',
+                          background: 'rgba(239,68,68,0.07)',
+                          border: '1px solid rgba(239,68,68,0.15)',
+                          borderRadius: '2px',
+                          color: 'rgba(239,68,68,0.6)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', flexShrink: 0,
+                        }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Edit dialog */}

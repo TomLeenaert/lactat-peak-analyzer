@@ -5,33 +5,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Users, Trash2, ChevronRight, Activity, Calendar } from 'lucide-react';
 import AppNav from '@/components/AppNav';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
-const getInitials = (name: string) =>
-  name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-
-const SPORT_COLORS: Record<string, string> = {
-  lopen: '#6644ff',
-  running: '#6644ff',
-  fietsen: '#00e57a',
-  cycling: '#00e57a',
-  triathlon: '#ff6b2b',
-  zwemmen: '#00c9a7',
-  swimming: '#00c9a7',
-  roeien: '#ffb800',
-  rowing: '#ffb800',
+const SPORT_ICONS: Record<string, string> = {
+  lopen: '🏃', running: '🏃',
+  fietsen: '🚴', cycling: '🚴',
+  triathlon: '🏊',
+  zwemmen: '🏊', swimming: '🏊',
+  roeien: '🚣', rowing: '🚣',
 };
-
-const getSportColor = (sport?: string | null): string => {
-  if (!sport) return '#6644ff';
-  const key = sport.toLowerCase();
-  return SPORT_COLORS[key] || '#6644ff';
-};
+const getSportIcon = (sport?: string | null) => SPORT_ICONS[sport?.toLowerCase() ?? ''] ?? '🏃';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -56,7 +43,7 @@ const Dashboard = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('athletes')
-        .select('*, test_results(id, test_date)')
+        .select('*, test_results(id, test_date, results_json)')
         .eq('user_id', user!.id)
         .order('name');
       if (error) throw error;
@@ -108,167 +95,106 @@ const Dashboard = () => {
   const [clubNameInput, setClubNameInput] = useState('');
 
   const navRight = editingClub ? (
-    <form onSubmit={e => { e.preventDefault(); updateClubName.mutate(clubNameInput); setEditingClub(false); }} className="flex gap-2">
-      <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} className="h-7 w-36 text-sm" placeholder="Clubnaam" />
-      <Button type="submit" size="sm" variant="outline" className="h-7 text-xs">Opslaan</Button>
+    <form onSubmit={e => { e.preventDefault(); updateClubName.mutate(clubNameInput); setEditingClub(false); }} style={{ display: 'flex', gap: '8px' }}>
+      <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} style={{ height: '28px', width: '140px', fontSize: '13px' }} placeholder="Clubnaam" />
+      <Button type="submit" size="sm" variant="outline" style={{ height: '28px', fontSize: '12px' }}>Opslaan</Button>
     </form>
   ) : (
     <button
       onClick={() => { setClubNameInput(profile?.club_name || ''); setEditingClub(true); }}
-      title="Klik om clubnaam te wijzigen"
-      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.38)', fontSize: '12px', padding: '4px 8px' }}
+      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.38)', fontSize: '12px', padding: '4px 8px', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700 }}
     >
-      <Users size={13} style={{ display: 'inline', marginRight: '5px' }} />
       {profile?.club_name || 'Mijn Club'}
     </button>
   );
 
+  // Get last lactate from test results
+  const getLastLactate = (testResults: any[]) => {
+    if (!testResults?.length) return null;
+    const sorted = [...testResults].sort((a, b) => (b.test_date || '').localeCompare(a.test_date || ''));
+    const last = sorted[0];
+    if (!last?.results_json) return null;
+    const r = last.results_json as any;
+    const lt2 = r?.lt2?.best ?? r?.lt2Speed ?? null;
+    return lt2 ? lt2.toFixed(1) : null;
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div style={{ minHeight: '100vh', background: '#0e0e0e' }}>
       <AppNav rightContent={navRight} />
 
-      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '24px 16px 100px' }}>
+      <main style={{ padding: '24px 24px 120px' }}>
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-          <div>
-            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', margin: 0, letterSpacing: '-0.3px' }}>
-              Atleten
-            </h2>
-            {athletes.length > 0 && (
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>
-                {athletes.length} {athletes.length === 1 ? 'atleet' : 'atleten'}
-              </p>
-            )}
-          </div>
+        {/* Status + Title */}
+        <section style={{ marginBottom: '24px' }}>
+          <span style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontWeight: 700,
+            fontSize: '11px',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#00fdc1',
+            display: 'block',
+            marginBottom: '4px',
+          }}>
+            Status: Arctic High
+          </span>
+          <h2 style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontSize: '48px',
+            fontWeight: 900,
+            letterSpacing: '-2px',
+            lineHeight: 1,
+            color: '#fff',
+            margin: '0 0 20px',
+            textTransform: 'uppercase',
+          }}>
+            ATHLETES
+          </h2>
 
-          {/* Desktop add button */}
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                className="hidden sm:flex"
-                style={{ background: 'linear-gradient(135deg, #6644ff, #8866ff)', border: 'none' }}
-              >
-                <Plus className="h-4 w-4 mr-2" />Atleet toevoegen
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nieuwe atleet</DialogTitle>
-                <DialogDescription>Vul de gegevens in van de atleet.</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={e => { e.preventDefault(); addAthlete.mutate(newAthlete); }} className="space-y-4">
-                <Input placeholder="Naam *" value={newAthlete.name} onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))} required />
-                <Input type="date" placeholder="Geboortedatum" value={newAthlete.birth_date} onChange={e => setNewAthlete(p => ({ ...p, birth_date: e.target.value }))} />
-                <Input placeholder="Sport" value={newAthlete.sport} onChange={e => setNewAthlete(p => ({ ...p, sport: e.target.value }))} />
-                <Input placeholder="Notities" value={newAthlete.notes} onChange={e => setNewAthlete(p => ({ ...p, notes: e.target.value }))} />
-                <Button type="submit" className="w-full" disabled={addAthlete.isPending}>
-                  {addAthlete.isPending ? 'Bezig...' : 'Toevoegen'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+          {/* Add button — gradient CTA */}
+          <button
+            onClick={() => setDialogOpen(true)}
+            style={{
+              width: '100%',
+              height: '72px',
+              background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)',
+              border: 'none',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0 28px',
+              cursor: 'pointer',
+              boxShadow: '0 8px 32px rgba(139,74,255,0.35)',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900, fontSize: '18px', letterSpacing: '-0.5px', color: '#fff' }}>
+              + Atleet toevoegen
+            </span>
+            <span style={{ fontSize: '24px' }}>👤</span>
+          </button>
+        </section>
 
         {/* Loading */}
         {isLoading && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[1, 2, 3].map(i => (
-              <div key={i} style={{
-                height: '80px', borderRadius: '16px',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                animation: 'pulse 1.5s ease-in-out infinite',
-              }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {[1, 2].map(i => (
+              <div key={i} style={{ height: '180px', background: '#201f1f', borderRadius: '2px' }} />
             ))}
           </div>
         )}
 
-        {/* Empty state */}
-        {!isLoading && athletes.length === 0 && (
-          <div style={{
-            border: '2px dashed rgba(255,255,255,0.08)',
-            borderRadius: '20px',
-            padding: '56px 24px',
-            textAlign: 'center',
-          }}>
-            <div style={{
-              width: '56px', height: '56px', borderRadius: '16px',
-              background: 'rgba(102,68,255,0.1)', border: '1px solid rgba(102,68,255,0.2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}>
-              <Users size={24} style={{ color: '#6644ff' }} />
-            </div>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#fff', marginBottom: '8px' }}>
-              Nog geen atleten
-            </h3>
-            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', marginBottom: '24px', maxWidth: '320px', margin: '0 auto 24px', lineHeight: 1.6 }}>
-              Voeg je eerste atleet toe en bouw de testhistoriek op doorheen het seizoen.
-            </p>
-            <div style={{
-              maxWidth: '340px', margin: '0 auto 28px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.07)',
-              borderRadius: '12px',
-              padding: '16px',
-              textAlign: 'left',
-            }}>
-              {['Voeg een atleet toe met naam en sport.', 'Start een lactaattest op het veld.', 'Bekijk drempels, zones en evolutie.'].map((step, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: i < 2 ? '12px' : 0 }}>
-                  <div style={{
-                    width: '20px', height: '20px', borderRadius: '50%', flexShrink: 0,
-                    background: 'rgba(102,68,255,0.2)', border: '1px solid rgba(102,68,255,0.4)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '10px', fontWeight: 700, color: '#a090ff',
-                  }}>{i + 1}</div>
-                  <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{step}</span>
-                </div>
-              ))}
-            </div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <button style={{
-                  padding: '12px 28px',
-                  background: 'linear-gradient(135deg, #6644ff, #8866ff)',
-                  border: 'none', borderRadius: '12px',
-                  color: '#fff', fontSize: '15px', fontWeight: 700,
-                  cursor: 'pointer',
-                }}>
-                  <Plus size={16} style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }} />
-                  Eerste atleet toevoegen
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Nieuwe atleet</DialogTitle>
-                  <DialogDescription>Vul de gegevens in van de atleet.</DialogDescription>
-                </DialogHeader>
-                <form onSubmit={e => { e.preventDefault(); addAthlete.mutate(newAthlete); }} className="space-y-4">
-                  <Input placeholder="Naam *" value={newAthlete.name} onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))} required />
-                  <Input type="date" placeholder="Geboortedatum" value={newAthlete.birth_date} onChange={e => setNewAthlete(p => ({ ...p, birth_date: e.target.value }))} />
-                  <Input placeholder="Sport" value={newAthlete.sport} onChange={e => setNewAthlete(p => ({ ...p, sport: e.target.value }))} />
-                  <Input placeholder="Notities" value={newAthlete.notes} onChange={e => setNewAthlete(p => ({ ...p, notes: e.target.value }))} />
-                  <Button type="submit" className="w-full" disabled={addAthlete.isPending}>
-                    {addAthlete.isPending ? 'Bezig...' : 'Toevoegen'}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
-
-        {/* Athlete cards */}
+        {/* Athlete bento cards */}
         {!isLoading && athletes.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {athletes.map(a => {
+          <section style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '48px' }}>
+            {athletes.map((a, idx) => {
               const testCount = a.test_results?.length ?? 0;
-              const lastTest = a.test_results
-                ?.map((t: any) => t.test_date)
-                .filter(Boolean)
-                .sort()
-                .reverse()[0];
-              const sportColor = getSportColor(a.sport);
+              const lastLactate = getLastLactate(a.test_results ?? []);
+              const isActive = idx === 0 && testCount > 0;
+              const accentColor = isActive ? '#00fdc1' : '#bd9dff';
+              const sportIcon = getSportIcon(a.sport);
 
               return (
                 <button
@@ -277,140 +203,155 @@ const Dashboard = () => {
                   style={{
                     width: '100%',
                     textAlign: 'left',
-                    background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    borderRadius: '16px',
-                    padding: '16px',
+                    background: '#201f1f',
+                    border: 'none',
+                    borderLeft: `4px solid ${accentColor}`,
+                    borderRadius: '2px',
+                    padding: '24px',
+                    minHeight: '180px',
                     cursor: 'pointer',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
                     WebkitTapHighlightColor: 'transparent',
-                    transition: 'border-color 0.15s, background 0.15s',
-                  }}
-                  onPointerEnter={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = `${sportColor}40`;
-                    (e.currentTarget as HTMLButtonElement).style.background = `${sportColor}08`;
-                  }}
-                  onPointerLeave={e => {
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.07)';
-                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.02)';
                   }}
                 >
-                  {/* Avatar */}
+                  {/* Sport icon watermark */}
                   <div style={{
-                    width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
-                    background: `${sportColor}18`,
-                    border: `1px solid ${sportColor}30`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '15px', fontWeight: 800, color: sportColor,
-                    letterSpacing: '-0.5px',
+                    position: 'absolute', top: '12px', right: '16px',
+                    fontSize: '56px', opacity: 0.12, lineHeight: 1,
+                    pointerEvents: 'none',
                   }}>
-                    {getInitials(a.name)}
+                    {sportIcon}
                   </div>
 
-                  {/* Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#fff', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {a.name}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                      {a.sport && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                          <Activity size={11} />
-                          {a.sport}
-                        </span>
-                      )}
-                      {lastTest && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                          <Calendar size={11} />
-                          {lastTest}
-                        </span>
-                      )}
-                    </div>
+                  {/* Top: status chip + name */}
+                  <div>
+                    <span style={{
+                      display: 'inline-block',
+                      background: isActive ? '#006c50' : '#262626',
+                      color: isActive ? '#dfffef' : '#adaaaa',
+                      fontSize: '10px',
+                      fontWeight: 900,
+                      fontFamily: 'Space Grotesk, sans-serif',
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      padding: '3px 8px',
+                      borderRadius: '2px',
+                      marginBottom: '8px',
+                    }}>
+                      {isActive ? 'Active Test' : 'Ready'}
+                    </span>
+                    <h3 style={{
+                      fontFamily: 'Space Grotesk, sans-serif',
+                      fontSize: '28px',
+                      fontWeight: 900,
+                      letterSpacing: '-0.5px',
+                      color: '#fff',
+                      margin: 0,
+                      lineHeight: 1.1,
+                      textTransform: 'uppercase',
+                    }}>
+                      {a.name.toUpperCase()}
+                    </h3>
                   </div>
 
-                  {/* Right: test count + arrow */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                    {testCount > 0 && (
-                      <div style={{
-                        background: `${sportColor}18`,
-                        border: `1px solid ${sportColor}30`,
-                        borderRadius: '8px',
-                        padding: '3px 8px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        color: sportColor,
-                      }}>
-                        {testCount} {testCount === 1 ? 'test' : 'tests'}
-                      </div>
-                    )}
-                    <ChevronRight size={16} style={{ color: 'rgba(255,255,255,0.2)' }} />
-
-                    {/* Delete */}
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        if (confirm('Atleet verwijderen?')) deleteAthlete.mutate(a.id);
-                      }}
-                      style={{
-                        width: '30px', height: '30px', borderRadius: '8px',
-                        background: 'rgba(239,68,68,0.07)',
-                        border: '1px solid rgba(239,68,68,0.15)',
-                        color: 'rgba(239,68,68,0.6)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                        WebkitTapHighlightColor: 'transparent',
-                      }}
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                  {/* Bottom: metric + arrow */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '16px' }}>
+                    <div>
+                      <p style={{ fontSize: '10px', fontWeight: 700, color: '#777575', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px', fontFamily: 'Space Grotesk, sans-serif' }}>
+                        {lastLactate ? 'Laatste Lactaat' : (a.sport || 'Geen tests')}
+                      </p>
+                      {lastLactate ? (
+                        <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '28px', fontWeight: 900, color: accentColor, margin: 0, lineHeight: 1 }}>
+                          {lastLactate} <span style={{ fontSize: '12px', fontWeight: 400, opacity: 0.7 }}>mmol/L</span>
+                        </p>
+                      ) : (
+                        <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '16px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                          {testCount} tests
+                        </p>
+                      )}
+                    </div>
+                    <span style={{ color: '#777575', fontSize: '20px', lineHeight: 1 }}>›</span>
                   </div>
                 </button>
               );
             })}
-          </div>
+          </section>
+        )}
+
+        {/* Empty state — Systeem Klaarmaken */}
+        {!isLoading && athletes.length === 0 && (
+          <section style={{
+            background: '#131313',
+            padding: '40px 24px',
+            marginTop: '24px',
+            borderRadius: '2px',
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <div style={{
+                width: '72px', height: '72px', borderRadius: '50%',
+                background: '#262626',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 16px', fontSize: '32px',
+              }}>🔬</div>
+              <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, letterSpacing: '-0.5px', textTransform: 'uppercase', color: '#fff', margin: '0 0 8px' }}>
+                Systeem Klaarmaken
+              </h4>
+              <p style={{ fontSize: '14px', color: '#adaaaa', lineHeight: 1.6, maxWidth: '280px', margin: '0 auto' }}>
+                Geen actieve atleten gevonden. Volg de protocol stappen voor een zuivere meting.
+              </p>
+            </div>
+
+            {[
+              { n: '01', title: 'Voeg atleet toe', desc: 'Importeer profiel of maak een nieuwe coach-ID aan.' },
+              { n: '02', title: 'Koppel Sensoren', desc: 'Zorg dat de Bluetooth analyzer is ingeschakeld.' },
+              { n: '03', title: 'Start de Test', desc: 'De data-flow start automatisch na de eerste strip.', accent: true },
+            ].map(step => (
+              <div key={step.n} style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '24px' }}>
+                <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '36px', fontWeight: 900, color: '#777575', opacity: 0.4, lineHeight: 1, flexShrink: 0 }}>{step.n}</span>
+                <div>
+                  <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: '16px', color: step.accent ? '#00fdc1' : '#fff', margin: '0 0 4px' }}>{step.title}</p>
+                  <p style={{ fontSize: '12px', color: '#adaaaa', margin: 0, lineHeight: 1.5 }}>{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </section>
         )}
       </main>
 
-      {/* Mobile FAB */}
-      <div className="sm:hidden">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <button style={{
-              position: 'fixed',
-              bottom: '88px',  /* above BottomNav if present, otherwise just above nav safe area */
-              right: '20px',
-              width: '56px', height: '56px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #6644ff, #8866ff)',
-              border: 'none',
-              boxShadow: '0 4px 20px rgba(102,68,255,0.5)',
-              cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              zIndex: 40,
-              WebkitTapHighlightColor: 'transparent',
-            }}>
-              <Plus size={24} style={{ color: '#fff' }} />
+      {/* Add athlete dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nieuwe atleet</DialogTitle>
+            <DialogDescription>Vul de gegevens in van de atleet.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={e => { e.preventDefault(); addAthlete.mutate(newAthlete); }} className="space-y-4">
+            <Input placeholder="Naam *" value={newAthlete.name} onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))} required />
+            <Input type="date" value={newAthlete.birth_date} onChange={e => setNewAthlete(p => ({ ...p, birth_date: e.target.value }))} />
+            <Input placeholder="Sport (lopen, fietsen...)" value={newAthlete.sport} onChange={e => setNewAthlete(p => ({ ...p, sport: e.target.value }))} />
+            <Input placeholder="Notities" value={newAthlete.notes} onChange={e => setNewAthlete(p => ({ ...p, notes: e.target.value }))} />
+            <button
+              type="submit"
+              disabled={addAthlete.isPending}
+              style={{
+                width: '100%', height: '56px',
+                background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)',
+                border: 'none', borderRadius: '4px',
+                color: '#fff', fontSize: '16px', fontWeight: 900,
+                fontFamily: 'Space Grotesk, sans-serif',
+                letterSpacing: '-0.3px', cursor: 'pointer',
+              }}
+            >
+              {addAthlete.isPending ? 'Bezig...' : 'Toevoegen'}
             </button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nieuwe atleet</DialogTitle>
-              <DialogDescription>Vul de gegevens in van de atleet.</DialogDescription>
-            </DialogHeader>
-            <form onSubmit={e => { e.preventDefault(); addAthlete.mutate(newAthlete); }} className="space-y-4">
-              <Input placeholder="Naam *" value={newAthlete.name} onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))} required />
-              <Input type="date" placeholder="Geboortedatum" value={newAthlete.birth_date} onChange={e => setNewAthlete(p => ({ ...p, birth_date: e.target.value }))} />
-              <Input placeholder="Sport" value={newAthlete.sport} onChange={e => setNewAthlete(p => ({ ...p, sport: e.target.value }))} />
-              <Input placeholder="Notities" value={newAthlete.notes} onChange={e => setNewAthlete(p => ({ ...p, notes: e.target.value }))} />
-              <Button type="submit" className="w-full" disabled={addAthlete.isPending}>
-                {addAthlete.isPending ? 'Bezig...' : 'Toevoegen'}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

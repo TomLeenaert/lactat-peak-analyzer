@@ -1,93 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/contexts/LanguageContext';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
-const COPY = {
-  nl: {
-    tagline: 'Lactaatanalyse voor coaches die resultaten willen.',
-    sub: 'Geen duur abonnement. Betaal enkel wat je gebruikt.',
-    bullets: [
-      { icon: '⚡', text: 'Resultaten in minder dan 10 seconden' },
-      { icon: '🎯', text: '3 drempelmethoden — OBLA, Dmax, Modified Dmax' },
-      { icon: '📊', text: '5 trainingszones automatisch berekend' },
-      { icon: '💶', text: '€9.95 per rapport — geen abonnement' },
-      { icon: '🔬', text: 'Dezelfde nauwkeurigheid als een labtest' },
-    ],
-    badge: 'Pay per use',
-    badgeSub: 'Geen maandelijkse kosten',
-    login: 'Inloggen',
-    register: 'Account aanmaken',
-    loginDesc: 'Welkom terug',
-    registerDesc: 'Start gratis',
-    email: 'E-mailadres',
-    password: 'Wachtwoord',
-    fullName: 'Volledige naam',
-    submit: 'Inloggen',
-    submitRegister: 'Account aanmaken',
-    submitting: 'Bezig...',
-    forgot: 'Wachtwoord vergeten?',
-    noAccount: 'Nog geen account?',
-    hasAccount: 'Al een account?',
-    registerLink: 'Registreer gratis',
-    loginLink: 'Log in',
-    accountCreated: 'Account aangemaakt',
-    checkEmail: 'Controleer je e-mail om je account te bevestigen.',
-    error: 'Fout',
-    fillEmail: 'Vul je e-mailadres in',
-    emailSent: 'E-mail verstuurd',
-    checkInbox: 'Controleer je inbox voor de reset link.',
-    switchLang: 'EN',
-  },
-  en: {
-    tagline: 'Lactate analysis for coaches who want results.',
-    sub: 'No expensive subscription. Pay only for what you use.',
-    bullets: [
-      { icon: '⚡', text: 'Results in under 10 seconds' },
-      { icon: '🎯', text: '3 threshold methods — OBLA, Dmax, Modified Dmax' },
-      { icon: '📊', text: '5 training zones calculated automatically' },
-      { icon: '💶', text: '€9.95 per report — no subscription' },
-      { icon: '🔬', text: 'Same accuracy as a lab test' },
-    ],
-    badge: 'Pay per use',
-    badgeSub: 'No monthly costs',
-    login: 'Sign in',
-    register: 'Create account',
-    loginDesc: 'Welcome back',
-    registerDesc: 'Start for free',
-    email: 'Email address',
-    password: 'Password',
-    fullName: 'Full name',
-    submit: 'Sign in',
-    submitRegister: 'Create account',
-    submitting: 'Loading...',
-    forgot: 'Forgot password?',
-    noAccount: 'No account yet?',
-    hasAccount: 'Already have an account?',
-    registerLink: 'Register for free',
-    loginLink: 'Sign in',
-    accountCreated: 'Account created',
-    checkEmail: 'Check your email to confirm your account.',
-    error: 'Error',
-    fillEmail: 'Enter your email address',
-    emailSent: 'Email sent',
-    checkInbox: 'Check your inbox for the reset link.',
-    switchLang: 'NL',
-  },
-};
-
 const Auth = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { lang, setLang } = useLang();
-  const c = COPY[lang];
 
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -113,232 +37,273 @@ const Auth = () => {
           options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast({ title: c.accountCreated, description: c.checkEmail });
+        toast({ title: lang === 'nl' ? 'Account aangemaakt' : 'Account created', description: lang === 'nl' ? 'Controleer je e-mail.' : 'Check your email.' });
       }
     } catch (err: unknown) {
-      toast({ title: c.error, description: getErrorMessage(err), variant: 'destructive' });
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleForgotPassword = async () => {
-    if (!email) { toast({ title: c.fillEmail, variant: 'destructive' }); return; }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    if (!email) { toast({ title: lang === 'nl' ? 'Vul je e-mailadres in' : 'Enter your email', variant: 'destructive' }); return; }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
     if (error) {
-      toast({ title: c.error, description: error.message, variant: 'destructive' });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: c.emailSent, description: c.checkInbox });
+      toast({ title: lang === 'nl' ? 'E-mail verstuurd' : 'Email sent', description: lang === 'nl' ? 'Controleer je inbox.' : 'Check your inbox.' });
     }
   };
 
   if (loading) return null;
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    height: '56px',
+    background: '#131313',
+    border: '1px solid #262626',
+    borderRadius: '2px',
+    color: '#fff',
+    fontSize: '14px',
+    fontFamily: 'Space Grotesk, monospace',
+    fontWeight: 500,
+    padding: '0 48px 0 16px',
+    letterSpacing: '0.05em',
+    outline: 'none',
+    boxSizing: 'border-box',
+  };
+
   return (
-    <div style={{ minHeight: '100vh', background: '#0c0d11', display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{
+      minHeight: '100vh',
+      background: '#0e0e0e',
+      backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)',
+      backgroundSize: '24px 24px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px 20px',
+      fontFamily: 'Inter, sans-serif',
+    }}>
+      <div style={{ width: '100%', maxWidth: '360px' }}>
 
-      {/* Nav */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 10,
-        background: 'rgba(12,13,17,0.92)', backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 32px', height: '58px', flexShrink: 0,
-      }}>
-        <a href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '17px', fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Lac<span style={{ color: '#6644ff' }}>.</span>Test
-        </a>
-        <button onClick={() => setLang(lang === 'nl' ? 'en' : 'nl')} style={{
-          fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)',
-          background: 'none', border: '1px solid rgba(255,255,255,0.13)',
-          borderRadius: '6px', padding: '5px 11px', cursor: 'pointer',
-        }}>
-          {c.switchLang}
-        </button>
-      </nav>
-
-      {/* Split layout */}
-      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-
-        {/* LEFT — hero panel */}
-        <div style={{
-          flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
-          padding: '60px 64px', background: 'linear-gradient(135deg, #0c0d11 0%, #111320 100%)',
-          borderRight: '1px solid rgba(255,255,255,0.06)',
-          position: 'relative', overflow: 'hidden',
-        }}>
-          {/* Background glow */}
-          <div style={{
-            position: 'absolute', top: '-80px', left: '-80px',
-            width: '400px', height: '400px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(102,68,255,0.12) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
-          <div style={{
-            position: 'absolute', bottom: '-60px', right: '-60px',
-            width: '300px', height: '300px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0,201,167,0.08) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
-
-          {/* Badge */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            background: 'rgba(102,68,255,0.15)', border: '1px solid rgba(102,68,255,0.3)',
-            borderRadius: '20px', padding: '6px 14px', marginBottom: '28px',
-            width: 'fit-content',
-          }}>
-            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#6644ff', boxShadow: '0 0 8px #6644ff' }} />
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#a090ff', letterSpacing: '0.5px' }}>{c.badge}</span>
-            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>— {c.badgeSub}</span>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span style={{ color: '#bd9dff', fontSize: '20px', lineHeight: 1 }}>✳</span>
+            <span style={{
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontWeight: 900,
+              fontSize: '22px',
+              letterSpacing: '-0.5px',
+              color: '#bd9dff',
+            }}>LACTEST</span>
           </div>
-
-          {/* Headline */}
-          <h1 style={{
-            fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', fontWeight: 800, color: '#fff',
-            lineHeight: 1.15, letterSpacing: '-0.5px', marginBottom: '16px',
-            maxWidth: '480px',
+          <p style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontSize: '9px',
+            fontWeight: 700,
+            letterSpacing: '0.25em',
+            textTransform: 'uppercase',
+            color: '#adaaaa',
+            margin: 0,
           }}>
-            {c.tagline}
-          </h1>
-          <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.5)', marginBottom: '40px', maxWidth: '420px', lineHeight: 1.6 }}>
-            {c.sub}
+            Arctic Precision Analytics
           </p>
-
-          {/* Bullets */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {c.bullets.map((b, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{
-                  width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px',
-                }}>
-                  {b.icon}
-                </div>
-                <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>{b.text}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* RIGHT — form panel */}
+        {/* Price badge */}
         <div style={{
-          width: '460px', flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '48px 48px',
-          background: '#0e0f15',
+          background: '#131313',
+          border: '1px solid #262626',
+          borderRadius: '2px',
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '28px',
         }}>
-          <div style={{ width: '100%', maxWidth: '360px' }}>
-
-            {/* Tab switch */}
-            <div style={{
-              display: 'flex', background: 'rgba(255,255,255,0.04)',
-              borderRadius: '10px', padding: '4px', marginBottom: '32px',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}>
-              {[{ key: true, label: c.login }, { key: false, label: c.register }].map(({ key, label }) => (
-                <button key={String(key)} onClick={() => setIsLogin(key)} style={{
-                  flex: 1, padding: '9px', fontSize: '13px', fontWeight: 600,
-                  borderRadius: '7px', border: 'none', cursor: 'pointer',
-                  background: isLogin === key ? '#6644ff' : 'transparent',
-                  color: isLogin === key ? '#fff' : 'rgba(255,255,255,0.4)',
-                  transition: 'all .2s',
-                }}>
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {/* Title */}
-            <div style={{ marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 700, color: '#fff', marginBottom: '4px' }}>
-                {isLogin ? c.loginDesc : c.registerDesc}
-              </h2>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {!isLogin && (
-                <Input
-                  placeholder={c.fullName}
-                  value={fullName}
-                  onChange={e => setFullName(e.target.value)}
-                  required
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-                />
-              )}
-              <Input
-                type="email"
-                placeholder={c.email}
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-              />
-              <Input
-                type="password"
-                placeholder={c.password}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                required
-                minLength={6}
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-              />
-              <Button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  background: 'linear-gradient(135deg, #6644ff, #8866ff)',
-                  border: 'none', color: '#fff', fontWeight: 700,
-                  padding: '12px', fontSize: '15px', borderRadius: '9px',
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  marginTop: '4px',
-                }}
-              >
-                {submitting ? c.submitting : isLogin ? c.submit : c.submitRegister}
-              </Button>
-            </form>
-
-            {/* Footer links */}
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-              {isLogin && (
-                <button onClick={handleForgotPassword} style={{
-                  fontSize: '13px', color: 'rgba(255,255,255,0.35)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  textDecoration: 'underline', display: 'block', margin: '0 auto 10px',
-                }}>
-                  {c.forgot}
-                </button>
-              )}
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.35)' }}>
-                {isLogin ? c.noAccount : c.hasAccount}{' '}
-                <button onClick={() => setIsLogin(!isLogin)} style={{
-                  color: '#a090ff', background: 'none', border: 'none',
-                  cursor: 'pointer', fontSize: '13px', textDecoration: 'underline',
-                }}>
-                  {isLogin ? c.registerLink : c.loginLink}
-                </button>
-              </p>
-            </div>
-
-            {/* Price reminder */}
-            <div style={{
-              marginTop: '32px', padding: '14px 16px',
-              background: 'rgba(0,201,167,0.07)', border: '1px solid rgba(0,201,167,0.2)',
-              borderRadius: '10px', textAlign: 'center',
-            }}>
-              <p style={{ fontSize: '12px', color: 'rgba(0,201,167,0.9)', fontWeight: 600, marginBottom: '2px' }}>
-                {lang === 'nl' ? '💡 Gratis analyses — betaal enkel bij export' : '💡 Free analysis — pay only when exporting'}
-              </p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>
-                {lang === 'nl' ? '€9.95 per PDF-rapport · geen abonnement' : '€9.95 per PDF report · no subscription'}
-              </p>
-            </div>
+          <div>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 2px' }}>
+              Standard Rate
+            </p>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, color: '#00fdc1', margin: 0, lineHeight: 1, letterSpacing: '-0.5px' }}>
+              €9.95 <span style={{ fontSize: '11px', fontWeight: 400, color: '#adaaaa' }}>per analyse</span>
+            </p>
           </div>
+          <div style={{
+            background: '#00fdc1',
+            borderRadius: '2px',
+            width: '28px', height: '28px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '14px',
+          }}>💳</div>
         </div>
+
+        {/* Coach Access heading */}
+        <div style={{ marginBottom: '24px' }}>
+          <h1 style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontWeight: 900,
+            fontSize: '32px',
+            letterSpacing: '-1px',
+            textTransform: 'uppercase',
+            color: '#fff',
+            margin: '0 0 4px',
+            lineHeight: 1,
+          }}>
+            {isLogin ? 'Coach Access' : 'New Laboratory'}
+          </h1>
+          <p style={{ fontSize: '13px', color: '#adaaaa', margin: 0, fontWeight: 400 }}>
+            {isLogin
+              ? 'Secure credential login required.'
+              : 'Register your coach account.'}
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+          {!isLogin && (
+            <div style={{ position: 'relative' }}>
+              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
+                Full Name
+              </p>
+              <input
+                style={inputStyle}
+                placeholder="Coach Name"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                required
+                onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
+                onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
+              />
+            </div>
+          )}
+
+          <div style={{ position: 'relative' }}>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
+              Terminal ID / Email
+            </p>
+            <input
+              style={inputStyle}
+              type="email"
+              placeholder="COACH_REF_0492"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
+              onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
+            />
+            <span style={{ position: 'absolute', right: '16px', bottom: '18px', color: '#777575', fontSize: '16px' }}>@</span>
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
+              Access Code
+            </p>
+            <input
+              style={inputStyle}
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              minLength={6}
+              onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
+              onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
+            />
+            <span style={{ position: 'absolute', right: '16px', bottom: '18px', color: '#777575', fontSize: '16px' }}>🔒</span>
+          </div>
+
+          {/* Primary CTA */}
+          <button
+            type="submit"
+            disabled={submitting}
+            style={{
+              width: '100%',
+              height: '60px',
+              background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)',
+              border: 'none',
+              borderRadius: '2px',
+              color: '#fff',
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontWeight: 900,
+              fontSize: '15px',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              marginTop: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: '0 8px 24px rgba(139,74,255,0.35)',
+              opacity: submitting ? 0.7 : 1,
+            }}
+          >
+            {submitting ? 'Processing...' : isLogin ? 'Initialize Session ›' : 'Register Laboratory ›'}
+          </button>
+        </form>
+
+        {/* Secondary links */}
+        <div style={{ marginTop: '20px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {isLogin && (
+            <button
+              onClick={handleForgotPassword}
+              style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#777575', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Forgot Calibration Keys?
+            </button>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ flex: 1, height: '1px', background: '#262626' }} />
+            <span style={{ fontSize: '11px', color: '#494847', fontWeight: 700, letterSpacing: '0.1em' }}>OR</span>
+            <div style={{ flex: 1, height: '1px', background: '#262626' }} />
+          </div>
+
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            style={{
+              width: '100%',
+              height: '52px',
+              background: 'transparent',
+              border: '1px solid #262626',
+              borderRadius: '2px',
+              color: '#fff',
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontWeight: 700,
+              fontSize: '13px',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+            }}
+          >
+            {isLogin ? 'Register New Laboratory' : 'Back to Coach Access'}
+          </button>
+        </div>
+
+        {/* Footer status */}
+        <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00fdc1', boxShadow: '0 0 6px #00fdc1' }} />
+          <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#494847' }}>
+            Encrypted Satellite Uplink Active
+          </span>
+        </div>
+
+        {/* Language toggle */}
+        <div style={{ marginTop: '16px', textAlign: 'center' }}>
+          <button
+            onClick={() => setLang(lang === 'nl' ? 'en' : 'nl')}
+            style={{ fontSize: '11px', color: '#494847', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}
+          >
+            {lang === 'nl' ? 'Switch to EN' : 'Schakel naar NL'}
+          </button>
+        </div>
+
       </div>
     </div>
   );

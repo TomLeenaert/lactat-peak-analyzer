@@ -1,119 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 48 33% 98%;
-    --foreground: 192 51% 15%;
-
-    --card: 48 100% 99%;
-    --card-foreground: 192 51% 15%;
-
-    --popover: 48 100% 99%;
-    --popover-foreground: 192 51% 15%;
-
-    --primary: 187 62% 34%;
-    --primary-foreground: 48 33% 98%;
-
-    --secondary: 32 19% 90%;
-    --secondary-foreground: 192 51% 15%;
-
-    --muted: 32 19% 90%;
-    --muted-foreground: 195 7% 41%;
-
-    --accent: 174 59% 49%;
-    --accent-foreground: 192 51% 15%;
-
-    --destructive: 348 80% 42%;
-    --destructive-foreground: 48 33% 98%;
-
-    --warning: 16 56% 42%;
-    --warning-foreground: 48 33% 98%;
-
-    --success: 187 62% 34%;
-    --success-foreground: 48 33% 98%;
-
-    --info: 195 7% 41%;
-    --info-foreground: 48 33% 98%;
-
-    --border: 32 19% 82%;
-    --input: 32 19% 82%;
-    --ring: 187 62% 34%;
-
-    --radius: 0.5rem;
-
-    --chart-1: 187 62% 34%;
-    --chart-2: 160 51% 49%;
-    --chart-3: 45 93% 47%;
-    --chart-4: 24 95% 53%;
-    --chart-5: 0 84% 60%;
-
-    --sidebar-background: 48 33% 96%;
-    --sidebar-foreground: 192 51% 15%;
-    --sidebar-primary: 187 62% 34%;
-    --sidebar-primary-foreground: 48 33% 98%;
-    --sidebar-accent: 32 19% 90%;
-    --sidebar-accent-foreground: 192 51% 15%;
-    --sidebar-border: 32 19% 82%;
-    --sidebar-ring: 187 62% 34%;
+    --background: 0 0% 6%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 265 100% 81%;
+    --primary-foreground: 265 100% 20%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 70%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 50%;
+    --accent: 166 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 345 100% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --warning: 20 100% 60%;
+    --warning-foreground: 0 0% 0%;
+    --border: 0 0% 15%;
+    --input: 0 0% 12%;
+    --ring: 265 100% 81%;
+    --radius: 0.25rem;
   }
 
   .dark {
-    /* Arctic Precision — field-ready high-contrast dark theme */
-    --background: 240 18% 5%;       /* #09090d */
-    --foreground: 0 0% 97%;
+    /* Arctic Precision — exact Stitch design tokens */
+    --background: 0 0% 6%;            /* #0e0e0e */
+    --foreground: 0 0% 100%;
 
-    --card: 234 13% 8%;             /* #111218 */
-    --card-foreground: 0 0% 97%;
+    --card: 0 0% 8%;                  /* #131313 surface-container-low */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 234 13% 10%;
-    --popover-foreground: 0 0% 97%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 249 100% 63%;        /* #6644ff */
-    --primary-foreground: 0 0% 100%;
+    --primary: 265 100% 81%;          /* #bd9dff */
+    --primary-foreground: 265 100% 20%;
 
-    --secondary: 234 13% 13%;
+    --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 70%;
 
-    --muted: 234 13% 13%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 50%;     /* #adaaaa */
 
-    --accent: 158 100% 45%;         /* #00e57a mint/teal */
-    --accent-foreground: 240 18% 5%;
+    --accent: 166 100% 50%;           /* #00fdc1 mint */
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 356 100% 66%;
-    --destructive-foreground: 240 18% 5%;
+    --destructive: 345 100% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 24 100% 57%;         /* #ff6b2b safety orange */
-    --warning-foreground: 240 18% 5%;
+    --warning: 20 100% 60%;           /* #ff7440 orange */
+    --warning-foreground: 0 0% 0%;
 
-    --success: 158 100% 45%;
-    --success-foreground: 240 18% 5%;
+    --border: 0 0% 15%;               /* #262626 */
+    --input: 0 0% 8%;                 /* surface-container-lowest */
+    --ring: 265 100% 81%;
 
-    --info: 0 0% 60%;
-    --info-foreground: 240 18% 5%;
+    --radius: 0.25rem;                /* sharp, engineered look */
 
-    --border: 234 13% 15%;
-    --input: 234 13% 15%;
-    --ring: 249 100% 63%;
-
-    --radius: 0.75rem;
-
-    --chart-1: 249 100% 63%;
-    --chart-2: 158 100% 45%;
+    --chart-1: 265 100% 81%;
+    --chart-2: 166 100% 50%;
     --chart-3: 45 93% 47%;
-    --chart-4: 24 100% 57%;
+    --chart-4: 20 100% 60%;
     --chart-5: 0 84% 60%;
 
-    --sidebar-background: 240 18% 4%;
+    --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 96%;
-    --sidebar-primary: 249 100% 63%;
+    --sidebar-primary: 265 100% 81%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 234 13% 13%;
+    --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 96%;
-    --sidebar-border: 234 13% 15%;
-    --sidebar-ring: 249 100% 63%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 265 100% 81%;
   }
 }
 
@@ -124,5 +89,39 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 }
+
+/* Arctic Precision utility classes */
+.font-headline {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.gradient-cta {
+  background: linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%);
+}
+
+.text-glow-primary {
+  text-shadow: 0 0 12px rgba(189, 157, 255, 0.4);
+}
+
+.text-glow-mint {
+  text-shadow: 0 0 12px rgba(0, 253, 193, 0.4);
+}
+
+.kinetic-blur {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* Surface layers */
+.surface { background: #0e0e0e; }
+.surface-low { background: #131313; }
+.surface-container { background: #1a1919; }
+.surface-high { background: #201f1f; }
+.surface-highest { background: #262626; }

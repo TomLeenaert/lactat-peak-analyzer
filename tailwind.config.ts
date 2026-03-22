@@ -77,10 +77,33 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      fontFamily: {
+        headline: ["Space Grotesk", "system-ui", "sans-serif"],
+        body: ["Inter", "system-ui", "sans-serif"],
+      },
+      colors: {
+        // Stitch Arctic Precision exact tokens
+        "arctic-primary":    "#bd9dff",
+        "arctic-primary-dim":"#8b4aff",
+        "arctic-mint":       "#00fdc1",
+        "arctic-mint-dim":   "#00edb4",
+        "arctic-orange":     "#ff7440",
+        "surface-base":      "#0e0e0e",
+        "surface-low":       "#131313",
+        "surface-container": "#1a1919",
+        "surface-high":      "#201f1f",
+        "surface-highest":   "#262626",
+        "on-surface-variant":"#adaaaa",
+        "outline-arctic":    "#777575",
+      },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        DEFAULT: "0.125rem",
+        lg: "0.25rem",
+        xl: "0.5rem",
+        "2xl": "0.75rem",
+        full: "0.75rem",
+        md: "0.125rem",
+        sm: "0.125rem",
       },
       keyframes: {
         "accordion-down": {
