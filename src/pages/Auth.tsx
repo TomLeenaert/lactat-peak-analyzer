@@ -101,17 +101,6 @@ const Auth = () => {
               color: '#bd9dff',
             }}>LACTEST</span>
           </div>
-          <p style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: '9px',
-            fontWeight: 700,
-            letterSpacing: '0.25em',
-            textTransform: 'uppercase',
-            color: '#adaaaa',
-            margin: 0,
-          }}>
-            Arctic Precision Analytics
-          </p>
         </div>
 
         {/* Price badge */}

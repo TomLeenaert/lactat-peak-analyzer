@@ -219,7 +219,6 @@ const ShareView = () => {
               Lac<span style={{ color: 'rgba(255,255,255,0.6)' }}>.</span>Test
             </span>
           </a>
-          <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)', marginTop: '4px' }}>Arctic Precision Analytics</p>
         </div>
 
       </div>
