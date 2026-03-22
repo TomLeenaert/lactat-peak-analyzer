@@ -104,34 +104,6 @@ const Auth = () => {
           </div>
         </div>
 
-        {/* Price badge */}
-        <div style={{
-          background: '#131313',
-          border: '1px solid #262626',
-          borderRadius: '2px',
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '28px',
-        }}>
-          <div>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 2px' }}>
-              Standard Rate
-            </p>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, color: '#00fdc1', margin: 0, lineHeight: 1, letterSpacing: '-0.5px' }}>
-              €9.95 <span style={{ fontSize: '11px', fontWeight: 400, color: '#adaaaa' }}>per analyse</span>
-            </p>
-          </div>
-          <div style={{
-            background: '#00fdc1',
-            borderRadius: '2px',
-            width: '28px', height: '28px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '14px',
-          }}>💳</div>
-        </div>
-
         {/* Heading */}
         <div style={{ marginBottom: '24px' }}>
           <h1 style={{
