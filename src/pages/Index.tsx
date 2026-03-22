@@ -58,17 +58,17 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <div className="mx-auto px-3 sm:px-6 py-4 sm:py-8 max-w-[900px]">
         <div className="mb-4 sm:mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">🔬 Lactaat Inspanningstest</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Lactaat Inspanningstest</h1>
           <p className="text-sm sm:text-lg text-muted-foreground mt-1">Protocol, berekening & trainingszones</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full flex h-auto gap-0.5 bg-muted p-1">
-            <TabsTrigger value="protocol" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📋 Protocol</TabsTrigger>
-            <TabsTrigger value="data" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📊 Data</TabsTrigger>
-            <TabsTrigger value="results" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🎯 Resultaat</TabsTrigger>
-            <TabsTrigger value="zones" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🏃 Zones</TabsTrigger>
-            <TabsTrigger value="science" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📚 Info</TabsTrigger>
+            <TabsTrigger value="protocol" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Protocol</TabsTrigger>
+            <TabsTrigger value="data" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Data</TabsTrigger>
+            <TabsTrigger value="results" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Resultaat</TabsTrigger>
+            <TabsTrigger value="zones" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Zones</TabsTrigger>
+            <TabsTrigger value="science" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Info</TabsTrigger>
           </TabsList>
 
           <div className="mt-4 sm:mt-6">

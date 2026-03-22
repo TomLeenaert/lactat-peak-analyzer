@@ -11,14 +11,7 @@ import AppNav from '@/components/AppNav';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
-const SPORT_ICONS: Record<string, string> = {
-  lopen: '🏃', running: '🏃',
-  fietsen: '🚴', cycling: '🚴',
-  triathlon: '🏊',
-  zwemmen: '🏊', swimming: '🏊',
-  roeien: '🚣', rowing: '🚣',
-};
-const getSportIcon = (sport?: string | null) => SPORT_ICONS[sport?.toLowerCase() ?? ''] ?? '🏃';
+const getSportInitial = (sport?: string | null) => (sport ?? 'L').charAt(0).toUpperCase();
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -173,7 +166,7 @@ const Dashboard = () => {
             <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900, fontSize: '18px', letterSpacing: '-0.5px', color: '#fff' }}>
               + Atleet toevoegen
             </span>
-            <span style={{ fontSize: '24px' }}>👤</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </button>
         </section>
 
@@ -194,7 +187,7 @@ const Dashboard = () => {
               const lastLactate = getLastLactate(a.test_results ?? []);
               const isActive = idx === 0 && testCount > 0;
               const accentColor = isActive ? '#00fdc1' : '#bd9dff';
-              const sportIcon = getSportIcon(a.sport);
+              const sportInitial = getSportInitial(a.sport);
 
               return (
                 <button
@@ -219,13 +212,15 @@ const Dashboard = () => {
                     WebkitTapHighlightColor: 'transparent',
                   }}
                 >
-                  {/* Sport icon watermark */}
+                  {/* Sport letter watermark */}
                   <div style={{
                     position: 'absolute', top: '12px', right: '16px',
-                    fontSize: '56px', opacity: 0.12, lineHeight: 1,
+                    fontSize: '64px', opacity: 0.08, lineHeight: 1,
+                    fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900,
+                    color: accentColor,
                     pointerEvents: 'none',
                   }}>
-                    {sportIcon}
+                    {sportInitial}
                   </div>
 
                   {/* Top: status chip + name */}
@@ -297,7 +292,7 @@ const Dashboard = () => {
                 background: '#262626',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 margin: '0 auto 16px', fontSize: '32px',
-              }}>🔬</div>
+              }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#bd9dff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.5}}><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11l4 2 4-2V3M3 9v10a2 2 0 0 0 2 2h4m0 0v-5m0 5h6m0 0v-5m0 5h4a2 2 0 0 0 2-2V9"/></svg></div>
               <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, letterSpacing: '-0.5px', textTransform: 'uppercase', color: '#fff', margin: '0 0 8px' }}>
                 Systeem Klaarmaken
               </h4>

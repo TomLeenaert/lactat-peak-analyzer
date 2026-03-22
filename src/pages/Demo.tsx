@@ -106,11 +106,11 @@ const StepProtocol = ({ active }: { active: boolean }) => {
   }, [active]);
 
   const proto = [
-    { label: 'Sport', value: 'Lopen', icon: '🏃' },
-    { label: 'Afstand per stap', value: '1.600 m', icon: '📏' },
-    { label: 'Startsnelheid', value: '9 km/u', icon: '🚦' },
-    { label: 'Stapgrootte', value: '+1 km/u', icon: '📈' },
-    { label: 'Aantal stappen', value: '8 stappen', icon: '🔢' },
+    { label: 'Sport', value: 'Lopen', icon: '' },
+    { label: 'Afstand per stap', value: '1.600 m', icon: '' },
+    { label: 'Startsnelheid', value: '9 km/u', icon: '' },
+    { label: 'Stapgrootte', value: '+1 km/u', icon: '' },
+    { label: 'Aantal stappen', value: '8 stappen', icon: '' },
   ];
 
   return (

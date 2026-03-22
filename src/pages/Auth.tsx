@@ -92,7 +92,7 @@ const Auth = () => {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '4px' }}>
-            <span style={{ color: '#bd9dff', fontSize: '20px', lineHeight: 1 }}>✳</span>
+            <span style={{ color: '#bd9dff', fontSize: '20px', lineHeight: 1, fontWeight: 900, fontFamily: 'Space Grotesk, sans-serif' }}>+</span>
             <span style={{
               fontFamily: 'Space Grotesk, sans-serif',
               fontWeight: 900,
@@ -215,7 +215,7 @@ const Auth = () => {
               onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
               onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
             />
-            <span style={{ position: 'absolute', right: '16px', bottom: '18px', color: '#777575', fontSize: '16px' }}>🔒</span>
+            <svg style={{ position: 'absolute', right: '16px', bottom: '16px', color: '#777575' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
 
           {/* Primary CTA */}

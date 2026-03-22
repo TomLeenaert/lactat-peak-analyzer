@@ -170,21 +170,11 @@ const AthleteTest = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Top tabs: visible on desktop only */}
           <TabsList className="hidden sm:grid w-full grid-cols-5 h-auto bg-muted p-1">
-            <TabsTrigger value="protocol" className="text-xs sm:text-sm px-1 py-2">
-              📋 Protocol
-            </TabsTrigger>
-            <TabsTrigger value="data" className="text-xs sm:text-sm px-1 py-2">
-              📊 Data
-            </TabsTrigger>
-            <TabsTrigger value="results" className="text-xs sm:text-sm px-1 py-2">
-              🎯 Resultaten
-            </TabsTrigger>
-            <TabsTrigger value="zones" className="text-xs sm:text-sm px-1 py-2">
-              🏃 Zones
-            </TabsTrigger>
-            <TabsTrigger value="science" className="text-xs sm:text-sm px-1 py-2">
-              📚 Wetenschap
-            </TabsTrigger>
+            <TabsTrigger value="protocol" className="text-xs sm:text-sm px-1 py-2">Protocol</TabsTrigger>
+            <TabsTrigger value="data" className="text-xs sm:text-sm px-1 py-2">Data</TabsTrigger>
+            <TabsTrigger value="results" className="text-xs sm:text-sm px-1 py-2">Resultaten</TabsTrigger>
+            <TabsTrigger value="zones" className="text-xs sm:text-sm px-1 py-2">Zones</TabsTrigger>
+            <TabsTrigger value="science" className="text-xs sm:text-sm px-1 py-2">Wetenschap</TabsTrigger>
           </TabsList>
 
           <div className="sm:mt-6">
