@@ -37,11 +37,11 @@ const ScienceTab = () => (
         <h4 className="text-base font-semibold mb-2">Trainingszones</h4>
         <p className="text-muted-foreground">Het 5-zone model (Seiler, 2010) verdeelt de intensiteit op basis van LT1 en LT2:</p>
         <p className="text-muted-foreground">
-          <strong className="text-foreground">Zone 1</strong> (Herstel): &lt;85% LT1-snelheid<br />
-          <strong className="text-foreground">Zone 2</strong> (Aeroob): 85%–100% LT1-snelheid<br />
-          <strong className="text-foreground">Zone 3</strong> (Tempo): LT1 – LT2<br />
-          <strong className="text-foreground">Zone 4</strong> (Drempel): 95%–105% LT2-snelheid<br />
-          <strong className="text-foreground">Zone 5</strong> (VO₂max): &gt;105% LT2-snelheid
+          <strong className="text-foreground">Zone 1</strong> (Herstel): &lt;1.5 mmol/L<br />
+          <strong className="text-foreground">Zone 2</strong> h(Aeroob): 1.5–2.0 mmol/L<br />
+          <strong className="text-foreground">Zone 3</strong> (Tempo): 2.0–3.0 mmol/L<br />
+          <strong className="text-foreground">Zone 4</strong> (Drempel): 3.0–4.0 mmol/L<br />
+          <strong className="text-foreground">Zone 5</strong> (VO₂max): &gt;4.0 mmol/L
         </p>
       </div>
 
