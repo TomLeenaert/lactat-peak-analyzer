@@ -27,7 +27,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('tokens')
+        .select('tokens, unlimited')
         .eq('user_id', user!.id)
         .single();
 
@@ -39,6 +39,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
   });
 
   const tokens = profile?.tokens ?? null;
+  const unlimited = profile?.unlimited ?? false;
   const isAdmin = user?.email === ADMIN_EMAIL;
 
   return (
@@ -137,7 +138,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {rightContent}
 
-        {!hideSignOut && tokens !== null && (
+        {!hideSignOut && (tokens !== null || unlimited) && (
           <div
             style={{
               display: 'flex',
@@ -145,21 +146,17 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
               gap: '5px',
               padding: '4px 10px',
               borderRadius: '20px',
-              background: tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
-              border: `1px solid ${tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
+              background: unlimited ? 'rgba(0,253,193,0.08)' : tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
+              border: `1px solid ${unlimited ? 'rgba(0,253,193,0.25)' : tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
               fontSize: '12px',
               fontWeight: 600,
-              color: tokens === 0 ? '#f87171' : '#a090ff',
+              color: unlimited ? '#00fdc1' : tokens === 0 ? '#f87171' : '#a090ff',
               cursor: 'default',
             }}
-            title={
-              tokens === 0
-                ? 'Geen tokens meer, koop tokens om analyses te doen'
-                : `${tokens} analyse${tokens === 1 ? '' : 's'} beschikbaar`
-            }
+            title={unlimited ? 'Beta — onbeperkte analyses' : tokens === 0 ? 'Geen tokens meer' : `${tokens} analyse${tokens === 1 ? '' : 's'} beschikbaar`}
           >
             <Coins size={12} />
-            {tokens}
+            {unlimited ? '∞' : tokens}
           </div>
         )}
 

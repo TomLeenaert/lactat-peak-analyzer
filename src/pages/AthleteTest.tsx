@@ -192,7 +192,7 @@ const AthleteTest = () => {
                 onCalculate={onCalculate}
               />
             </TabsContent>
-            <TabsContent value="results"><ResultsTab results={results} /></TabsContent>
+            <TabsContent value="results"><ResultsTab results={results} testId={testId} athleteName={athleteName} testDate={testDate} /></TabsContent>
             <TabsContent value="zones"><ZonesTab results={results} /></TabsContent>
             <TabsContent value="science"><ScienceTab /></TabsContent>
           </div>

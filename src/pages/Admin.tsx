@@ -4,10 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppNav from '@/components/AppNav';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Coins, Users, FlaskConical, Plus } from 'lucide-react';
+import { Coins, Users, FlaskConical, Plus, Infinity } from 'lucide-react';
 
 const ADMIN_EMAIL = 'tomleenaert@gmail.com';
 
@@ -17,6 +15,7 @@ interface AdminUser {
   full_name: string;
   club_name: string;
   tokens: number;
+  unlimited: boolean;
   athlete_count: number;
   test_count: number;
   created_at: string;
@@ -44,6 +43,22 @@ const Admin = () => {
       return data as AdminUser[];
     },
     enabled: !!user,
+  });
+
+  // Toggle unlimited mutation
+  const toggleUnlimited = useMutation({
+    mutationFn: async ({ userId, unlimited }: { userId: string; unlimited: boolean }) => {
+      const { error } = await supabase.rpc('admin_set_unlimited', {
+        p_user_id: userId,
+        p_unlimited: unlimited,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_, { unlimited }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      toast({ title: unlimited ? 'Unlimited beta geactiveerd' : 'Unlimited uitgeschakeld' });
+    },
+    onError: (err: any) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
   });
 
   // Grant tokens mutation
@@ -123,7 +138,7 @@ const Admin = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                    {['Naam / Email', 'Club', 'Atleten', 'Testen', 'Tokens', 'Tokens geven', 'Lid sinds'].map(h => (
+                    {['Naam / Email', 'Club', 'Atleten', 'Testen', 'Tokens', 'Beta', 'Tokens geven', 'Lid sinds'].map(h => (
                       <th key={h} style={{
                         padding: '10px 16px', textAlign: 'left',
                         color: 'rgba(255,255,255,0.35)', fontWeight: 500,
@@ -169,14 +184,32 @@ const Admin = () => {
                         <span style={{
                           display: 'inline-flex', alignItems: 'center', gap: '4px',
                           padding: '3px 10px', borderRadius: '20px',
-                          background: u.tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
-                          border: `1px solid ${u.tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
-                          color: u.tokens === 0 ? '#f87171' : '#a090ff',
+                          background: u.unlimited ? 'rgba(0,253,193,0.1)' : u.tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
+                          border: `1px solid ${u.unlimited ? 'rgba(0,253,193,0.3)' : u.tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
+                          color: u.unlimited ? '#00fdc1' : u.tokens === 0 ? '#f87171' : '#a090ff',
                           fontWeight: 700, fontSize: '13px',
                         }}>
-                          <Coins size={11} />
-                          {u.tokens}
+                          {u.unlimited ? <Infinity size={11} /> : <Coins size={11} />}
+                          {u.unlimited ? '∞' : u.tokens}
                         </span>
+                      </td>
+
+                      {/* Beta unlimited toggle */}
+                      <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                        <button
+                          onClick={() => toggleUnlimited.mutate({ userId: u.user_id, unlimited: !u.unlimited })}
+                          disabled={toggleUnlimited.isPending}
+                          style={{
+                            padding: '4px 10px', borderRadius: '20px', cursor: 'pointer',
+                            background: u.unlimited ? 'rgba(0,253,193,0.15)' : 'rgba(255,255,255,0.05)',
+                            border: `1px solid ${u.unlimited ? 'rgba(0,253,193,0.4)' : 'rgba(255,255,255,0.12)'}`,
+                            color: u.unlimited ? '#00fdc1' : 'rgba(255,255,255,0.35)',
+                            fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px',
+                            transition: 'all 0.15s',
+                          }}
+                        >
+                          {u.unlimited ? 'BETA AAN' : 'BETA'}
+                        </button>
                       </td>
 
                       {/* Tokens geven */}
