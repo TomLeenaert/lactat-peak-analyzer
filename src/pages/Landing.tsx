@@ -280,16 +280,16 @@ const Landing = () => {
       <section className="lp-hero-wrap" id="how">
         <div className="lp-hero">
           <div className="lp-hero-left">
-            <div className="lp-hero-eyebrow">
-              <span className="lp-hero-eyebrow-dot" />
-              <span>{t.eyebrow}</span>
-            </div>
             <h1 className="lp-h1">
               {t.heroTitleA}
               <br />
               <em>{t.heroTitleB}</em>
             </h1>
             <p className="lp-hero-desc">{t.heroDesc}</p>
+            <div className="lp-hero-eyebrow">
+              <span className="lp-hero-eyebrow-dot" />
+              <span>{t.eyebrow}</span>
+            </div>
 <div className="lp-hero-actions">
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
               <button className="lp-hero-cta-secondary" onClick={() => navigate('/demo')}>{t.cta2}</button>
