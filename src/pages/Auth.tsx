@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logoSrc from '@/assets/screen.png';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -91,15 +92,15 @@ const Auth = () => {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '4px' }}>
-            <span style={{ color: '#bd9dff', fontSize: '20px', lineHeight: 1, fontWeight: 900, fontFamily: 'Space Grotesk, sans-serif' }}>+</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+            <img src={logoSrc} alt="LacTest" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
             <span style={{
               fontFamily: 'Space Grotesk, sans-serif',
               fontWeight: 900,
-              fontSize: '22px',
+              fontSize: '24px',
               letterSpacing: '-0.5px',
-              color: '#bd9dff',
-            }}>LACTEST</span>
+              color: '#fff',
+            }}>Lac<span style={{ color: '#bd9dff' }}>.</span>Test</span>
           </div>
         </div>
 

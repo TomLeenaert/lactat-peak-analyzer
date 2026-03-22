@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { LogOut, ArrowLeft, Coins } from 'lucide-react';
+import logoSrc from '@/assets/screen.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -96,15 +97,17 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
             href="/"
             style={{
               display: 'flex',
-              alignItems: 'baseline',
-              gap: '7px',
+              alignItems: 'center',
+              gap: '8px',
               color: '#fff',
               textDecoration: 'none',
-              fontSize: '17px',
               flexShrink: 0,
             }}
           >
-            Lac<span style={{ color: '#6644ff' }}>.</span>Test
+            <img src={logoSrc} alt="LacTest" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+            <span style={{ fontSize: '17px', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
+              Lac<span style={{ color: '#6644ff' }}>.</span>Test
+            </span>
             <span style={{
               fontSize: '10px',
               fontWeight: 700,

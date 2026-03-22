@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logoSrc from '@/assets/screen.png';
 import stepGetSetImg from '@/assets/step-getset.jpg';
 import stepTestImg from '@/assets/step-test.png';
 import stepAnalyzeImg from '@/assets/step-analyze.jpg';
@@ -256,7 +257,8 @@ const Landing = () => {
   return (
     <div className="landing-page">
       <nav className="lp-nav">
-        <a href="#" className="lp-nav-logo" style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+        <a href="#" className="lp-nav-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={logoSrc} alt="LacTest" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
           Lac<span className="lp-nav-logo-dot">.</span>Test
           <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(102,68,255,0.6)', letterSpacing: '0.5px' }}>
             v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
