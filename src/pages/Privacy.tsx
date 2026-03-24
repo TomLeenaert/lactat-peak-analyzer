@@ -28,7 +28,7 @@ const Privacy = () => {
         </p>
 
         <Section title="1. Wie zijn wij?">
-          LacTest is een dienst aangeboden door Tom Leenaert, gevestigd in België. Je kan ons bereiken via{' '}
+          MyLactest is een dienst aangeboden door Tom Leenaert, gevestigd in België. Je kan ons bereiken via{' '}
           <a href="mailto:tom@lactest.app" style={{ color: '#6644ff' }}>tom@lactest.app</a>.
         </Section>
 

@@ -65,7 +65,7 @@ const Terms = () => {
         </Section>
 
         <Section title="8. Aansprakelijkheid">
-          LacTest is niet aansprakelijk voor schade die voortvloeit uit het gebruik van de app of uit beslissingen genomen op basis van de resultaten. Gebruik de app op eigen risico.
+          MyLactest is niet aansprakelijk voor schade die voortvloeit uit het gebruik van de app of uit beslissingen genomen op basis van de resultaten. Gebruik de app op eigen risico.
         </Section>
 
         <Section title="9. Beëindiging">
