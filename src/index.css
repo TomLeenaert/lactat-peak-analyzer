@@ -96,6 +96,16 @@
   h1, h2, h3, h4 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
   }
+
+  /* Force dark theme on all form elements */
+  input, textarea, select {
+    background-color: hsl(var(--card)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+  }
 }
 
 /* Arctic Precision utility classes */
