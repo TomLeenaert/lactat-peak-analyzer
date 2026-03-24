@@ -53,7 +53,7 @@ const AthleteTest = () => {
         }
       } else if (data.results_json && Object.keys(data.results_json as object).length > 0) {
         setResults(data.results_json as unknown as CalculationResults);
-        setActiveTab('results');
+        setActiveTab('analyze');
       }
       return data;
     },
