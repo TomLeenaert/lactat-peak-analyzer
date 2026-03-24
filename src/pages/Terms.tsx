@@ -61,7 +61,7 @@ const Terms = () => {
         </Section>
 
         <Section title="7. Intellectuele eigendom">
-          Alle software, algoritmen en ontwerpen van LacTest zijn eigendom van Tom Leenaert. Jouw testdata blijft van jou.
+          Alle software, algoritmen en ontwerpen van MyLactest zijn eigendom van Tom Leenaert. Jouw testdata blijft van jou.
         </Section>
 
         <Section title="8. Aansprakelijkheid">
