@@ -365,12 +365,18 @@ const DataInputTab = ({
                       </div>
                       <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
                         Stap {i + 1}
-                        {row.speed > 0 && (
-                          <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 400, marginLeft: '8px', fontFamily: 'monospace', fontSize: '13px' }}>
-                            {formatPace(row.speed)} /km
-                          </span>
-                        )}
                       </span>
+                      {row.speed > 0 && (
+                        <span style={{
+                          fontSize: '13px', fontWeight: 700, fontFamily: 'monospace',
+                          color: '#00fdc1',
+                          background: 'rgba(0,253,193,0.1)',
+                          border: '1px solid rgba(0,253,193,0.25)',
+                          borderRadius: '8px', padding: '2px 8px',
+                        }}>
+                          {formatPace(row.speed)}/km
+                        </span>
+                      )}
                     </div>
                     <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive shrink-0" onClick={() => removeRow(i)}>
                       <Trash2 className="h-3.5 w-3.5" />
