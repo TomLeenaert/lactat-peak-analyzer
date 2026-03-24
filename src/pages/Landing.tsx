@@ -134,7 +134,7 @@ const COPY = {
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
     stepHero: ['Your test. Your protocol.', 'Measure.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
-      { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. LacTest automatically generates all test steps.' },
+      { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. MyLactest automatically generates all test steps.' },
       { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step.' },
       { title: 'Instant results', desc: 'Enter everything via your mobile app. No paper needed.' },
       { title: 'Train with data', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds. Ready for coach and athlete.' },
