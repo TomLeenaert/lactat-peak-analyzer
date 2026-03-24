@@ -28,7 +28,7 @@ const Terms = () => {
         </p>
 
         <Section title="1. Aanvaarding van de voorwaarden">
-          Door LacTest te gebruiken ga je akkoord met deze gebruiksvoorwaarden. Als je niet akkoord gaat, gebruik de dienst dan niet.
+          Door MyLactest te gebruiken ga je akkoord met deze gebruiksvoorwaarden. Als je niet akkoord gaat, gebruik de dienst dan niet.
         </Section>
 
         <Section title="2. Beschrijving van de dienst">
