@@ -387,7 +387,7 @@ const DataInputTab = ({
 
                   {/* Tijd (text input — mm:ss) */}
                   <div style={{ marginBottom: '8px' }}>
-                    <Label className="text-xs text-muted-foreground">⏱ Tijd (mm:ss)</Label>
+                    <Label className="text-xs text-muted-foreground">Tijd (mm:ss)</Label>
                     <Input
                       className="font-mono text-base h-11"
                       value={secsToTimeStr(row.time || 0)}
@@ -418,7 +418,7 @@ const DataInputTab = ({
                       }}
                     >
                       <span style={{ fontSize: '9px', fontWeight: 600, color: '#6644ff', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                        🩸 Lactaat
+                        Lactaat
                       </span>
                       <span style={{
                         fontSize: hasLactate ? '22px' : '15px',

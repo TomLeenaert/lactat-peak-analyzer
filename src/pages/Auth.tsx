@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logoSrc from '@/assets/screen.png';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -89,60 +90,52 @@ const Auth = () => {
     }}>
       <div style={{ width: '100%', maxWidth: '360px' }}>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '4px' }}>
-            <span style={{ color: '#bd9dff', fontSize: '20px', lineHeight: 1 }}>✳</span>
+        {/* Logo — hero-sized with glow */}
+        <div style={{ textAlign: 'center', marginBottom: '40px', paddingTop: '8px' }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div style={{
+              position: 'relative',
+              width: '120px',
+              height: '120px',
+            }}>
+              {/* Glow ring behind logo */}
+              <div style={{
+                position: 'absolute',
+                inset: '-12px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(139,74,255,0.15) 0%, rgba(139,74,255,0.05) 50%, transparent 70%)',
+                filter: 'blur(8px)',
+              }} />
+              <img
+                src={logoSrc}
+                alt="LacTest"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  objectFit: 'contain',
+                  mixBlendMode: 'lighten',
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: 'drop-shadow(0 4px 24px rgba(139,74,255,0.3))',
+                }}
+              />
+            </div>
             <span style={{
               fontFamily: 'Space Grotesk, sans-serif',
               fontWeight: 900,
-              fontSize: '22px',
+              fontSize: '28px',
               letterSpacing: '-0.5px',
-              color: '#bd9dff',
-            }}>LACTEST</span>
+              color: '#fff',
+            }}>Lac<span style={{ color: '#bd9dff' }}>.</span>Test</span>
           </div>
-          <p style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: '9px',
-            fontWeight: 700,
-            letterSpacing: '0.25em',
-            textTransform: 'uppercase',
-            color: '#adaaaa',
-            margin: 0,
-          }}>
-            Arctic Precision Analytics
-          </p>
         </div>
 
-        {/* Price badge */}
-        <div style={{
-          background: '#131313',
-          border: '1px solid #262626',
-          borderRadius: '2px',
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '28px',
-        }}>
-          <div>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 2px' }}>
-              Standard Rate
-            </p>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, color: '#00fdc1', margin: 0, lineHeight: 1, letterSpacing: '-0.5px' }}>
-              €9.95 <span style={{ fontSize: '11px', fontWeight: 400, color: '#adaaaa' }}>per analyse</span>
-            </p>
-          </div>
-          <div style={{
-            background: '#00fdc1',
-            borderRadius: '2px',
-            width: '28px', height: '28px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '14px',
-          }}>💳</div>
-        </div>
-
-        {/* Coach Access heading */}
+        {/* Heading */}
         <div style={{ marginBottom: '24px' }}>
           <h1 style={{
             fontFamily: 'Space Grotesk, sans-serif',
@@ -154,12 +147,12 @@ const Auth = () => {
             margin: '0 0 4px',
             lineHeight: 1,
           }}>
-            {isLogin ? 'Coach Access' : 'New Laboratory'}
+            {isLogin ? (lang === 'nl' ? 'Inloggen' : 'Sign in') : (lang === 'nl' ? 'Account aanmaken' : 'Create account')}
           </h1>
           <p style={{ fontSize: '13px', color: '#adaaaa', margin: 0, fontWeight: 400 }}>
             {isLogin
-              ? 'Secure credential login required.'
-              : 'Register your coach account.'}
+              ? (lang === 'nl' ? 'Log in met je e-mail en wachtwoord.' : 'Log in with your email and password.')
+              : (lang === 'nl' ? 'Maak een gratis coachaccount aan.' : 'Create a free coach account.')}
           </p>
         </div>
 
@@ -169,11 +162,11 @@ const Auth = () => {
           {!isLogin && (
             <div style={{ position: 'relative' }}>
               <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-                Full Name
+                {lang === 'nl' ? 'Naam' : 'Name'}
               </p>
               <input
                 style={inputStyle}
-                placeholder="Coach Name"
+                placeholder={lang === 'nl' ? 'Jouw naam' : 'Your name'}
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
                 required
@@ -185,12 +178,12 @@ const Auth = () => {
 
           <div style={{ position: 'relative' }}>
             <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-              Terminal ID / Email
+              E-mail
             </p>
             <input
               style={inputStyle}
               type="email"
-              placeholder="COACH_REF_0492"
+              placeholder="coach@example.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -202,7 +195,7 @@ const Auth = () => {
 
           <div style={{ position: 'relative' }}>
             <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-              Access Code
+              {lang === 'nl' ? 'Wachtwoord' : 'Password'}
             </p>
             <input
               style={inputStyle}
@@ -215,7 +208,7 @@ const Auth = () => {
               onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
               onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
             />
-            <span style={{ position: 'absolute', right: '16px', bottom: '18px', color: '#777575', fontSize: '16px' }}>🔒</span>
+            <svg style={{ position: 'absolute', right: '16px', bottom: '16px', color: '#777575' }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
 
           {/* Primary CTA */}
@@ -244,7 +237,11 @@ const Auth = () => {
               opacity: submitting ? 0.7 : 1,
             }}
           >
-            {submitting ? 'Processing...' : isLogin ? 'Initialize Session ›' : 'Register Laboratory ›'}
+            {submitting
+              ? (lang === 'nl' ? 'Even geduld...' : 'Please wait...')
+              : isLogin
+                ? (lang === 'nl' ? 'Inloggen →' : 'Sign in →')
+                : (lang === 'nl' ? 'Account aanmaken →' : 'Create account →')}
           </button>
         </form>
 
@@ -255,7 +252,7 @@ const Auth = () => {
               onClick={handleForgotPassword}
               style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#777575', background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              Forgot Calibration Keys?
+              {lang === 'nl' ? 'Wachtwoord vergeten?' : 'Forgot password?'}
             </button>
           )}
 
@@ -282,17 +279,12 @@ const Auth = () => {
               cursor: 'pointer',
             }}
           >
-            {isLogin ? 'Register New Laboratory' : 'Back to Coach Access'}
+            {isLogin
+              ? (lang === 'nl' ? 'Nog geen account? Registreer hier' : 'No account yet? Register here')
+              : (lang === 'nl' ? 'Al een account? Log in' : 'Already have an account? Sign in')}
           </button>
         </div>
 
-        {/* Footer status */}
-        <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00fdc1', boxShadow: '0 0 6px #00fdc1' }} />
-          <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#494847' }}>
-            Encrypted Satellite Uplink Active
-          </span>
-        </div>
 
         {/* Language toggle */}
         <div style={{ marginTop: '16px', textAlign: 'center' }}>

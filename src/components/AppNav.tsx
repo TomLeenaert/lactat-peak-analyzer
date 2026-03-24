@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { LogOut, ArrowLeft, Coins } from 'lucide-react';
+import logoSrc from '@/assets/screen.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,7 +28,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('tokens')
+        .select('tokens, unlimited')
         .eq('user_id', user!.id)
         .single();
 
@@ -39,6 +40,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
   });
 
   const tokens = profile?.tokens ?? null;
+  const unlimited = profile?.unlimited ?? false;
   const isAdmin = user?.email === ADMIN_EMAIL;
 
   return (
@@ -95,23 +97,32 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
             href="/"
             style={{
               display: 'flex',
-              alignItems: 'baseline',
-              gap: '7px',
+              alignItems: 'center',
+              gap: '8px',
               color: '#fff',
               textDecoration: 'none',
-              fontSize: '17px',
               flexShrink: 0,
             }}
           >
-            Lac<span style={{ color: '#6644ff' }}>.</span>Test
+            <img src={logoSrc} alt="LacTest" style={{ width: '32px', height: '32px', objectFit: 'contain', mixBlendMode: 'lighten', filter: 'drop-shadow(0 2px 8px rgba(139,74,255,0.25))' }} />
+            <span style={{ fontSize: '17px', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
+              Lac<span style={{ color: '#6644ff' }}>.</span>Test
+            </span>
             <span style={{
               fontSize: '10px',
               fontWeight: 700,
               color: 'rgba(102,68,255,0.6)',
               letterSpacing: '0.5px',
               lineHeight: 1,
-            }}>
+            }}
+              data-build={`${typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : ''} ${typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : ''}`}
+            >
               v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
+              {typeof __GIT_BRANCH__ !== 'undefined' && __GIT_BRANCH__ !== 'main' && (
+                <span style={{ marginLeft: '4px', opacity: 0.7 }}>
+                  {typeof __BUILD_DATE__ !== 'undefined' ? `· ${__BUILD_DATE__} ${__BUILD_TIME__}` : ''}
+                </span>
+              )}
             </span>
           </a>
         )}
@@ -137,7 +148,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {rightContent}
 
-        {!hideSignOut && tokens !== null && (
+        {!hideSignOut && (tokens !== null || unlimited) && (
           <div
             style={{
               display: 'flex',
@@ -145,21 +156,17 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
               gap: '5px',
               padding: '4px 10px',
               borderRadius: '20px',
-              background: tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
-              border: `1px solid ${tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
+              background: unlimited ? 'rgba(0,253,193,0.08)' : tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
+              border: `1px solid ${unlimited ? 'rgba(0,253,193,0.25)' : tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
               fontSize: '12px',
               fontWeight: 600,
-              color: tokens === 0 ? '#f87171' : '#a090ff',
+              color: unlimited ? '#00fdc1' : tokens === 0 ? '#f87171' : '#a090ff',
               cursor: 'default',
             }}
-            title={
-              tokens === 0
-                ? 'Geen tokens meer, koop tokens om analyses te doen'
-                : `${tokens} analyse${tokens === 1 ? '' : 's'} beschikbaar`
-            }
+            title={unlimited ? 'Beta — onbeperkte analyses' : tokens === 0 ? 'Geen tokens meer' : `${tokens} analyse${tokens === 1 ? '' : 's'} beschikbaar`}
           >
             <Coins size={12} />
-            {tokens}
+            {unlimited ? '∞' : tokens}
           </div>
         )}
 

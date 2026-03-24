@@ -17,6 +17,7 @@ import AthleteDetail from "./pages/AthleteDetail";
 import AthleteTest from "./pages/AthleteTest";
 import ResetPassword from "./pages/ResetPassword";
 import Admin from "./pages/Admin";
+import ShareView from "./pages/ShareView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/athlete/:id/test" element={<ProtectedRoute><AthleteTest /></ProtectedRoute>} />
               <Route path="/athlete/:id/test/:testId" element={<ProtectedRoute><AthleteTest /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+              <Route path="/share/:token" element={<ShareView />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

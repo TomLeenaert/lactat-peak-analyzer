@@ -80,7 +80,7 @@ const TestPage = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-base sm:text-lg font-semibold truncate">
-            {isQuick ? '⚡ Veldtest' : '🔬 Inspanningstest'}
+            {isQuick ? 'Veldtest' : 'Inspanningstest'}
           </h1>
         </div>
       </header>
@@ -88,11 +88,11 @@ const TestPage = () => {
       <main className="max-w-[900px] mx-auto px-3 sm:px-4 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full flex h-auto gap-0.5 bg-muted p-1 overflow-x-auto">
-            <TabsTrigger value="protocol" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📋 Protocol</TabsTrigger>
-            <TabsTrigger value="data" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📊 Data</TabsTrigger>
-            <TabsTrigger value="results" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🎯 Resultaat</TabsTrigger>
-            <TabsTrigger value="zones" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">🏃 Zones</TabsTrigger>
-            <TabsTrigger value="science" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">📚 Info</TabsTrigger>
+            <TabsTrigger value="protocol" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Protocol</TabsTrigger>
+            <TabsTrigger value="data" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Data</TabsTrigger>
+            <TabsTrigger value="results" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Resultaat</TabsTrigger>
+            <TabsTrigger value="zones" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Zones</TabsTrigger>
+            <TabsTrigger value="science" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Info</TabsTrigger>
           </TabsList>
 
           <div className="mt-4 sm:mt-6">

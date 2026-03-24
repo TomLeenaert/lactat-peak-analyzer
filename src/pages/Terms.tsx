@@ -46,8 +46,8 @@ const Terms = () => {
         <Section title="4. Prijs en betaling">
           <ul style={{ marginTop: '12px', paddingLeft: '20px', lineHeight: '2' }}>
             <li>Het aanmaken van een account en invoeren van testdata is gratis.</li>
-            <li>Het downloaden van een PDF-rapport kost <strong>€9.95 per rapport</strong>.</li>
-            <li>Er is geen abonnement. Je betaalt enkel wat je downloadt.</li>
+            <li>Het uitvoeren van een lactaatanalyse kost <strong>€9.95 per analyse</strong>.</li>
+            <li>Er is geen abonnement. Je betaalt enkel per analyse.</li>
             <li>Alle prijzen zijn inclusief BTW.</li>
           </ul>
         </Section>

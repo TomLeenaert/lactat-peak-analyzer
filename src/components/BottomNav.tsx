@@ -1,3 +1,5 @@
+import { ClipboardList, Flame, Timer, Wind, BarChart2 } from 'lucide-react';
+
 interface BottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -5,11 +7,11 @@ interface BottomNavProps {
 }
 
 const TABS = [
-  { key: 'protocol', label: 'PREP',   icon: '📋' },
-  { key: 'warmup',   label: 'WARMUP', icon: '🔥' },
-  { key: 'data',     label: 'TEST',   icon: '⏱' },
-  { key: 'zones',    label: 'COOL',   icon: '❄️' },
-  { key: 'results',  label: 'DATA',   icon: '📊' },
+  { key: 'protocol', label: 'PREP',   Icon: ClipboardList },
+  { key: 'warmup',   label: 'WARMUP', Icon: Flame },
+  { key: 'data',     label: 'TEST',   Icon: Timer },
+  { key: 'zones',    label: 'COOL',   Icon: Wind },
+  { key: 'results',  label: 'DATA',   Icon: BarChart2 },
 ];
 
 const BottomNav = ({ activeTab, onTabChange, hasResults }: BottomNavProps) => {
@@ -26,14 +28,15 @@ const BottomNav = ({ activeTab, onTabChange, hasResults }: BottomNavProps) => {
       WebkitBackdropFilter: 'blur(24px)',
       zIndex: 50,
       boxShadow: '0 -4px 24px rgba(0,0,0,0.6)',
+      borderTop: '1px solid rgba(255,255,255,0.05)',
     }}>
-      {TABS.map(tab => {
-        const isActive = activeTab === tab.key;
-        const isDisabled = (tab.key === 'results' || tab.key === 'zones') && !hasResults;
+      {TABS.map(({ key, label, Icon }) => {
+        const isActive = activeTab === key;
+        const isDisabled = (key === 'results' || key === 'zones') && !hasResults;
         return (
           <button
-            key={tab.key}
-            onClick={() => !isDisabled && onTabChange(tab.key)}
+            key={key}
+            onClick={() => !isDisabled && onTabChange(key)}
             style={{
               display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
@@ -51,7 +54,14 @@ const BottomNav = ({ activeTab, onTabChange, hasResults }: BottomNavProps) => {
               minWidth: '56px',
             }}
           >
-            <span style={{ fontSize: '18px', marginBottom: '3px', lineHeight: 1 }}>{tab.icon}</span>
+            <Icon
+              size={18}
+              style={{
+                marginBottom: '3px',
+                color: isActive ? '#00fdc1' : '#777575',
+                strokeWidth: isActive ? 2.5 : 1.75,
+              }}
+            />
             <span style={{
               fontFamily: 'Inter, sans-serif', fontWeight: 700,
               fontSize: '9px', letterSpacing: '0.05em',
@@ -59,7 +69,7 @@ const BottomNav = ({ activeTab, onTabChange, hasResults }: BottomNavProps) => {
               color: isActive ? '#00fdc1' : '#777575',
               lineHeight: 1,
             }}>
-              {tab.label}
+              {label}
             </span>
           </button>
         );

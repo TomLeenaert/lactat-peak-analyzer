@@ -1,11 +1,42 @@
-import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR, interpolateWatt } from '@/lib/lactate-math';
+import { useState } from 'react';
+import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
+import { supabase } from '@/integrations/supabase/client';
+import { Share2, Check, Link } from 'lucide-react';
 
 interface ResultsTabProps {
   results: CalculationResults | null;
+  testId?: string;
+  athleteName?: string;
+  testDate?: string;
 }
 
-const ResultsTab = ({ results }: ResultsTabProps) => {
+const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps) => {
+  const [sharing, setSharing] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+
+  const handleShare = async () => {
+    if (!testId || !athleteName) return;
+    setSharing(true);
+    try {
+      const { data: token, error } = await supabase.rpc('create_share_link', {
+        p_test_result_id: testId,
+        p_athlete_name: athleteName,
+        p_test_date: testDate ?? new Date().toISOString().split('T')[0],
+      });
+      if (error) throw error;
+      const url = `${window.location.origin}/share/${token}`;
+      setShareUrl(url);
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSharing(false);
+    }
+  };
   if (!results) {
     return (
       <div style={{
@@ -21,7 +52,7 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
     );
   }
 
-  const { lt1, lt2, speeds, hrs, watts, coeffs } = results;
+  const { lt1, lt2, speeds, hrs, coeffs } = results;
   if (!coeffs || !Array.isArray(coeffs)) {
     return (
       <div style={{
@@ -38,7 +69,6 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
   }
 
   const zones = getZones(results);
-  const hasWatts = watts.some(w => w > 0);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
 
   const lt1HR = interpolateHR(lt1.best, speeds, hrs);
@@ -171,8 +201,6 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
         {zones.map(z => {
           const hrFrom = interpolateHR(z.from, speeds, hrs);
           const hrTo   = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
-          const wFrom  = hasWatts ? interpolateWatt(z.from, speeds, watts) : 0;
-          const wTo    = hasWatts ? interpolateWatt(Math.min(z.to, speeds[speeds.length - 1]), speeds, watts) : 0;
           const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
           const lacTo   = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
 
@@ -205,11 +233,6 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
                       {hrFrom} – {hrTo} bpm
                     </p>
                   )}
-                  {hasWatts && (
-                    <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>
-                      {wFrom} – {wTo} W
-                    </p>
-                  )}
                   <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)' }}>
                     {lacFrom} – {lacTo} mmol/L
                   </p>
@@ -228,6 +251,63 @@ const ResultsTab = ({ results }: ResultsTabProps) => {
           );
         })}
       </div>
+
+      {/* Share button */}
+      {testId && (
+        <div style={{ marginTop: '20px' }}>
+          {shareUrl ? (
+            <div style={{
+              background: 'rgba(0,253,193,0.06)',
+              border: '1px solid rgba(0,253,193,0.2)',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}>
+              <Link size={14} style={{ color: '#00fdc1', flexShrink: 0 }} />
+              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', flex: 1, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {shareUrl}
+              </span>
+              <button
+                onClick={handleShare}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '5px',
+                  padding: '6px 12px', borderRadius: '4px', border: 'none',
+                  background: copied ? 'rgba(0,253,193,0.2)' : 'rgba(0,253,193,0.1)',
+                  color: '#00fdc1', fontSize: '11px', fontWeight: 700,
+                  cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                {copied ? <Check size={12} /> : <Share2 size={12} />}
+                {copied ? 'GEKOPIEERD' : 'KOPIEER'}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleShare}
+              disabled={sharing}
+              style={{
+                width: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                padding: '14px',
+                borderRadius: '6px',
+                border: '1px solid rgba(0,253,193,0.25)',
+                background: 'rgba(0,253,193,0.06)',
+                color: '#00fdc1',
+                fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px',
+                cursor: sharing ? 'wait' : 'pointer',
+                transition: 'all 0.15s',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              <Share2 size={15} />
+              {sharing ? 'Link aanmaken...' : 'Deel resultaten met atleet'}
+            </button>
+          )}
+        </div>
+      )}
 
     </div>
   );

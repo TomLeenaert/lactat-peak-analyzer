@@ -8,17 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
+import logoSrc from '@/assets/screen.png';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
-const SPORT_ICONS: Record<string, string> = {
-  lopen: '🏃', running: '🏃',
-  fietsen: '🚴', cycling: '🚴',
-  triathlon: '🏊',
-  zwemmen: '🏊', swimming: '🏊',
-  roeien: '🚣', rowing: '🚣',
-};
-const getSportIcon = (sport?: string | null) => SPORT_ICONS[sport?.toLowerCase() ?? ''] ?? '🏃';
+const getSportInitial = (sport?: string | null) => (sport ?? 'L').charAt(0).toUpperCase();
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -109,12 +103,12 @@ const Dashboard = () => {
   );
 
   // Get last lactate from test results
-  const getLastLactate = (testResults: any[]) => {
+  const getLastLactate = (testResults: { test_date?: string; results_json?: Record<string, unknown> }[]) => {
     if (!testResults?.length) return null;
     const sorted = [...testResults].sort((a, b) => (b.test_date || '').localeCompare(a.test_date || ''));
     const last = sorted[0];
     if (!last?.results_json) return null;
-    const r = last.results_json as any;
+    const r = last.results_json as Record<string, Record<string, unknown>>;
     const lt2 = r?.lt2?.best ?? r?.lt2Speed ?? null;
     return lt2 ? lt2.toFixed(1) : null;
   };
@@ -173,16 +167,28 @@ const Dashboard = () => {
             <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900, fontSize: '18px', letterSpacing: '-0.5px', color: '#fff' }}>
               + Atleet toevoegen
             </span>
-            <span style={{ fontSize: '24px' }}>👤</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </button>
         </section>
 
         {/* Loading */}
         {isLoading && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[1, 2].map(i => (
-              <div key={i} style={{ height: '180px', background: '#201f1f', borderRadius: '2px' }} />
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '20px' }}>
+            <img
+              src={logoSrc}
+              alt=""
+              style={{
+                width: '56px',
+                height: '56px',
+                objectFit: 'contain',
+                mixBlendMode: 'lighten',
+                opacity: 0.6,
+                animation: 'pulse 2s ease-in-out infinite',
+              }}
+            />
+            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, letterSpacing: '0.1em' }}>
+              Laden...
+            </span>
           </div>
         )}
 
@@ -194,7 +200,7 @@ const Dashboard = () => {
               const lastLactate = getLastLactate(a.test_results ?? []);
               const isActive = idx === 0 && testCount > 0;
               const accentColor = isActive ? '#00fdc1' : '#bd9dff';
-              const sportIcon = getSportIcon(a.sport);
+              const sportInitial = getSportInitial(a.sport);
 
               return (
                 <button
@@ -219,13 +225,15 @@ const Dashboard = () => {
                     WebkitTapHighlightColor: 'transparent',
                   }}
                 >
-                  {/* Sport icon watermark */}
+                  {/* Sport letter watermark */}
                   <div style={{
                     position: 'absolute', top: '12px', right: '16px',
-                    fontSize: '56px', opacity: 0.12, lineHeight: 1,
+                    fontSize: '64px', opacity: 0.08, lineHeight: 1,
+                    fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900,
+                    color: accentColor,
                     pointerEvents: 'none',
                   }}>
-                    {sportIcon}
+                    {sportInitial}
                   </div>
 
                   {/* Top: status chip + name */}
@@ -293,11 +301,23 @@ const Dashboard = () => {
           }}>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <div style={{
-                width: '72px', height: '72px', borderRadius: '50%',
-                background: '#262626',
+                width: '80px', height: '80px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                margin: '0 auto 16px', fontSize: '32px',
-              }}>🔬</div>
+                margin: '0 auto 16px',
+              }}>
+                <img
+                  src={logoSrc}
+                  alt=""
+                  style={{
+                    width: '72px',
+                    height: '72px',
+                    objectFit: 'contain',
+                    mixBlendMode: 'lighten',
+                    filter: 'drop-shadow(0 4px 16px rgba(139,74,255,0.25))',
+                    opacity: 0.7,
+                  }}
+                />
+              </div>
               <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, letterSpacing: '-0.5px', textTransform: 'uppercase', color: '#fff', margin: '0 0 8px' }}>
                 Systeem Klaarmaken
               </h4>

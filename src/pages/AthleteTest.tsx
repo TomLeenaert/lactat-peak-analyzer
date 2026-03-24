@@ -124,9 +124,9 @@ const AthleteTest = () => {
       const payload = {
         athlete_id: athleteId!,
         test_date: testDate,
-        protocol_json: protocol as any,
-        steps_json: testData as any,
-        results_json: results as any,
+        protocol_json: protocol as unknown as Record<string, unknown>,
+        steps_json: testData as unknown as Record<string, unknown>[],
+        results_json: results as unknown as Record<string, unknown>,
       };
       if (testId) {
         const { error } = await supabase.from('test_results').update(payload).eq('id', testId);
@@ -141,7 +141,7 @@ const AthleteTest = () => {
       toast({ title: 'Test opgeslagen' });
       navigate(`/athlete/${athleteId}`);
     },
-    onError: (err: any) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
+    onError: (err: Error) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
   });
 
   const saveButton = results ? (
@@ -170,21 +170,11 @@ const AthleteTest = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Top tabs: visible on desktop only */}
           <TabsList className="hidden sm:grid w-full grid-cols-5 h-auto bg-muted p-1">
-            <TabsTrigger value="protocol" className="text-xs sm:text-sm px-1 py-2">
-              📋 Protocol
-            </TabsTrigger>
-            <TabsTrigger value="data" className="text-xs sm:text-sm px-1 py-2">
-              📊 Data
-            </TabsTrigger>
-            <TabsTrigger value="results" className="text-xs sm:text-sm px-1 py-2">
-              🎯 Resultaten
-            </TabsTrigger>
-            <TabsTrigger value="zones" className="text-xs sm:text-sm px-1 py-2">
-              🏃 Zones
-            </TabsTrigger>
-            <TabsTrigger value="science" className="text-xs sm:text-sm px-1 py-2">
-              📚 Wetenschap
-            </TabsTrigger>
+            <TabsTrigger value="protocol" className="text-xs sm:text-sm px-1 py-2">Protocol</TabsTrigger>
+            <TabsTrigger value="data" className="text-xs sm:text-sm px-1 py-2">Data</TabsTrigger>
+            <TabsTrigger value="results" className="text-xs sm:text-sm px-1 py-2">Resultaten</TabsTrigger>
+            <TabsTrigger value="zones" className="text-xs sm:text-sm px-1 py-2">Zones</TabsTrigger>
+            <TabsTrigger value="science" className="text-xs sm:text-sm px-1 py-2">Wetenschap</TabsTrigger>
           </TabsList>
 
           <div className="sm:mt-6">
@@ -202,7 +192,7 @@ const AthleteTest = () => {
                 onCalculate={onCalculate}
               />
             </TabsContent>
-            <TabsContent value="results"><ResultsTab results={results} /></TabsContent>
+            <TabsContent value="results"><ResultsTab results={results} testId={testId} athleteName={athleteName} testDate={testDate} /></TabsContent>
             <TabsContent value="zones"><ZonesTab results={results} /></TabsContent>
             <TabsContent value="science"><ScienceTab /></TabsContent>
           </div>
