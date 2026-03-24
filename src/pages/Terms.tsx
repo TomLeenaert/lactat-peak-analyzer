@@ -32,7 +32,7 @@ const Terms = () => {
         </Section>
 
         <Section title="2. Beschrijving van de dienst">
-          LacTest is een webapplicatie voor de analyse van lactaattestdata. De app berekent aerobe en anaerobe drempels op basis van ingevoerde veldtestgegevens en genereert trainingszones en rapporten.
+          MyLactest is een webapplicatie voor de analyse van lactaattestdata. De app berekent aerobe en anaerobe drempels op basis van ingevoerde veldtestgegevens en genereert trainingszones en rapporten.
         </Section>
 
         <Section title="3. Account">
