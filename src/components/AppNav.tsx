@@ -104,7 +104,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
               flexShrink: 0,
             }}
           >
-            <img src={logoSrc} alt="LacTest" style={{ width: '28px', height: '28px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
+            <img src={logoSrc} alt="LacTest" style={{ width: '32px', height: '32px', objectFit: 'contain', mixBlendMode: 'lighten', filter: 'drop-shadow(0 2px 8px rgba(139,74,255,0.25))' }} />
             <span style={{ fontSize: '17px', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
               Lac<span style={{ color: '#6644ff' }}>.</span>Test
             </span>

@@ -90,14 +90,45 @@ const Auth = () => {
     }}>
       <div style={{ width: '100%', maxWidth: '360px' }}>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-            <img src={logoSrc} alt="LacTest" style={{ width: '40px', height: '40px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
+        {/* Logo — hero-sized with glow */}
+        <div style={{ textAlign: 'center', marginBottom: '40px', paddingTop: '8px' }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            <div style={{
+              position: 'relative',
+              width: '120px',
+              height: '120px',
+            }}>
+              {/* Glow ring behind logo */}
+              <div style={{
+                position: 'absolute',
+                inset: '-12px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(139,74,255,0.15) 0%, rgba(139,74,255,0.05) 50%, transparent 70%)',
+                filter: 'blur(8px)',
+              }} />
+              <img
+                src={logoSrc}
+                alt="LacTest"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  objectFit: 'contain',
+                  mixBlendMode: 'lighten',
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: 'drop-shadow(0 4px 24px rgba(139,74,255,0.3))',
+                }}
+              />
+            </div>
             <span style={{
               fontFamily: 'Space Grotesk, sans-serif',
               fontWeight: 900,
-              fontSize: '24px',
+              fontSize: '28px',
               letterSpacing: '-0.5px',
               color: '#fff',
             }}>Lac<span style={{ color: '#bd9dff' }}>.</span>Test</span>

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
+import logoSrc from '@/assets/screen.png';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
@@ -172,10 +173,22 @@ const Dashboard = () => {
 
         {/* Loading */}
         {isLoading && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[1, 2].map(i => (
-              <div key={i} style={{ height: '180px', background: '#201f1f', borderRadius: '2px' }} />
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '20px' }}>
+            <img
+              src={logoSrc}
+              alt=""
+              style={{
+                width: '56px',
+                height: '56px',
+                objectFit: 'contain',
+                mixBlendMode: 'lighten',
+                opacity: 0.6,
+                animation: 'pulse 2s ease-in-out infinite',
+              }}
+            />
+            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, letterSpacing: '0.1em' }}>
+              Laden...
+            </span>
           </div>
         )}
 
@@ -288,11 +301,23 @@ const Dashboard = () => {
           }}>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <div style={{
-                width: '72px', height: '72px', borderRadius: '50%',
-                background: '#262626',
+                width: '80px', height: '80px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                margin: '0 auto 16px', fontSize: '32px',
-              }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#bd9dff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.5}}><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11l4 2 4-2V3M3 9v10a2 2 0 0 0 2 2h4m0 0v-5m0 5h6m0 0v-5m0 5h4a2 2 0 0 0 2-2V9"/></svg></div>
+                margin: '0 auto 16px',
+              }}>
+                <img
+                  src={logoSrc}
+                  alt=""
+                  style={{
+                    width: '72px',
+                    height: '72px',
+                    objectFit: 'contain',
+                    mixBlendMode: 'lighten',
+                    filter: 'drop-shadow(0 4px 16px rgba(139,74,255,0.25))',
+                    opacity: 0.7,
+                  }}
+                />
+              </div>
               <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, letterSpacing: '-0.5px', textTransform: 'uppercase', color: '#fff', margin: '0 0 8px' }}>
                 Systeem Klaarmaken
               </h4>

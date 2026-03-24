@@ -282,6 +282,11 @@ const Landing = () => {
       <section className="lp-hero-wrap" id="how">
         <div className="lp-hero">
           <div className="lp-hero-left">
+            {/* Hero logo — prominent, centered above headline */}
+            <div className="lp-hero-logo-wrap">
+              <div className="lp-hero-logo-glow" />
+              <img src={logoSrc} alt="LacTest" className="lp-hero-logo" />
+            </div>
             <h1 className="lp-h1">
               {t.heroTitleA}
               <br />
@@ -426,7 +431,10 @@ const Landing = () => {
       </section>
 
       <footer className="lp-footer">
-        <div>LacTest</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={logoSrc} alt="" style={{ width: '22px', height: '22px', objectFit: 'contain', mixBlendMode: 'lighten', opacity: 0.7 }} />
+          <span>LacTest</span>
+        </div>
         <div className="lp-footer-links">
           <a href="/privacy">{t.footerPrivacy}</a>
           <a href="/terms">{t.footerTerms}</a>
