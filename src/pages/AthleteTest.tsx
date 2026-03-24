@@ -129,10 +129,10 @@ const AthleteTest = () => {
         results_json: results as unknown as Record<string, unknown>,
       };
       if (testId) {
-        const { error } = await supabase.from('test_results').update(payload).eq('id', testId);
+        const { error } = await supabase.from('test_results').update(payload as any).eq('id', testId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('test_results').insert(payload);
+        const { error } = await supabase.from('test_results').insert(payload as any);
         if (error) throw error;
       }
     },

@@ -197,7 +197,7 @@ const Dashboard = () => {
           <section style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '48px' }}>
             {athletes.map((a, idx) => {
               const testCount = a.test_results?.length ?? 0;
-              const lastLactate = getLastLactate(a.test_results ?? []);
+              const lastLactate = getLastLactate((a.test_results ?? []) as any);
               const isActive = idx === 0 && testCount > 0;
               const accentColor = isActive ? '#00fdc1' : '#bd9dff';
               const sportInitial = getSportInitial(a.sport);

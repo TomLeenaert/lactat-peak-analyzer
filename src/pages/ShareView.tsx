@@ -12,8 +12,8 @@ const ShareView = () => {
     queryKey: ['share', token],
     queryFn: async () => {
       // 1. Fetch the share record
-      const { data: share, error: shareErr } = await supabase
-        .from('shared_results')
+      const { data: share, error: shareErr } = await (supabase
+        .from as any)('shared_results')
         .select('test_result_id, athlete_name, test_date')
         .eq('token', token!)
         .single();
@@ -23,13 +23,13 @@ const ShareView = () => {
       const { data: test, error: testErr } = await supabase
         .from('test_results')
         .select('results_json, test_date')
-        .eq('id', share.test_result_id)
+        .eq('id', (share as any).test_result_id)
         .single();
       if (testErr || !test) throw new Error('Testresultaat niet gevonden');
 
       return {
-        athleteName: share.athlete_name,
-        testDate: share.test_date || test.test_date,
+        athleteName: (share as any).athlete_name,
+        testDate: (share as any).test_date || test.test_date,
         results: test.results_json as unknown as CalculationResults,
       };
     },

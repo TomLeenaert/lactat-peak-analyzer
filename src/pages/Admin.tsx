@@ -58,7 +58,7 @@ const Admin = () => {
   // Grant tokens mutation
   const grantTokens = useMutation({
     mutationFn: async ({ userId, amount }: { userId: string; amount: number }) => {
-      const { error } = await supabase.rpc('admin_grant_tokens', {
+      const { error } = await (supabase.rpc as any)('admin_grant_tokens', {
         p_user_id: userId,
         p_amount: amount,
       });
