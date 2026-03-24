@@ -114,8 +114,15 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
               color: 'rgba(102,68,255,0.6)',
               letterSpacing: '0.5px',
               lineHeight: 1,
-            }}>
+            }}
+              data-build={`${typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : ''} ${typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : ''}`}
+            >
               v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
+              {typeof __GIT_BRANCH__ !== 'undefined' && __GIT_BRANCH__ !== 'main' && (
+                <span style={{ marginLeft: '4px', opacity: 0.7 }}>
+                  {typeof __BUILD_DATE__ !== 'undefined' ? `· ${__BUILD_DATE__} ${__BUILD_TIME__}` : ''}
+                </span>
+              )}
             </span>
           </a>
         )}
