@@ -256,7 +256,7 @@ const Demo = () => {
         padding: '0 32px', height: '58px',
       }}>
         <a href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '17px', fontWeight: 700 }}>
-          Lac<span style={{ color: '#6644ff' }}>.</span>Test
+          MyLactest
         </a>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>Live demo</span>
@@ -283,7 +283,7 @@ const Demo = () => {
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#a090ff' }}>Interactieve demo — geen login nodig</span>
           </div>
           <h1 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.2, marginBottom: '12px' }}>
-            Zo werkt LacTest in de praktijk
+            Zo werkt MyLactest in de praktijk
           </h1>
           <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.45)', maxWidth: '500px', margin: '0 auto', lineHeight: 1.6 }}>
             Van atleet aanmaken tot volledige drempelanalyse — dit is de echte tool met echte berekeningen.

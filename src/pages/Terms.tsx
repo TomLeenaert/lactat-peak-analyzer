@@ -12,7 +12,7 @@ const Terms = () => {
         padding: '0 24px', height: '58px',
       }}>
         <a href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '17px', fontWeight: 600 }}>
-          Lac<span style={{ color: '#6644ff' }}>.</span>Test
+          MyLactest
         </a>
         <button onClick={() => navigate(-1)} style={{
           fontSize: '13px', color: 'rgba(255,255,255,0.5)', background: 'none',
@@ -28,11 +28,11 @@ const Terms = () => {
         </p>
 
         <Section title="1. Aanvaarding van de voorwaarden">
-          Door LacTest te gebruiken ga je akkoord met deze gebruiksvoorwaarden. Als je niet akkoord gaat, gebruik de dienst dan niet.
+          Door MyLactest te gebruiken ga je akkoord met deze gebruiksvoorwaarden. Als je niet akkoord gaat, gebruik de dienst dan niet.
         </Section>
 
         <Section title="2. Beschrijving van de dienst">
-          LacTest is een webapplicatie voor de analyse van lactaattestdata. De app berekent aerobe en anaerobe drempels op basis van ingevoerde veldtestgegevens en genereert trainingszones en rapporten.
+          MyLactest is een webapplicatie voor de analyse van lactaattestdata. De app berekent aerobe en anaerobe drempels op basis van ingevoerde veldtestgegevens en genereert trainingszones en rapporten.
         </Section>
 
         <Section title="3. Account">
@@ -53,19 +53,19 @@ const Terms = () => {
         </Section>
 
         <Section title="5. Medische disclaimer">
-          <strong style={{ color: '#ff9800' }}>Belangrijk:</strong> LacTest is een hulpmiddel voor coaches en atleten, geen medisch hulpmiddel. De resultaten zijn bedoeld als ondersteuning bij trainingsplanning en vervangen geen medisch advies. Raadpleeg een arts of sportarts bij twijfel over je gezondheid of prestaties.
+          <strong style={{ color: '#ff9800' }}>Belangrijk:</strong> MyLactest is een hulpmiddel voor coaches en atleten, geen medisch hulpmiddel. De resultaten zijn bedoeld als ondersteuning bij trainingsplanning en vervangen geen medisch advies. Raadpleeg een arts of sportarts bij twijfel over je gezondheid of prestaties.
         </Section>
 
         <Section title="6. Nauwkeurigheid van resultaten">
-          De berekende drempels zijn gebaseerd op wetenschappelijk onderbouwde methoden (OBLA, Dmax, Modified Dmax). De nauwkeurigheid is mede afhankelijk van de kwaliteit van de ingevoerde testdata. LacTest kan niet garanderen dat de resultaten in alle gevallen overeenkomen met labmetingen.
+          De berekende drempels zijn gebaseerd op wetenschappelijk onderbouwde methoden (OBLA, Dmax, Modified Dmax). De nauwkeurigheid is mede afhankelijk van de kwaliteit van de ingevoerde testdata. MyLactest kan niet garanderen dat de resultaten in alle gevallen overeenkomen met labmetingen.
         </Section>
 
         <Section title="7. Intellectuele eigendom">
-          Alle software, algoritmen en ontwerpen van LacTest zijn eigendom van Tom Leenaert. Jouw testdata blijft van jou.
+          Alle software, algoritmen en ontwerpen van MyLactest zijn eigendom van Tom Leenaert. Jouw testdata blijft van jou.
         </Section>
 
         <Section title="8. Aansprakelijkheid">
-          LacTest is niet aansprakelijk voor schade die voortvloeit uit het gebruik van de app of uit beslissingen genomen op basis van de resultaten. Gebruik de app op eigen risico.
+          MyLactest is niet aansprakelijk voor schade die voortvloeit uit het gebruik van de app of uit beslissingen genomen op basis van de resultaten. Gebruik de app op eigen risico.
         </Section>
 
         <Section title="9. Beëindiging">

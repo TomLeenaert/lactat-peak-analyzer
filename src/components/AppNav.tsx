@@ -104,25 +104,9 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
               flexShrink: 0,
             }}
           >
-            <img src={logoSrc} alt="LacTest" style={{ width: '32px', height: '32px', objectFit: 'contain', mixBlendMode: 'lighten', filter: 'drop-shadow(0 2px 8px rgba(139,74,255,0.25))' }} />
+            <img src={logoSrc} alt="MyLactest" style={{ width: '44px', height: '44px', objectFit: 'contain', mixBlendMode: 'lighten', filter: 'drop-shadow(0 2px 8px rgba(139,74,255,0.25))' }} />
             <span style={{ fontSize: '17px', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
-              Lac<span style={{ color: '#6644ff' }}>.</span>Test
-            </span>
-            <span style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              color: 'rgba(102,68,255,0.6)',
-              letterSpacing: '0.5px',
-              lineHeight: 1,
-            }}
-              data-build={`${typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : ''} ${typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : ''}`}
-            >
-              v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
-              {typeof __GIT_BRANCH__ !== 'undefined' && __GIT_BRANCH__ !== 'main' && (
-                <span style={{ marginLeft: '4px', opacity: 0.7 }}>
-                  {typeof __BUILD_DATE__ !== 'undefined' ? `· ${__BUILD_DATE__} ${__BUILD_TIME__}` : ''}
-                </span>
-              )}
+              MyLactest
             </span>
           </a>
         )}

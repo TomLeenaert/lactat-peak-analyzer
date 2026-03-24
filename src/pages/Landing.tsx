@@ -18,9 +18,9 @@ const COPY = {
     eyebrow: 'Gratis tijdens de bèta. Volledige analyse. Geen kaart nodig.',
     heroTitleA: 'Ken je drempels.',
     heroTitleB: 'Train met data.',
-    heroDesc: 'LacTest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
+    heroDesc: 'MyLactest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
     cmdLabel: 'start',
-    cmdText: 'lactest.app → analyseer → resultaten',
+    cmdText: 'mylactest.app → analyseer → resultaten',
     cta1: 'Start je analyse →',
     cta2: 'Bekijk demo',
     featKicker: 'Wat is inbegrepen',
@@ -38,8 +38,8 @@ const COPY = {
     cmpKicker: 'Vergelijking',
     cmpTitleA: 'Lab-niveau inzicht.',
     cmpTitleB: 'Zonder lab-niveau kosten.',
-    cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. LacTest doet het voor €9.95 in seconden.',
-    cmpHeaders: ['Criterium', 'Labtest', 'LacTest', 'Spreadsheet'],
+    cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. MyLactest doet het voor €9.95 in seconden.',
+    cmpHeaders: ['Criterium', 'Labtest', 'MyLactest', 'Spreadsheet'],
     cmpRows: [
       ['Kostprijs', '€300–500', '€9.95', '€0 + manueel werk'],
       ['Doorlooptijd', '1–3 werkdagen', '<60 sec', '2–4 uur'],
@@ -69,7 +69,7 @@ const COPY = {
     stepLabels: ['Klaar!', 'Test.', 'Analyseer.', 'Train.'],
     stepHero: ['Jouw test. Jouw protocol.', 'Meet.', 'Data in. Duidelijkheid uit.', 'Zones, geen giswerk.'],
     steps: [
-      { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.' },
+      { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. MyLactest genereert automatisch alle teststappen.' },
       { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap.' },
       { title: 'Directe resultaten', desc: 'Voer alles in via je mobiele app. Geen papier meer.' },
       { title: 'Train met data', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.' },
@@ -83,9 +83,9 @@ const COPY = {
     eyebrow: 'Free during beta. Full analysis. No card required.',
     heroTitleA: 'Know your thresholds.',
     heroTitleB: 'Train with data.',
-    heroDesc: 'LacTest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
+    heroDesc: 'MyLactest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
     cmdLabel: 'start',
-    cmdText: 'lactest.app → analyse → results',
+    cmdText: 'mylactest.app → analyse → results',
     cta1: 'Start your analysis →',
     cta2: 'View demo',
     featKicker: "What's included",
@@ -103,8 +103,8 @@ const COPY = {
     cmpKicker: 'Comparison',
     cmpTitleA: 'Lab-level insight.',
     cmpTitleB: 'Without lab-level cost.',
-    cmpLead: 'A professional threshold test often costs €300–500 and several business days. LacTest does it for €9.95 in seconds.',
-    cmpHeaders: ['Criteria', 'Lab test', 'LacTest', 'Spreadsheet'],
+    cmpLead: 'A professional threshold test often costs €300–500 and several business days. MyLactest does it for €9.95 in seconds.',
+    cmpHeaders: ['Criteria', 'Lab test', 'MyLactest', 'Spreadsheet'],
     cmpRows: [
       ['Cost', '€300–500', '€9.95', '€0 + manual work'],
       ['Turnaround', '1–3 business days', '<60 sec', '2–4 hours'],
@@ -134,7 +134,7 @@ const COPY = {
     stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
     stepHero: ['Your test. Your protocol.', 'Measure.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
     steps: [
-      { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. LacTest automatically generates all test steps.' },
+      { title: 'Set up your protocol', desc: 'Choose your distance, starting pace and step size. MyLactest automatically generates all test steps.' },
       { title: 'Run the field test', desc: 'Have your athlete run and measure lactate after each step.' },
       { title: 'Instant results', desc: 'Enter everything via your mobile app. No paper needed.' },
       { title: 'Train with data', desc: 'The full lactate curve, thresholds and 5 training zones ready in under 10 seconds. Ready for coach and athlete.' },
@@ -258,18 +258,8 @@ const Landing = () => {
     <div className="landing-page">
       <nav className="lp-nav">
         <a href="#" className="lp-nav-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={logoSrc} alt="LacTest" style={{ width: '26px', height: '26px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
-          Lac<span className="lp-nav-logo-dot">.</span>Test
-          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(102,68,255,0.6)', letterSpacing: '0.5px' }}
-            data-build={`${typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : ''} ${typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : ''}`}
-          >
-            v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
-            {typeof __GIT_BRANCH__ !== 'undefined' && __GIT_BRANCH__ !== 'main' && (
-              <span style={{ marginLeft: '4px', opacity: 0.7 }}>
-                {typeof __BUILD_DATE__ !== 'undefined' ? `· ${__BUILD_DATE__} ${__BUILD_TIME__}` : ''}
-              </span>
-            )}
-          </span>
+          <img src={logoSrc} alt="MyLactest" style={{ width: '34px', height: '34px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
+          MyLactest
         </a>
         <div className="lp-nav-links">
           <a className="lp-nav-link" href="#how-it-works">{t.navHow}</a>
@@ -288,8 +278,8 @@ const Landing = () => {
       <section className="lp-hero-wrap" id="how">
         {/* Brand — centered above both columns */}
         <div className="lp-hero-brand">
-          <img src={logoSrc} alt="LacTest" className="lp-hero-logo" />
-          <span className="lp-hero-logo-label">LacTest</span>
+          <img src={logoSrc} alt="MyLactest" className="lp-hero-logo" />
+          <span className="lp-hero-logo-label">MyLactest</span>
         </div>
 
         <div className="lp-hero">
@@ -317,7 +307,7 @@ const Landing = () => {
                 <div className="lp-demo-dot yellow" />
                 <div className="lp-demo-dot green" />
               </div>
-              <div className="lp-demo-urlbar">lactest.app/analyse</div>
+              <div className="lp-demo-urlbar">mylactest.app/analyse</div>
             </div>
             <div className="lp-demo-body">
               <div className="lp-demo-sidebar">
@@ -440,14 +430,14 @@ const Landing = () => {
       <footer className="lp-footer">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src={logoSrc} alt="" style={{ width: '22px', height: '22px', objectFit: 'contain', mixBlendMode: 'lighten', opacity: 0.7 }} />
-          <span>LacTest</span>
+          <span>MyLactest</span>
         </div>
         <div className="lp-footer-links">
           <a href="/privacy">{t.footerPrivacy}</a>
           <a href="/terms">{t.footerTerms}</a>
           <a href="mailto:tom@lactest.app">{t.footerContact}</a>
         </div>
-        <div>&copy; {new Date().getFullYear()} LacTest — {t.footerText}</div>
+        <div>&copy; {new Date().getFullYear()} MyLactest — {t.footerText}</div>
       </footer>
     </div>
   );
