@@ -287,13 +287,14 @@ const Landing = () => {
       </nav>
 
       <section className="lp-hero-wrap" id="how">
+        {/* Brand — centered above both columns */}
+        <div className="lp-hero-brand">
+          <img src={logoSrc} alt="LacTest" className="lp-hero-logo" />
+          <span className="lp-hero-logo-label">LacTest</span>
+        </div>
+
         <div className="lp-hero">
           <div className="lp-hero-left">
-            {/* Hero logo â prominent, centered above headline */}
-            <div className="lp-hero-logo-wrap">
-              <img src={logoSrc} alt="LacTest" className="lp-hero-logo" />
-              <span className="lp-hero-logo-label">LacTest</span>
-            </div>
             <h1 className="lp-h1">
               {t.heroTitleA}
               <br />
