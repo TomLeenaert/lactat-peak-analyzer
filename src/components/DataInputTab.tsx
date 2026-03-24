@@ -367,15 +367,23 @@ const DataInputTab = ({
                         Stap {i + 1}
                       </span>
                       {row.speed > 0 && (
-                        <span style={{
-                          fontSize: '13px', fontWeight: 700, fontFamily: 'monospace',
-                          color: '#00fdc1',
-                          background: 'rgba(0,253,193,0.1)',
-                          border: '1px solid rgba(0,253,193,0.25)',
-                          borderRadius: '8px', padding: '2px 8px',
-                        }}>
-                          {formatPace(row.speed)}/km
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{
+                            fontSize: '13px', fontWeight: 700, fontFamily: 'monospace',
+                            color: '#00fdc1',
+                            background: 'rgba(0,253,193,0.1)',
+                            border: '1px solid rgba(0,253,193,0.25)',
+                            borderRadius: '8px', padding: '2px 8px',
+                          }}>
+                            {formatPace(row.speed)}/km
+                          </span>
+                          <span style={{
+                            fontSize: '12px', fontWeight: 500, fontFamily: 'monospace',
+                            color: 'rgba(255,255,255,0.4)',
+                          }}>
+                            {secsToDisplay(row.time || 0)} /{(row.distance || dist) >= 1000 ? `${((row.distance || dist) / 1000).toFixed(1)}km` : `${row.distance || dist}m`}
+                          </span>
+                        </div>
                       )}
                     </div>
                     <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive shrink-0" onClick={() => removeRow(i)}>
