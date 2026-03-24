@@ -20,7 +20,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     if (!testId || !athleteName) return;
     setSharing(true);
     try {
-      const { data: token, error } = await supabase.rpc('create_share_link', {
+      const { data: token, error } = await (supabase.rpc as any)('create_share_link', {
         p_test_result_id: testId,
         p_athlete_name: athleteName,
         p_test_date: testDate ?? new Date().toISOString().split('T')[0],

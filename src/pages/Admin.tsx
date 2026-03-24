@@ -32,7 +32,7 @@ const Admin = () => {
   const { data: users = [], isLoading } = useQuery<AdminUser[]>({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('admin_get_users');
+      const { data, error } = await (supabase.rpc as any)('admin_get_users');
       if (error) throw error;
       return data as AdminUser[];
     },
@@ -42,7 +42,7 @@ const Admin = () => {
   // Toggle unlimited mutation
   const toggleUnlimited = useMutation({
     mutationFn: async ({ userId, unlimited }: { userId: string; unlimited: boolean }) => {
-      const { error } = await supabase.rpc('admin_set_unlimited', {
+      const { error } = await (supabase.rpc as any)('admin_set_unlimited', {
         p_user_id: userId,
         p_unlimited: unlimited,
       });
@@ -58,7 +58,7 @@ const Admin = () => {
   // Grant tokens mutation
   const grantTokens = useMutation({
     mutationFn: async ({ userId, amount }: { userId: string; amount: number }) => {
-      const { error } = await supabase.rpc('admin_grant_tokens', {
+      const { error } = await (supabase.rpc as any)('admin_grant_tokens', {
         p_user_id: userId,
         p_amount: amount,
       });

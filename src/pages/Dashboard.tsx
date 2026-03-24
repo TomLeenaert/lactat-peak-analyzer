@@ -110,7 +110,7 @@ const Dashboard = () => {
     if (!last?.results_json) return null;
     const r = last.results_json as Record<string, Record<string, unknown>>;
     const lt2 = r?.lt2?.best ?? r?.lt2Speed ?? null;
-    return lt2 ? lt2.toFixed(1) : null;
+    return lt2 ? (lt2 as number).toFixed(1) : null;
   };
 
   return (
@@ -197,7 +197,7 @@ const Dashboard = () => {
           <section style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '48px' }}>
             {athletes.map((a, idx) => {
               const testCount = a.test_results?.length ?? 0;
-              const lastLactate = getLastLactate(a.test_results ?? []);
+              const lastLactate = getLastLactate((a.test_results ?? []) as any);
               const isActive = idx === 0 && testCount > 0;
               const accentColor = isActive ? '#00fdc1' : '#bd9dff';
               const sportInitial = getSportInitial(a.sport);
