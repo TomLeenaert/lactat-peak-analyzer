@@ -18,7 +18,7 @@ const COPY = {
     eyebrow: 'Gratis tijdens de bèta. Volledige analyse. Geen kaart nodig.',
     heroTitleA: 'Ken je drempels.',
     heroTitleB: 'Train met data.',
-    heroDesc: 'LacTest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
+    heroDesc: 'MyLactest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
     cmdLabel: 'start',
     cmdText: 'lactest.app → analyseer → resultaten',
     cta1: 'Start je analyse →',
