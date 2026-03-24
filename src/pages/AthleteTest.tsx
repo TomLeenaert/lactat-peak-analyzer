@@ -93,7 +93,7 @@ const AthleteTest = () => {
 
   const onCalculate = useCallback(async () => {
     if (!testId) {
-      const { data: tokenUsed, error } = await supabase.rpc('use_token');
+      const { data: tokenUsed, error } = await (supabase.rpc as any)('use_token');
       if (error) {
         toast({ title: 'Fout', description: error.message, variant: 'destructive' });
         return;
