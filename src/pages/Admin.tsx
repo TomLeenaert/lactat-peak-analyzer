@@ -42,7 +42,7 @@ const Admin = () => {
   // Toggle unlimited mutation
   const toggleUnlimited = useMutation({
     mutationFn: async ({ userId, unlimited }: { userId: string; unlimited: boolean }) => {
-      const { error } = await supabase.rpc('admin_set_unlimited', {
+      const { error } = await (supabase.rpc as any)('admin_set_unlimited', {
         p_user_id: userId,
         p_unlimited: unlimited,
       });
