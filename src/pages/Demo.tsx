@@ -256,7 +256,7 @@ const Demo = () => {
         padding: '0 32px', height: '58px',
       }}>
         <a href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '17px', fontWeight: 700 }}>
-          Lac<span style={{ color: '#6644ff' }}>.</span>Test
+          MyLactest
         </a>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>Live demo</span>
