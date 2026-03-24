@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logoSrc from '@/assets/screen.png';
 import stepGetSetImg from '@/assets/step-getset.jpg';
 import stepTestImg from '@/assets/step-test.png';
 import stepAnalyzeImg from '@/assets/step-analyze.jpg';
@@ -13,41 +14,41 @@ const COPY = {
     navHow: 'Hoe het werkt',
     navFeat: 'Mogelijkheden',
     navPrice: 'Vergelijking',
-    navStart: 'Start gratis →',
-    eyebrow: 'Geen abonnement. Betaal €9.95 per test. Drempels en zones in seconden.',
+    navStart: 'Start gratis â',
+    eyebrow: 'Geen abonnement. Betaal â¬9.95 per test. Drempels en zones in seconden.',
     heroTitleA: 'Ken je drempels.',
     heroTitleB: 'Train met data.',
-    heroDesc: 'LacTest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel, 5 trainingszones en een coach-klaar PDF.',
+    heroDesc: 'LacTest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
     cmdLabel: 'start',
-    cmdText: 'lactest.app → analyseer → export.pdf',
-    cta1: 'Start je analyse →',
+    cmdText: 'lactest.app â analyseer â resultaten',
+    cta1: 'Start je analyse â',
     cta2: 'Bekijk demo',
     featKicker: 'Wat is inbegrepen',
     featTitleA: 'Alles om slimmer te coachen.',
     featTitleB: 'Sneller. Wetenschappelijk.',
-    featLead: 'Eén veldtest wordt een compleet prestatierapport. Gebouwd voor coaches die duidelijkheid willen, geen complexiteit.',
+    featLead: 'EÃ©n veldtest wordt een compleet prestatierapport. Gebouwd voor coaches die duidelijkheid willen, geen complexiteit.',
     feat: [
       { title: 'Mobiel. Op de piste.', desc: 'Voer je test uit en analyseer direct vanaf je telefoon. Geen lab. Geen spreadsheets. Geen gedoe.' },
       { title: 'Volledige lactaatcurve', desc: 'Nauwkeurige curve met datapunten, modelfit en belangrijke referentiemarkers. Helder inzicht in de fysiologie van je atleet.' },
-      { title: 'Wetenschappelijke drempelanalyse', desc: 'Meerdere gevalideerde methoden gecombineerd tot één duidelijk resultaat. Geen black box. Robuuste, evidence-based resultaten.' },
-      { title: '5 kant-en-klare trainingszones', desc: 'Directe zones voor tempo, hartslag en vermogen. Train met precisie vanaf dag één.' },
+      { title: 'Wetenschappelijke drempelanalyse', desc: 'Meerdere gevalideerde methoden gecombineerd tot Ã©Ã©n duidelijk resultaat. Geen black box. Robuuste, evidence-based resultaten.' },
+      { title: '5 kant-en-klare trainingszones', desc: 'Directe zones voor tempo en hartslag. Train met precisie vanaf dag Ã©Ã©n.' },
       { title: 'Betaal per gebruik. Geen abonnement.', desc: 'Betaal enkel wanneer je een test uitvoert. Simpel. Transparant. Schaalt met jou.' },
       { title: 'Gebouwd voor echte tests', desc: 'Ontworpen voor coaches, clubs en atleten. Geen labomstandigheden nodig. Werkt waar je traint.' },
     ],
     cmpKicker: 'Vergelijking',
     cmpTitleA: 'Lab-niveau inzicht.',
     cmpTitleB: 'Zonder lab-niveau kosten.',
-    cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. LacTest doet het voor €9.95 in seconden.',
+    cmpLead: 'Een professionele drempeltest kost al snel â¬300â500 en meerdere werkdagen. LacTest doet het voor â¬9.95 in seconden.',
     cmpHeaders: ['Criterium', 'Labtest', 'LacTest', 'Spreadsheet'],
     cmpRows: [
-      ['Kostprijs', '€300–500', '€9.95', '€0 + manueel werk'],
-      ['Doorlooptijd', '1–3 werkdagen', '<60 sec', '2–4 uur'],
+      ['Kostprijs', 'â¬300â500', 'â¬9.95', 'â¬0 + manueel werk'],
+      ['Doorlooptijd', '1â3 werkdagen', '<60 sec', '2â4 uur'],
     ],
     ctaTitleA: 'Stop met gokken.',
     ctaTitleB: 'Train op basis van data.',
-    ctaDesc: 'Je eerste analyse in minder dan 5 minuten. Betaal enkel bij export.',
-    ctaBtn: 'Start gratis analyse →',
-    ctaNote: '€9.95 enkel bij rapport-download — geen abonnement',
+    ctaDesc: 'Je eerste analyse in minder dan 5 minuten.',
+    ctaBtn: 'Start gratis analyse â',
+    ctaNote: 'â¬9.95 enkel bij rapport-download â geen abonnement',
     sceneTitle: 'Nieuwe lactaattest',
     sceneAthlete: 'Sarah Vermeulen - Lopen',
     analyse: 'Analyseer drempels',
@@ -55,37 +56,37 @@ const COPY = {
     rpAero: 'Aerobe drempel',
     rpAna: 'Anaerobe drempel',
     rpFit: 'Uitstekend',
-    exportLabel: 'Rapport klaar — genereer PDF',
-    exportBtn: 'Download PDF',
+    exportLabel: 'Rapport klaar â bekijk resultaten',
+    exportBtn: 'Bekijk resultaten',
     zl: 'Z1 Herstel',
     footerText: 'Gemaakt voor atleten',
     footerPrivacy: 'Privacy',
     footerTerms: 'Gebruiksvoorwaarden',
     footerContact: 'Contact',
     howKicker: 'Hoe het werkt',
-    howTitle: 'Get set.',
-    howTitleEm: 'Test. Analyze. Train.',
-    stepLabels: ['Get set.', 'Test.', 'Analyze.', 'Train.'],
-    stepHero: ['Your test. Your protocol.', 'Measure.', 'Data in. Clarity out.', 'Train zones, not guesses.'],
+    howTitle: 'Klaar.',
+    howTitleEm: 'Test. Analyseer. Train.',
+    stepLabels: ['Klaar!', 'Test.', 'Analyseer.', 'Train.'],
+    stepHero: ['Jouw test. Jouw protocol.', 'Meet.', 'Data in. Duidelijkheid uit.', 'Zones, geen giswerk.'],
     steps: [
       { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.' },
       { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap.' },
       { title: 'Directe resultaten', desc: 'Voer alles in via je mobiele app. Geen papier meer.' },
-      { title: 'Train met data', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden. Klaar voor coach en atleet.' },
+      { title: 'Train met data', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.' },
     ],
   },
   en: {
     navHow: 'How it works',
     navFeat: 'Features',
     navPrice: 'Comparison',
-    navStart: 'Start free →',
-    eyebrow: 'No subscription. Pay €9.95 per test. Thresholds and zones in seconds.',
+    navStart: 'Start free â',
+    eyebrow: 'No subscription. Pay â¬9.95 per test. Thresholds and zones in seconds.',
     heroTitleA: 'Know your thresholds.',
     heroTitleB: 'Train with data.',
-    heroDesc: 'LacTest turns your field test data into a full analysis report with aerobic and anaerobic threshold, 5 training zones and a coach-ready PDF.',
+    heroDesc: 'LacTest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
     cmdLabel: 'start',
-    cmdText: 'lactest.app → analyse → export.pdf',
-    cta1: 'Start your analysis →',
+    cmdText: 'lactest.app â analyse â results',
+    cta1: 'Start your analysis â',
     cta2: 'View demo',
     featKicker: "What's included",
     featTitleA: 'Everything you need to coach smarter.',
@@ -95,24 +96,24 @@ const COPY = {
       { title: 'Mobile. On the track.', desc: 'Run and analyse your test directly from your phone. No lab. No spreadsheets. No friction.' },
       { title: 'Full lactate curve', desc: 'Accurate curve with data points, model fit and key reference markers. Clear insight into your athlete\'s physiology.' },
       { title: 'Science-based threshold analysis', desc: 'Multiple validated methods combined into one clear outcome. No black box. Just robust, evidence-based results.' },
-      { title: '5 ready-to-use training zones', desc: 'Instant zones for pace, heart rate and power. Train with precision from day one.' },
+      { title: '5 ready-to-use training zones', desc: 'Instant zones for pace and heart rate. Train with precision from day one.' },
       { title: 'Pay per use. No subscription.', desc: 'Only pay when you run a test. Simple. Transparent. Scales with you.' },
       { title: 'Built for real-world testing', desc: 'Designed for coaches, clubs and athletes. No lab conditions required. Works where you actually train.' },
     ],
     cmpKicker: 'Comparison',
     cmpTitleA: 'Lab-level insight.',
     cmpTitleB: 'Without lab-level cost.',
-    cmpLead: 'A professional threshold test often costs €300–500 and several business days. LacTest does it for €9.95 in seconds.',
+    cmpLead: 'A professional threshold test often costs â¬300â500 and several business days. LacTest does it for â¬9.95 in seconds.',
     cmpHeaders: ['Criteria', 'Lab test', 'LacTest', 'Spreadsheet'],
     cmpRows: [
-      ['Cost', '€300–500', '€9.95', '€0 + manual work'],
-      ['Turnaround', '1–3 business days', '<60 sec', '2–4 hours'],
+      ['Cost', 'â¬300â500', 'â¬9.95', 'â¬0 + manual work'],
+      ['Turnaround', '1â3 business days', '<60 sec', '2â4 hours'],
     ],
     ctaTitleA: 'Stop guessing.',
     ctaTitleB: 'Start training with data.',
-    ctaDesc: 'Your first analysis in under 5 minutes. Pay only when exporting.',
-    ctaBtn: 'Start free analysis →',
-    ctaNote: '€9.95 only at report download — no subscription',
+    ctaDesc: 'Your first analysis in under 5 minutes.',
+    ctaBtn: 'Start free analysis â',
+    ctaNote: 'â¬9.95 only at report download â no subscription',
     sceneTitle: 'New lactate test',
     sceneAthlete: 'Sarah Vermeulen - Running',
     analyse: 'Analyse thresholds',
@@ -120,8 +121,8 @@ const COPY = {
     rpAero: 'Aerobic threshold',
     rpAna: 'Anaerobic threshold',
     rpFit: 'Excellent',
-    exportLabel: 'Report ready — generate PDF',
-    exportBtn: 'Download PDF',
+    exportLabel: 'Report ready â view results',
+    exportBtn: 'View results',
     zl: 'Z1 Recovery',
     footerText: 'Made for athletes',
     footerPrivacy: 'Privacy',
@@ -256,10 +257,18 @@ const Landing = () => {
   return (
     <div className="landing-page">
       <nav className="lp-nav">
-        <a href="#" className="lp-nav-logo" style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+        <a href="#" className="lp-nav-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={logoSrc} alt="LacTest" style={{ width: '26px', height: '26px', objectFit: 'contain', mixBlendMode: 'normal' }} />
           Lac<span className="lp-nav-logo-dot">.</span>Test
-          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(102,68,255,0.6)', letterSpacing: '0.5px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(102,68,255,0.6)', letterSpacing: '0.5px' }}
+            data-build={`${typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : ''} ${typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : ''}`}
+          >
             v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
+            {typeof __GIT_BRANCH__ !== 'undefined' && __GIT_BRANCH__ !== 'main' && (
+              <span style={{ marginLeft: '4px', opacity: 0.7 }}>
+                {typeof __BUILD_DATE__ !== 'undefined' ? `Â· ${__BUILD_DATE__} ${__BUILD_TIME__}` : ''}
+              </span>
+            )}
           </span>
         </a>
         <div className="lp-nav-links">
@@ -280,9 +289,10 @@ const Landing = () => {
       <section className="lp-hero-wrap" id="how">
         <div className="lp-hero">
           <div className="lp-hero-left">
-            <div className="lp-hero-eyebrow">
-              <span className="lp-hero-eyebrow-dot" />
-              <span>{t.eyebrow}</span>
+            {/* Hero logo â prominent, centered above headline */}
+            <div className="lp-hero-logo-wrap">
+              <img src={logoSrc} alt="LacTest" className="lp-hero-logo" />
+              <span className="lp-hero-logo-label">LacTest</span>
             </div>
             <h1 className="lp-h1">
               {t.heroTitleA}
@@ -290,6 +300,10 @@ const Landing = () => {
               <em>{t.heroTitleB}</em>
             </h1>
             <p className="lp-hero-desc">{t.heroDesc}</p>
+            <div className="lp-hero-eyebrow">
+              <span className="lp-hero-eyebrow-dot" />
+              <span>{t.eyebrow}</span>
+            </div>
 <div className="lp-hero-actions">
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
               <button className="lp-hero-cta-secondary" onClick={() => navigate('/demo')}>{t.cta2}</button>
@@ -386,7 +400,7 @@ const Landing = () => {
       </section>
 
 
-      {/* ── How it works ── */}
+      {/* ââ How it works ââ */}
       <section className="lp-section lp-how-section" id="how-it-works">
         <div className="lp-center-head">
           <div className="lp-section-kicker">{t.howKicker}</div>
@@ -424,13 +438,16 @@ const Landing = () => {
       </section>
 
       <footer className="lp-footer">
-        <div>LacTest</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={logoSrc} alt="" style={{ width: '22px', height: '22px', objectFit: 'contain', mixBlendMode: 'normal', opacity: 0.7 }} />
+          <span>LacTest</span>
+        </div>
         <div className="lp-footer-links">
           <a href="/privacy">{t.footerPrivacy}</a>
           <a href="/terms">{t.footerTerms}</a>
           <a href="mailto:tom@lactest.app">{t.footerContact}</a>
         </div>
-        <div>&copy; {new Date().getFullYear()} LacTest — {t.footerText}</div>
+        <div>&copy; {new Date().getFullYear()} LacTest â {t.footerText}</div>
       </footer>
     </div>
   );
