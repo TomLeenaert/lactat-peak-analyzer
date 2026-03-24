@@ -278,8 +278,8 @@ const Landing = () => {
       <section className="lp-hero-wrap" id="how">
         {/* Brand — centered above both columns */}
         <div className="lp-hero-brand">
-          <img src={logoSrc} alt="LacTest" className="lp-hero-logo" />
-          <span className="lp-hero-logo-label">LacTest</span>
+          <img src={logoSrc} alt="MyLactest" className="lp-hero-logo" />
+          <span className="lp-hero-logo-label">MyLactest</span>
         </div>
 
         <div className="lp-hero">
