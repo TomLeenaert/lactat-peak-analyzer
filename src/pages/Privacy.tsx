@@ -12,7 +12,7 @@ const Privacy = () => {
         padding: '0 24px', height: '58px',
       }}>
         <a href="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '17px', fontWeight: 600 }}>
-          Lac<span style={{ color: '#6644ff' }}>.</span>Test
+          MyLactest
         </a>
         <button onClick={() => navigate(-1)} style={{
           fontSize: '13px', color: 'rgba(255,255,255,0.5)', background: 'none',

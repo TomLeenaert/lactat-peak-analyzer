@@ -430,14 +430,14 @@ const Landing = () => {
       <footer className="lp-footer">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src={logoSrc} alt="" style={{ width: '22px', height: '22px', objectFit: 'contain', mixBlendMode: 'lighten', opacity: 0.7 }} />
-          <span>LacTest</span>
+          <span>MyLactest</span>
         </div>
         <div className="lp-footer-links">
           <a href="/privacy">{t.footerPrivacy}</a>
           <a href="/terms">{t.footerTerms}</a>
           <a href="mailto:tom@lactest.app">{t.footerContact}</a>
         </div>
-        <div>&copy; {new Date().getFullYear()} LacTest — {t.footerText}</div>
+        <div>&copy; {new Date().getFullYear()} MyLactest — {t.footerText}</div>
       </footer>
     </div>
   );

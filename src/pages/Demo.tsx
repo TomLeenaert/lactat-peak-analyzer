@@ -283,7 +283,7 @@ const Demo = () => {
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#a090ff' }}>Interactieve demo — geen login nodig</span>
           </div>
           <h1 style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.2, marginBottom: '12px' }}>
-            Zo werkt LacTest in de praktijk
+            Zo werkt MyLactest in de praktijk
           </h1>
           <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.45)', maxWidth: '500px', margin: '0 auto', lineHeight: 1.6 }}>
             Van atleet aanmaken tot volledige drempelanalyse — dit is de echte tool met echte berekeningen.

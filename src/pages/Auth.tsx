@@ -131,7 +131,7 @@ const Auth = () => {
               fontSize: '28px',
               letterSpacing: '-0.5px',
               color: '#fff',
-            }}>Lac<span style={{ color: '#bd9dff' }}>.</span>Test</span>
+            }}>MyLactest</span>
           </div>
         </div>
 
