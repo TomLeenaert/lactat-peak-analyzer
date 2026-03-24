@@ -345,16 +345,26 @@ const Dashboard = () => {
 
       {/* Add athlete dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+      <DialogContent>
           <DialogHeader>
             <DialogTitle>Nieuwe atleet</DialogTitle>
-            <DialogDescription>Vul de gegevens in van de atleet.</DialogDescription>
+            <DialogDescription>Voer de naam van de atleet in.</DialogDescription>
           </DialogHeader>
           <form onSubmit={e => { e.preventDefault(); addAthlete.mutate(newAthlete); }} className="space-y-4">
-            <Input placeholder="Naam *" value={newAthlete.name} onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))} required />
-            <Input type="date" value={newAthlete.birth_date} onChange={e => setNewAthlete(p => ({ ...p, birth_date: e.target.value }))} />
-            <Input placeholder="Sport (lopen, fietsen...)" value={newAthlete.sport} onChange={e => setNewAthlete(p => ({ ...p, sport: e.target.value }))} />
-            <Input placeholder="Notities" value={newAthlete.notes} onChange={e => setNewAthlete(p => ({ ...p, notes: e.target.value }))} />
+            <Input
+              placeholder="Naam *"
+              value={newAthlete.name}
+              onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))}
+              required
+              style={{
+                background: '#1a1a1a',
+                border: '2px solid #333',
+                color: '#fff',
+                fontSize: '16px',
+                height: '52px',
+                borderRadius: '6px',
+              }}
+            />
             <button
               type="submit"
               disabled={addAthlete.isPending}
