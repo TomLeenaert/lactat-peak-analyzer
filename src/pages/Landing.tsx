@@ -20,7 +20,7 @@ const COPY = {
     heroTitleB: 'Train met data.',
     heroDesc: 'MyLactest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
     cmdLabel: 'start',
-    cmdText: 'lactest.app → analyseer → resultaten',
+    cmdText: 'mylactest.app → analyseer → resultaten',
     cta1: 'Start je analyse →',
     cta2: 'Bekijk demo',
     featKicker: 'Wat is inbegrepen',
