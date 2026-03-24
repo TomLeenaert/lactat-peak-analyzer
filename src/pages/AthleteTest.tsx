@@ -49,7 +49,7 @@ const AthleteTest = () => {
         const calcResult = calculate(steps, 0);
         if (typeof calcResult !== 'string') {
           setResults(calcResult);
-          setActiveTab('results');
+          setActiveTab('analyze');
         }
       } else if (data.results_json && Object.keys(data.results_json as object).length > 0) {
         setResults(data.results_json as unknown as CalculationResults);
