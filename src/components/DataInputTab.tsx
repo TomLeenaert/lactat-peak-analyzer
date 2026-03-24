@@ -383,11 +383,6 @@ const DataInputTab = ({
                           }}>
                             ({secsToDisplay(Math.round(1440 / row.speed))} /400m)
                           </span>
-                            fontSize: '12px', fontWeight: 500, fontFamily: 'monospace',
-                            color: 'rgba(255,255,255,0.35)',
-                          }}>
-                            ({secsToDisplay(Math.round(1440 / row.speed))} /400m)
-                          </span>
                         </div>
                       )}
                     </div>
