@@ -113,7 +113,7 @@ const AthleteTest = () => {
       return;
     }
     setResults(result);
-    setActiveTab('results');
+    setActiveTab('analyze');
     toast({ title: 'Berekening voltooid' });
   }, [testData, restingLactate, testId, toast, queryClient]);
 
