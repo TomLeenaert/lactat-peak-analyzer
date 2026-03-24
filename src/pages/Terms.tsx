@@ -53,7 +53,7 @@ const Terms = () => {
         </Section>
 
         <Section title="5. Medische disclaimer">
-          <strong style={{ color: '#ff9800' }}>Belangrijk:</strong> LacTest is een hulpmiddel voor coaches en atleten, geen medisch hulpmiddel. De resultaten zijn bedoeld als ondersteuning bij trainingsplanning en vervangen geen medisch advies. Raadpleeg een arts of sportarts bij twijfel over je gezondheid of prestaties.
+          <strong style={{ color: '#ff9800' }}>Belangrijk:</strong> MyLactest is een hulpmiddel voor coaches en atleten, geen medisch hulpmiddel. De resultaten zijn bedoeld als ondersteuning bij trainingsplanning en vervangen geen medisch advies. Raadpleeg een arts of sportarts bij twijfel over je gezondheid of prestaties.
         </Section>
 
         <Section title="6. Nauwkeurigheid van resultaten">
