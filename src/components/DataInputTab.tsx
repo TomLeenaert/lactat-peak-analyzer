@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus, Upload, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Trash2, Plus, Upload, ChevronLeft, ChevronRight, Check, Timer, Droplets, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NumPad from '@/components/NumPad';
 
@@ -25,12 +25,16 @@ interface DataInputTabProps {
 }
 
 type ImportRow = Record<string, unknown>;
-type EntryField = 'lactate' | 'hr';
+type SubField = 'time_min' | 'time_sec' | 'lactate' | 'hr';
 
-interface ActiveEntry {
-  row: number;
-  field: EntryField;
-}
+const SUB_FIELDS: SubField[] = ['time_min', 'time_sec', 'lactate', 'hr'];
+
+const FIELD_META: Record<SubField, { label: string; unit: string; color: string; maxValue: number; decimalPlaces: number; icon: React.ReactNode }> = {
+  time_min: { label: 'Minuten', unit: 'min', color: '#00fdc1', maxValue: 59, decimalPlaces: 0, icon: <Timer size={16} /> },
+  time_sec: { label: 'Seconden', unit: 'sec', color: '#00fdc1', maxValue: 59, decimalPlaces: 0, icon: <Timer size={16} /> },
+  lactate:  { label: 'Lactaat', unit: 'mmol/L', color: '#6644ff', maxValue: 25, decimalPlaces: 1, icon: <Droplets size={16} /> },
+  hr:       { label: 'Hartslag', unit: 'bpm', color: '#ff6b2b', maxValue: 220, decimalPlaces: 0, icon: <Heart size={16} /> },
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
@@ -57,38 +61,10 @@ const findFirstArray = (row: Record<string, unknown>): unknown[] => {
   return [];
 };
 
-const secsToTimeStr = (secs: number): string => {
-  if (!secs || secs <= 0) return '';
-  const m = Math.floor(secs / 60);
-  const s = Math.round(secs % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-};
-
-const timeStrToSecs = (str: string): number => {
-  const parts = str.replace(',', ':').replace('.', ':').split(':');
-  if (parts.length === 2) {
-    const m = parseInt(parts[0]) || 0;
-    const s = parseInt(parts[1]) || 0;
-    return m * 60 + s;
-  }
-  if (parts.length === 1) {
-    const val = parseInt(parts[0]) || 0;
-    if (val > 100) return Math.floor(val / 100) * 60 + (val % 100);
-    return val * 60;
-  }
-  return 0;
-};
-
 const calcSpeed = (distanceM: number, timeSec: number): number => {
   if (!distanceM || !timeSec || timeSec <= 0) return 0;
   return (distanceM / 1000) / (timeSec / 3600);
 };
-
-const FIELD_CONFIG: Record<EntryField, { label: string; unit: string; color: string; maxValue: number; decimalPlaces: number }> = {
-  lactate: { label: 'Lactaat', unit: 'mmol/L', color: '#6644ff', maxValue: 25, decimalPlaces: 1 },
-  hr:      { label: 'Hartslag', unit: 'bpm',    color: '#ff6b2b', maxValue: 220, decimalPlaces: 0 },
-};
-
 
 const DataInputTab = ({
   testData, setTestData,
@@ -103,53 +79,119 @@ const DataInputTab = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
-  const [activeEntry, setActiveEntry] = useState<ActiveEntry | null>(null);
+
+  // Wizard state
+  const [wizardActive, setWizardActive] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [currentField, setCurrentField] = useState<SubField>('time_min');
   const [numPadValue, setNumPadValue] = useState('');
 
-  // ── NumPad helpers ───────────────────────────────────────────────────────
-  const openNumPad = (row: number, field: EntryField) => {
-    const current = field === 'lactate'
-      ? (testData[row].lactate ? String(testData[row].lactate) : '')
-      : (testData[row].hr ? String(testData[row].hr) : '');
-    setNumPadValue(current);
-    setActiveEntry({ row, field });
-  };
+  // ── Wizard helpers ─────────────────────────────────────────────────────
+  const getFieldValue = useCallback((step: number, field: SubField): string => {
+    const row = testData[step];
+    if (!row) return '';
+    if (field === 'time_min') {
+      const secs = row.time || 0;
+      return secs > 0 ? String(Math.floor(secs / 60)) : '';
+    }
+    if (field === 'time_sec') {
+      const secs = row.time || 0;
+      return secs > 0 ? String(Math.round(secs % 60)) : '';
+    }
+    if (field === 'lactate') return row.lactate > 0 ? String(row.lactate) : '';
+    if (field === 'hr') return row.hr > 0 ? String(row.hr) : '';
+    return '';
+  }, [testData]);
 
-  const confirmNumPad = () => {
-    if (!activeEntry) return;
+  const openWizard = useCallback((step: number) => {
+    setCurrentStep(step);
+    setCurrentField('time_min');
+    setNumPadValue(getFieldValue(step, 'time_min'));
+    setWizardActive(true);
+  }, [getFieldValue]);
+
+  const saveCurrentField = useCallback(() => {
     const val = parseFloat(numPadValue) || 0;
     const newData = [...testData];
-    newData[activeEntry.row] = { ...newData[activeEntry.row], [activeEntry.field]: val };
-    setTestData(newData);
+    const row = { ...newData[currentStep] };
 
-    // auto-advance: lactate → hr → next step lactate
-    const { row, field } = activeEntry;
-    if (field === 'lactate') {
-      setNumPadValue(newData[row].hr ? String(newData[row].hr) : '');
-      setActiveEntry({ row, field: 'hr' });
+    if (currentField === 'time_min') {
+      const oldSecs = row.time || 0;
+      const oldSec = Math.round(oldSecs % 60);
+      const totalSecs = val * 60 + oldSec;
+      row.time = totalSecs;
+      row.speed = calcSpeed(row.distance || dist, totalSecs);
+    } else if (currentField === 'time_sec') {
+      const oldSecs = row.time || 0;
+      const oldMin = Math.floor(oldSecs / 60);
+      const totalSecs = oldMin * 60 + val;
+      row.time = totalSecs;
+      row.speed = calcSpeed(row.distance || dist, totalSecs);
+    } else if (currentField === 'lactate') {
+      row.lactate = val;
+    } else if (currentField === 'hr') {
+      row.hr = val;
+    }
+
+    newData[currentStep] = row;
+    setTestData(newData);
+    return newData;
+  }, [numPadValue, testData, currentStep, currentField, dist, setTestData]);
+
+  const confirmAndAdvance = useCallback(() => {
+    const newData = saveCurrentField();
+    const fieldIdx = SUB_FIELDS.indexOf(currentField);
+
+    if (fieldIdx < SUB_FIELDS.length - 1) {
+      // Next sub-field within same step
+      const nextField = SUB_FIELDS[fieldIdx + 1];
+      setCurrentField(nextField);
+      // Load value for next field from updated data
+      const row = newData[currentStep];
+      if (nextField === 'time_sec') {
+        const secs = row.time || 0;
+        setNumPadValue(secs > 0 ? String(Math.round(secs % 60)) : '');
+      } else if (nextField === 'lactate') {
+        setNumPadValue(row.lactate > 0 ? String(row.lactate) : '');
+      } else if (nextField === 'hr') {
+        setNumPadValue(row.hr > 0 ? String(row.hr) : '');
+      }
     } else {
-      // try next step
-      const nextRow = row + 1;
-      if (nextRow < testData.length) {
-        setNumPadValue(newData[nextRow].lactate ? String(newData[nextRow].lactate) : '');
-        setActiveEntry({ row: nextRow, field: 'lactate' });
+      // Move to next step
+      const nextStep = currentStep + 1;
+      if (nextStep < testData.length) {
+        setCurrentStep(nextStep);
+        setCurrentField('time_min');
+        const nextRow = newData[nextStep];
+        const secs = nextRow.time || 0;
+        setNumPadValue(secs > 0 ? String(Math.floor(secs / 60)) : '');
       } else {
-        setActiveEntry(null);
+        // All steps done
+        setWizardActive(false);
+        toast({ title: 'Alle stappen ingevuld! 🎉' });
       }
     }
-  };
+  }, [saveCurrentField, currentField, currentStep, testData.length, toast]);
 
-  const dismissNumPad = () => {
-    if (!activeEntry) return;
-    // save current value before dismissing
-    const val = parseFloat(numPadValue) || 0;
-    if (val > 0) {
-      const newData = [...testData];
-      newData[activeEntry.row] = { ...newData[activeEntry.row], [activeEntry.field]: val };
-      setTestData(newData);
+  const dismissWizard = useCallback(() => {
+    saveCurrentField();
+    setWizardActive(false);
+  }, [saveCurrentField]);
+
+  const goToPrevField = useCallback(() => {
+    saveCurrentField();
+    const fieldIdx = SUB_FIELDS.indexOf(currentField);
+    if (fieldIdx > 0) {
+      const prevField = SUB_FIELDS[fieldIdx - 1];
+      setCurrentField(prevField);
+      setNumPadValue(getFieldValue(currentStep, prevField));
+    } else if (currentStep > 0) {
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      setCurrentField('hr');
+      setNumPadValue(getFieldValue(prevStep, 'hr'));
     }
-    setActiveEntry(null);
-  };
+  }, [saveCurrentField, currentField, currentStep, getFieldValue]);
 
   // ── JSON import ──────────────────────────────────────────────────────────
   const processJsonFile = (file: File) => {
@@ -229,20 +271,6 @@ const DataInputTab = ({
     setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0, distance: 1600, time: 0 })));
   };
 
-  const updateRowTime = (i: number, timeStr: string) => {
-    const newData = [...testData];
-    const secs = timeStrToSecs(timeStr);
-    const rowDist = newData[i].distance || dist;
-    newData[i] = { ...newData[i], time: secs, speed: calcSpeed(rowDist, secs) };
-    setTestData(newData);
-  };
-
-  const updateRow = (i: number, field: keyof StepData, val: string) => {
-    const newData = [...testData];
-    newData[i] = { ...newData[i], [field]: parseFloat(val) || 0 };
-    setTestData(newData);
-  };
-
   const addRow = () => {
     setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
   };
@@ -251,9 +279,20 @@ const DataInputTab = ({
     setTestData(testData.filter((_, idx) => idx !== i));
   };
 
-  // ── Completion count ─────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────
   const filledCount = testData.filter(r => r.lactate > 0).length;
   const totalCount = testData.length;
+
+  const secsToDisplay = (secs: number): string => {
+    if (!secs || secs <= 0) return '—';
+    const m = Math.floor(secs / 60);
+    const s = Math.round(secs % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // Current position in overall flow
+  const canGoPrev = currentStep > 0 || SUB_FIELDS.indexOf(currentField) > 0;
+  const isLastField = currentStep === testData.length - 1 && currentField === 'hr';
 
   return (
     <>
@@ -339,133 +378,84 @@ const DataInputTab = ({
             </div>
           )}
 
-          {/* Step cards */}
+          {/* Step overview cards */}
           <h4 className="text-base font-semibold pt-2">Stapgegevens</h4>
           <div className="space-y-2">
             {testData.map((row, i) => {
-              const rowDist = row.distance || dist;
               const hasLactate = row.lactate > 0;
               const hasHR = row.hr > 0;
+              const hasTime = (row.time || 0) > 0;
+              const rowDist = row.distance || dist;
 
               return (
                 <div
                   key={i}
+                  onClick={() => openWizard(i)}
                   style={{
                     border: hasLactate ? '1px solid rgba(102,68,255,0.3)' : '1px solid rgba(255,255,255,0.06)',
                     borderRadius: '14px',
-                    padding: '12px',
+                    padding: '14px 16px',
                     background: hasLactate ? 'rgba(102,68,255,0.05)' : 'rgba(255,255,255,0.02)',
                     transition: 'border-color 0.2s',
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
                   }}
                 >
-                  {/* Header */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {/* Step number */}
                       <div style={{
-                        width: '28px', height: '28px', borderRadius: '50%',
+                        width: '32px', height: '32px', borderRadius: '50%',
                         background: hasLactate ? 'rgba(102,68,255,0.25)' : 'rgba(255,255,255,0.06)',
                         border: hasLactate ? '1px solid rgba(102,68,255,0.5)' : '1px solid rgba(255,255,255,0.1)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '11px', fontWeight: 700,
+                        fontSize: '13px', fontWeight: 700,
                         color: hasLactate ? '#a090ff' : 'rgba(255,255,255,0.4)',
                         flexShrink: 0,
                       }}>
                         {hasLactate ? '✓' : i + 1}
                       </div>
-                      {row.speed > 0 ? (
-                        <span style={{ fontSize: '13px', fontWeight: 600, fontFamily: 'monospace', color: '#fff' }}>
-                          {formatPace(row.speed)} /km
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>{rowDist}m</span>
-                      )}
+
+                      {/* Data summary */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          {row.speed > 0 ? (
+                            <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: 'monospace', color: '#fff' }}>
+                              {formatPace(row.speed)} /km
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>Stap {i + 1} · {rowDist}m</span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px', fontSize: '12px' }}>
+                          {hasTime && (
+                            <span style={{ color: '#00fdc1', fontWeight: 600, fontFamily: 'monospace' }}>
+                              ⏱ {secsToDisplay(row.time || 0)}
+                            </span>
+                          )}
+                          {hasLactate && (
+                            <span style={{ color: '#a090ff', fontWeight: 600, fontFamily: 'monospace' }}>
+                              🩸 {row.lactate}
+                            </span>
+                          )}
+                          {hasHR && (
+                            <span style={{ color: '#ff6b2b', fontWeight: 600, fontFamily: 'monospace' }}>
+                              💓 {row.hr}
+                            </span>
+                          )}
+                          {!hasTime && !hasLactate && !hasHR && (
+                            <span style={{ color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>Tik om in te vullen</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => removeRow(i)}>
+
+                    <Button
+                      variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive shrink-0"
+                      onClick={(e) => { e.stopPropagation(); removeRow(i); }}
+                    >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
-                  </div>
-
-                  {/* Tijd (text input — mm:ss) */}
-                  <div style={{ marginBottom: '8px' }}>
-                    <Label className="text-xs text-muted-foreground">Tijd (mm:ss)</Label>
-                    <Input
-                      className="font-mono text-base h-11"
-                      value={secsToTimeStr(row.time || 0)}
-                      onChange={e => updateRowTime(i, e.target.value)}
-                      placeholder="5:30"
-                      inputMode="numeric"
-                    />
-                  </div>
-
-                  {/* Lactaat + HR — tap to open NumPad on mobile */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    {/* Lactaat button */}
-                    <button
-                      onClick={() => openNumPad(i, 'lactate')}
-                      style={{
-                        height: '64px',
-                        borderRadius: '12px',
-                        border: hasLactate ? '1px solid rgba(102,68,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                        background: hasLactate ? 'rgba(102,68,255,0.1)' : 'rgba(255,255,255,0.03)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '2px',
-                        WebkitTapHighlightColor: 'transparent',
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      <span style={{ fontSize: '9px', fontWeight: 600, color: '#6644ff', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                        Lactaat
-                      </span>
-                      <span style={{
-                        fontSize: hasLactate ? '22px' : '15px',
-                        fontWeight: 800,
-                        color: hasLactate ? '#fff' : 'rgba(255,255,255,0.2)',
-                        fontFamily: 'monospace',
-                      }}>
-                        {hasLactate ? `${row.lactate}` : 'tikken'}
-                      </span>
-                      {hasLactate && (
-                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>mmol/L</span>
-                      )}
-                    </button>
-
-                    {/* HR button */}
-                    <button
-                      onClick={() => openNumPad(i, 'hr')}
-                      style={{
-                        height: '64px',
-                        borderRadius: '12px',
-                        border: hasHR ? '1px solid rgba(255,107,43,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                        background: hasHR ? 'rgba(255,107,43,0.08)' : 'rgba(255,255,255,0.03)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '2px',
-                        WebkitTapHighlightColor: 'transparent',
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      <span style={{ fontSize: '9px', fontWeight: 600, color: '#ff6b2b', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                        💓 Hartslag
-                      </span>
-                      <span style={{
-                        fontSize: hasHR ? '22px' : '15px',
-                        fontWeight: 800,
-                        color: hasHR ? '#fff' : 'rgba(255,255,255,0.2)',
-                        fontFamily: 'monospace',
-                      }}>
-                        {hasHR ? `${row.hr}` : 'tikken'}
-                      </span>
-                      {hasHR && (
-                        <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>bpm</span>
-                      )}
-                    </button>
                   </div>
                 </div>
               );
@@ -481,12 +471,12 @@ const DataInputTab = ({
         </CardContent>
       </Card>
 
-      {/* NumPad bottom sheet overlay */}
-      {activeEntry && (
+      {/* ── Wizard NumPad overlay ──────────────────────────────────────────── */}
+      {wizardActive && (
         <>
           {/* Backdrop */}
           <div
-            onClick={dismissNumPad}
+            onClick={dismissWizard}
             style={{
               position: 'fixed',
               inset: 0,
@@ -506,67 +496,58 @@ const DataInputTab = ({
             background: '#0e0f15',
             borderTop: '1px solid rgba(255,255,255,0.1)',
             borderRadius: '24px 24px 0 0',
-            padding: '20px 20px 40px',
+            padding: '16px 20px 40px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
           }}>
             {/* Handle */}
             <div style={{
               width: '40px', height: '4px', borderRadius: '2px',
               background: 'rgba(255,255,255,0.15)',
-              margin: '0 auto 20px',
+              margin: '0 auto 16px',
             }} />
 
-            {/* Step indicator */}
+            {/* Step + field indicator */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: '16px',
+              marginBottom: '8px',
             }}>
               <button
-                onClick={() => {
-                  if (activeEntry.row > 0) {
-                    setNumPadValue(activeEntry.field === 'lactate'
-                      ? (testData[activeEntry.row - 1].lactate ? String(testData[activeEntry.row - 1].lactate) : '')
-                      : (testData[activeEntry.row - 1].hr ? String(testData[activeEntry.row - 1].hr) : ''));
-                    setActiveEntry({ row: activeEntry.row - 1, field: activeEntry.field });
-                  }
-                }}
-                disabled={activeEntry.row === 0}
+                onClick={goToPrevField}
+                disabled={!canGoPrev}
                 style={{
                   width: '36px', height: '36px', borderRadius: '50%',
                   background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                  color: activeEntry.row === 0 ? 'rgba(255,255,255,0.2)' : '#fff',
-                  cursor: activeEntry.row === 0 ? 'default' : 'pointer',
+                  color: !canGoPrev ? 'rgba(255,255,255,0.2)' : '#fff',
+                  cursor: !canGoPrev ? 'default' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
                 <ChevronLeft size={18} />
               </button>
 
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
-                Stap {activeEntry.row + 1} van {testData.length}
-                {testData[activeEntry.row].speed > 0 && (
-                  <span style={{ marginLeft: '8px', color: 'rgba(255,255,255,0.3)' }}>
-                    · {formatPace(testData[activeEntry.row].speed)} /km
-                  </span>
+              <div style={{ textAlign: 'center' }}>
+                <span style={{ fontSize: '15px', fontWeight: 700, color: '#fff' }}>
+                  Stap {currentStep + 1}
+                  <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}> / {testData.length}</span>
+                </span>
+                {testData[currentStep]?.speed > 0 && (
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', fontFamily: 'monospace' }}>
+                    {formatPace(testData[currentStep].speed)} /km
+                  </div>
                 )}
-              </span>
+              </div>
 
               <button
-                onClick={() => {
-                  if (activeEntry.row < testData.length - 1) {
-                    setNumPadValue(activeEntry.field === 'lactate'
-                      ? (testData[activeEntry.row + 1].lactate ? String(testData[activeEntry.row + 1].lactate) : '')
-                      : (testData[activeEntry.row + 1].hr ? String(testData[activeEntry.row + 1].hr) : ''));
-                    setActiveEntry({ row: activeEntry.row + 1, field: activeEntry.field });
-                  }
-                }}
-                disabled={activeEntry.row === testData.length - 1}
+                onClick={confirmAndAdvance}
+                disabled={isLastField}
                 style={{
                   width: '36px', height: '36px', borderRadius: '50%',
                   background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                  color: activeEntry.row === testData.length - 1 ? 'rgba(255,255,255,0.2)' : '#fff',
-                  cursor: activeEntry.row === testData.length - 1 ? 'default' : 'pointer',
+                  color: isLastField ? 'rgba(255,255,255,0.2)' : '#fff',
+                  cursor: isLastField ? 'default' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
@@ -574,27 +555,66 @@ const DataInputTab = ({
               </button>
             </div>
 
+            {/* Sub-field progress dots */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '6px',
+              marginBottom: '16px',
+            }}>
+              {SUB_FIELDS.map((f) => {
+                const isActive = f === currentField;
+                const meta = FIELD_META[f];
+                return (
+                  <button
+                    key={f}
+                    onClick={() => {
+                      saveCurrentField();
+                      setCurrentField(f);
+                      setNumPadValue(getFieldValue(currentStep, f));
+                    }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '4px',
+                      padding: '6px 12px',
+                      borderRadius: '999px',
+                      fontSize: '11px',
+                      fontWeight: isActive ? 700 : 500,
+                      background: isActive ? `${meta.color}20` : 'rgba(255,255,255,0.03)',
+                      border: isActive ? `1.5px solid ${meta.color}60` : '1px solid rgba(255,255,255,0.06)',
+                      color: isActive ? meta.color : 'rgba(255,255,255,0.3)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    {meta.icon}
+                    {meta.label}
+                  </button>
+                );
+              })}
+            </div>
+
             <NumPad
               value={numPadValue}
               onChange={setNumPadValue}
-              label={FIELD_CONFIG[activeEntry.field].label}
-              unit={FIELD_CONFIG[activeEntry.field].unit}
-              color={FIELD_CONFIG[activeEntry.field].color}
-              maxValue={FIELD_CONFIG[activeEntry.field].maxValue}
-              decimalPlaces={FIELD_CONFIG[activeEntry.field].decimalPlaces}
+              label={FIELD_META[currentField].label}
+              unit={FIELD_META[currentField].unit}
+              color={FIELD_META[currentField].color}
+              maxValue={FIELD_META[currentField].maxValue}
+              decimalPlaces={FIELD_META[currentField].decimalPlaces}
             />
 
             {/* Confirm button */}
             <button
-              onClick={confirmNumPad}
+              onClick={confirmAndAdvance}
               style={{
                 marginTop: '12px',
                 width: '100%',
                 height: '60px',
                 borderRadius: '16px',
-                background: 'linear-gradient(135deg, #6644ff, #8866ff)',
+                background: `linear-gradient(135deg, ${FIELD_META[currentField].color}, ${FIELD_META[currentField].color}cc)`,
                 border: 'none',
-                color: '#fff',
+                color: currentField === 'time_min' || currentField === 'time_sec' ? '#000' : '#fff',
                 fontSize: '17px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -606,7 +626,11 @@ const DataInputTab = ({
               }}
             >
               <Check size={20} />
-              {activeEntry.row < testData.length - 1 ? 'Opslaan & volgende' : 'Opslaan'}
+              {isLastField
+                ? 'Afronden'
+                : currentField === 'hr'
+                  ? `Volgende stap →`
+                  : 'Volgende →'}
             </button>
           </div>
         </>
