@@ -379,12 +379,6 @@ const DataInputTab = ({
                           </span>
                           <span style={{
                             fontSize: '12px', fontWeight: 500, fontFamily: 'monospace',
-                            color: 'rgba(255,255,255,0.4)',
-                          }}>
-                            {secsToDisplay(row.time || 0)} /{(row.distance || dist) >= 1000 ? `${((row.distance || dist) / 1000).toFixed(1)}km` : `${row.distance || dist}m`}
-                          </span>
-                          <span style={{
-                            fontSize: '12px', fontWeight: 500, fontFamily: 'monospace',
                             color: 'rgba(255,255,255,0.35)',
                           }}>
                             ({secsToDisplay(Math.round(1440 / row.speed))} /400m)
