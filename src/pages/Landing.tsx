@@ -10,7 +10,7 @@ import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
 
 const COPY = {
-  nl: {
+  nl: {h
     navHow: 'Hoe het werkt',
     navFeat: 'Mogelijkheden',
     navPrice: 'Vergelijking',
@@ -260,8 +260,15 @@ const Landing = () => {
         <a href="#" className="lp-nav-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src={logoSrc} alt="LacTest" style={{ width: '26px', height: '26px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
           Lac<span className="lp-nav-logo-dot">.</span>Test
-          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(102,68,255,0.6)', letterSpacing: '0.5px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(102,68,255,0.6)', letterSpacing: '0.5px' }}
+            data-build={`${typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : ''} ${typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : ''}`}
+          >
             v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.3.0'}
+            {typeof __GIT_BRANCH__ !== 'undefined' && __GIT_BRANCH__ !== 'main' && (
+              <span style={{ marginLeft: '4px', opacity: 0.7 }}>
+                {typeof __BUILD_DATE__ !== 'undefined' ? `· ${__BUILD_DATE__} ${__BUILD_TIME__}` : ''}
+              </span>
+            )}
           </span>
         </a>
         <div className="lp-nav-links">
