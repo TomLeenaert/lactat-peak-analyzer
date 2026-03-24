@@ -356,14 +356,7 @@ const Dashboard = () => {
               value={newAthlete.name}
               onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))}
               required
-              style={{
-                background: '#1a1a1a',
-                border: '2px solid #333',
-                color: '#fff',
-                fontSize: '16px',
-                height: '52px',
-                borderRadius: '6px',
-              }}
+              className="h-[52px] text-base"
             />
             <button
               type="submit"
