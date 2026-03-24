@@ -694,7 +694,7 @@
   font-size: 14px;
 }
 
-/* ── How it works stepper ── */
+/* ââ How it works stepper ââ */
 .lp-how-section {
   border-top: 1px solid var(--border);
 }
@@ -933,5 +933,48 @@
 @media (max-width: 480px) {
   .lp-stepper {
     grid-template-columns: 1fr;
+  }
+
+  .lp-hero-logo {
+    width: 140px !important;
+    height: 140px !important;
+  }
+}
+
+/* ââ Hero logo ââ */
+.lp-hero-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.lp-hero-logo {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+.lp-hero-logo-label {
+  margin-top: 12px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  .lp-hero-logo-wrap {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .lp-hero-logo {
+    width: 160px;
+    height: 160px;
+  }
+
+  .lp-hero-logo-label {
+    font-size: 24px;
   }
 }
