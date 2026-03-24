@@ -313,56 +313,10 @@ const DataInputTab = ({
     <>
       <Card>
         <CardHeader className="pb-3">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <CardTitle className="text-lg">Testgegevens invoeren</CardTitle>
-            <div className="flex gap-2 flex-wrap">
-              <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
-                <Upload className="h-3.5 w-3.5 mr-1" /> JSON
-              </Button>
-              <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
-              <Button variant="destructive" size="sm" onClick={clearData}>🗑️ Wissen</Button>
-            </div>
-          </div>
+          <CardTitle className="text-lg">Stapgegevens</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Drop zone */}
-          <div
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`hidden sm:flex border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors flex-col items-center justify-center ${isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/50'}`}
-          >
-            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm font-medium text-muted-foreground">Sleep een JSON bestand hierheen</p>
-          </div>
-
-          {/* Meta fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs">Naam atleet</Label>
-              <Input className="h-11" value={athleteName} onChange={e => setAthleteName(e.target.value)} placeholder="Naam" />
-            </div>
-            <div>
-              <Label className="text-xs">Datum</Label>
-              <Input className="h-11" type="date" value={testDate} onChange={e => setTestDate(e.target.value)} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <Label className="text-xs">Rustlactaat</Label>
-              <Input className="h-11" type="number" step="0.1" value={restingLactate} onChange={e => setRestingLactate(e.target.value)} placeholder="1.0" />
-            </div>
-            <div>
-              <Label className="text-xs">Afstand (m)</Label>
-              <Input className="h-11" type="number" step="100" value={stepDistance} onChange={e => setStepDistance(e.target.value)} min={400} max={3000} />
-            </div>
-            <div>
-              <Label className="text-xs">Increment</Label>
-              <Input className="h-11" type="number" step="0.5" value={stepIncrement} onChange={e => setStepIncrement(e.target.value)} />
-            </div>
-          </div>
+          <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
 
           {/* Progress */}
           {filledCount > 0 && (
