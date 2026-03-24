@@ -110,7 +110,7 @@ const Dashboard = () => {
     if (!last?.results_json) return null;
     const r = last.results_json as Record<string, Record<string, unknown>>;
     const lt2 = r?.lt2?.best ?? r?.lt2Speed ?? null;
-    return lt2 ? lt2.toFixed(1) : null;
+    return lt2 ? (lt2 as number).toFixed(1) : null;
   };
 
   return (
