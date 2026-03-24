@@ -38,8 +38,8 @@ const COPY = {
     cmpKicker: 'Vergelijking',
     cmpTitleA: 'Lab-niveau inzicht.',
     cmpTitleB: 'Zonder lab-niveau kosten.',
-    cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. LacTest doet het voor €9.95 in seconden.',
-    cmpHeaders: ['Criterium', 'Labtest', 'LacTest', 'Spreadsheet'],
+    cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. MyLactest doet het voor €9.95 in seconden.',
+    cmpHeaders: ['Criterium', 'Labtest', 'MyLactest', 'Spreadsheet'],
     cmpRows: [
       ['Kostprijs', '€300–500', '€9.95', '€0 + manueel werk'],
       ['Doorlooptijd', '1–3 werkdagen', '<60 sec', '2–4 uur'],
