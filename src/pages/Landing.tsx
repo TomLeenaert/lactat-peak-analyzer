@@ -307,7 +307,7 @@ const Landing = () => {
                 <div className="lp-demo-dot yellow" />
                 <div className="lp-demo-dot green" />
               </div>
-              <div className="lp-demo-urlbar">lactest.app/analyse</div>
+              <div className="lp-demo-urlbar">mylactest.app/analyse</div>
             </div>
             <div className="lp-demo-body">
               <div className="lp-demo-sidebar">
