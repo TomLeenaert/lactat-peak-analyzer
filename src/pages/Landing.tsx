@@ -10,7 +10,7 @@ import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
 
 const COPY = {
-  nl: {h
+  nl: {
     navHow: 'Hoe het werkt',
     navFeat: 'Mogelijkheden',
     navPrice: 'Vergelijking',
