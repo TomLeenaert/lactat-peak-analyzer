@@ -57,7 +57,7 @@ const Terms = () => {
         </Section>
 
         <Section title="6. Nauwkeurigheid van resultaten">
-          De berekende drempels zijn gebaseerd op wetenschappelijk onderbouwde methoden (OBLA, Dmax, Modified Dmax). De nauwkeurigheid is mede afhankelijk van de kwaliteit van de ingevoerde testdata. LacTest kan niet garanderen dat de resultaten in alle gevallen overeenkomen met labmetingen.
+          De berekende drempels zijn gebaseerd op wetenschappelijk onderbouwde methoden (OBLA, Dmax, Modified Dmax). De nauwkeurigheid is mede afhankelijk van de kwaliteit van de ingevoerde testdata. MyLactest kan niet garanderen dat de resultaten in alle gevallen overeenkomen met labmetingen.
         </Section>
 
         <Section title="7. Intellectuele eigendom">
