@@ -102,12 +102,12 @@ const Dashboard = () => {
   );
 
   // Get last lactate from test results
-  const getLastLactate = (testResults: any[]) => {
+  const getLastLactate = (testResults: { test_date?: string; results_json?: Record<string, unknown> }[]) => {
     if (!testResults?.length) return null;
     const sorted = [...testResults].sort((a, b) => (b.test_date || '').localeCompare(a.test_date || ''));
     const last = sorted[0];
     if (!last?.results_json) return null;
-    const r = last.results_json as any;
+    const r = last.results_json as Record<string, Record<string, unknown>>;
     const lt2 = r?.lt2?.best ?? r?.lt2Speed ?? null;
     return lt2 ? lt2.toFixed(1) : null;
   };

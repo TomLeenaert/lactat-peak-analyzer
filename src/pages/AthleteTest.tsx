@@ -124,9 +124,9 @@ const AthleteTest = () => {
       const payload = {
         athlete_id: athleteId!,
         test_date: testDate,
-        protocol_json: protocol as any,
-        steps_json: testData as any,
-        results_json: results as any,
+        protocol_json: protocol as unknown as Record<string, unknown>,
+        steps_json: testData as unknown as Record<string, unknown>[],
+        results_json: results as unknown as Record<string, unknown>,
       };
       if (testId) {
         const { error } = await supabase.from('test_results').update(payload).eq('id', testId);
@@ -141,7 +141,7 @@ const AthleteTest = () => {
       toast({ title: 'Test opgeslagen' });
       navigate(`/athlete/${athleteId}`);
     },
-    onError: (err: any) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
+    onError: (err: Error) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
   });
 
   const saveButton = results ? (

@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppNav from '@/components/AppNav';
 import { useToast } from '@/hooks/use-toast';
-import { Coins, Users, FlaskConical, Plus, Infinity } from 'lucide-react';
+import { Coins, Users, FlaskConical, Plus, Infinity as InfinityIcon } from 'lucide-react';
 
 const ADMIN_EMAIL = 'tomleenaert@gmail.com';
 
@@ -28,13 +28,7 @@ const Admin = () => {
   const queryClient = useQueryClient();
   const [grantAmount, setGrantAmount] = useState<Record<string, string>>({});
 
-  // Redirect als niet admin
-  if (user && user.email !== ADMIN_EMAIL) {
-    navigate('/dashboard');
-    return null;
-  }
-
-  // Fetch all users
+  // Fetch all users — hooks MUST be called before any early return
   const { data: users = [], isLoading } = useQuery<AdminUser[]>({
     queryKey: ['admin-users'],
     queryFn: async () => {
@@ -58,7 +52,7 @@ const Admin = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast({ title: unlimited ? 'Unlimited beta geactiveerd' : 'Unlimited uitgeschakeld' });
     },
-    onError: (err: any) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
+    onError: (err: Error) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
   });
 
   // Grant tokens mutation
@@ -76,8 +70,14 @@ const Admin = () => {
       toast({ title: `${amount} token${amount === 1 ? '' : 's'} toegekend` });
       setGrantAmount(prev => ({ ...prev, [userId]: '' }));
     },
-    onError: (err: any) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
+    onError: (err: Error) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
   });
+
+  // Redirect als niet admin — after all hooks
+  if (user && user.email !== ADMIN_EMAIL) {
+    navigate('/dashboard');
+    return null;
+  }
 
   // Statistieken
   const totalUsers = users.length;
@@ -189,7 +189,7 @@ const Admin = () => {
                           color: u.unlimited ? '#00fdc1' : u.tokens === 0 ? '#f87171' : '#a090ff',
                           fontWeight: 700, fontSize: '13px',
                         }}>
-                          {u.unlimited ? <Infinity size={11} /> : <Coins size={11} />}
+                          {u.unlimited ? <InfinityIcon size={11} /> : <Coins size={11} />}
                           {u.unlimited ? '∞' : u.tokens}
                         </span>
                       </td>
