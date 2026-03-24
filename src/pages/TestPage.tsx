@@ -1,13 +1,11 @@
 import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import ProtocolTab from '@/components/ProtocolTab';
 import DataInputTab from '@/components/DataInputTab';
-import ResultsTab from '@/components/ResultsTab';
-import ZonesTab from '@/components/ZonesTab';
-import ScienceTab from '@/components/ScienceTab';
+import AnalyzeTab from '@/components/AnalyzeTab';
+import StepNav from '@/components/StepNav';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
@@ -68,7 +66,7 @@ const TestPage = () => {
       return;
     }
     setResults(result);
-    setActiveTab('results');
+    setActiveTab('analyze');
     toast({ title: 'Berekening voltooid' });
   }, [testData, restingLactate, toast]);
 
@@ -85,36 +83,26 @@ const TestPage = () => {
         </div>
       </header>
 
-      <main className="max-w-[900px] mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full flex h-auto gap-0.5 bg-muted p-1 overflow-x-auto">
-            <TabsTrigger value="protocol" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Protocol</TabsTrigger>
-            <TabsTrigger value="data" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Data</TabsTrigger>
-            <TabsTrigger value="results" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Resultaat</TabsTrigger>
-            <TabsTrigger value="zones" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Zones</TabsTrigger>
-            <TabsTrigger value="science" className="flex-1 min-w-0 text-xs sm:text-sm px-2 sm:px-3">Info</TabsTrigger>
-          </TabsList>
+      <main className="max-w-[900px] mx-auto px-3 sm:px-4 py-2 sm:py-4">
+        <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
-          <div className="mt-4 sm:mt-6">
-            <TabsContent value="protocol">
-              <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
-            </TabsContent>
-            <TabsContent value="data">
-              <DataInputTab
-                testData={testData} setTestData={setTestData}
-                athleteName={athleteName} setAthleteName={setAthleteName}
-                testDate={testDate} setTestDate={setTestDate}
-                restingLactate={restingLactate} setRestingLactate={setRestingLactate}
-                stepDistance={stepDistance} setStepDistance={setStepDistance}
-                stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
-                onCalculate={onCalculate}
-              />
-            </TabsContent>
-            <TabsContent value="results"><ResultsTab results={results} /></TabsContent>
-            <TabsContent value="zones"><ZonesTab results={results} /></TabsContent>
-            <TabsContent value="science"><ScienceTab /></TabsContent>
-          </div>
-        </Tabs>
+        {activeTab === 'protocol' && (
+          <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
+        )}
+        {activeTab === 'data' && (
+          <DataInputTab
+            testData={testData} setTestData={setTestData}
+            athleteName={athleteName} setAthleteName={setAthleteName}
+            testDate={testDate} setTestDate={setTestDate}
+            restingLactate={restingLactate} setRestingLactate={setRestingLactate}
+            stepDistance={stepDistance} setStepDistance={setStepDistance}
+            stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
+            onCalculate={onCalculate}
+          />
+        )}
+        {activeTab === 'analyze' && (
+          <AnalyzeTab results={results} />
+        )}
       </main>
     </div>
   );

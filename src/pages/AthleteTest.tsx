@@ -2,15 +2,12 @@ import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import ProtocolTab from '@/components/ProtocolTab';
 import DataInputTab from '@/components/DataInputTab';
-import ResultsTab from '@/components/ResultsTab';
-import ZonesTab from '@/components/ZonesTab';
-import ScienceTab from '@/components/ScienceTab';
+import AnalyzeTab from '@/components/AnalyzeTab';
 import AppNav from '@/components/AppNav';
-import BottomNav from '@/components/BottomNav';
+import StepNav from '@/components/StepNav';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
@@ -51,11 +48,11 @@ const AthleteTest = () => {
         const calcResult = calculate(steps, 0);
         if (typeof calcResult !== 'string') {
           setResults(calcResult);
-          setActiveTab('results');
+          setActiveTab('analyze');
         }
       } else if (data.results_json && Object.keys(data.results_json as object).length > 0) {
         setResults(data.results_json as unknown as CalculationResults);
-        setActiveTab('results');
+        setActiveTab('analyze');
       }
       return data;
     },
@@ -115,7 +112,7 @@ const AthleteTest = () => {
       return;
     }
     setResults(result);
-    setActiveTab('results');
+    setActiveTab('analyze');
     toast({ title: 'Berekening voltooid' });
   }, [testData, restingLactate, testId, toast, queryClient]);
 
@@ -165,48 +162,27 @@ const AthleteTest = () => {
         rightContent={saveButton}
       />
 
-      {/* Desktop top tabs (hidden on mobile) */}
-      <main className="max-w-[900px] mx-auto px-4 py-6 pb-28 sm:pb-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          {/* Top tabs: visible on desktop only */}
-          <TabsList className="hidden sm:grid w-full grid-cols-5 h-auto bg-muted p-1">
-            <TabsTrigger value="protocol" className="text-xs sm:text-sm px-1 py-2">Protocol</TabsTrigger>
-            <TabsTrigger value="data" className="text-xs sm:text-sm px-1 py-2">Data</TabsTrigger>
-            <TabsTrigger value="results" className="text-xs sm:text-sm px-1 py-2">Resultaten</TabsTrigger>
-            <TabsTrigger value="zones" className="text-xs sm:text-sm px-1 py-2">Zones</TabsTrigger>
-            <TabsTrigger value="science" className="text-xs sm:text-sm px-1 py-2">Wetenschap</TabsTrigger>
-          </TabsList>
+      <main className="max-w-[900px] mx-auto px-4 py-2 pb-6">
+        <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
-          <div className="sm:mt-6">
-            <TabsContent value="protocol">
-              <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
-            </TabsContent>
-            <TabsContent value="data">
-              <DataInputTab
-                testData={testData} setTestData={setTestData}
-                athleteName={athleteName} setAthleteName={setAthleteName}
-                testDate={testDate} setTestDate={setTestDate}
-                restingLactate={restingLactate} setRestingLactate={setRestingLactate}
-                stepDistance={stepDistance} setStepDistance={setStepDistance}
-                stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
-                onCalculate={onCalculate}
-              />
-            </TabsContent>
-            <TabsContent value="results"><ResultsTab results={results} testId={testId} athleteName={athleteName} testDate={testDate} /></TabsContent>
-            <TabsContent value="zones"><ZonesTab results={results} /></TabsContent>
-            <TabsContent value="science"><ScienceTab /></TabsContent>
-          </div>
-        </Tabs>
+        {activeTab === 'protocol' && (
+          <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
+        )}
+        {activeTab === 'data' && (
+          <DataInputTab
+            testData={testData} setTestData={setTestData}
+            athleteName={athleteName} setAthleteName={setAthleteName}
+            testDate={testDate} setTestDate={setTestDate}
+            restingLactate={restingLactate} setRestingLactate={setRestingLactate}
+            stepDistance={stepDistance} setStepDistance={setStepDistance}
+            stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
+            onCalculate={onCalculate}
+          />
+        )}
+        {activeTab === 'analyze' && (
+          <AnalyzeTab results={results} testId={testId} athleteName={athleteName} testDate={testDate} />
+        )}
       </main>
-
-      {/* Mobile bottom nav */}
-      <div className="sm:hidden">
-        <BottomNav
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          hasResults={!!results}
-        />
-      </div>
     </div>
   );
 };
