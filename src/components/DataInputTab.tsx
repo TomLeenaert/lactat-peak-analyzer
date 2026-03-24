@@ -25,9 +25,8 @@ interface DataInputTabProps {
 }
 
 type ImportRow = Record<string, unknown>;
-type SubField = 'time_min' | 'time_sec' | 'lactate' | 'hr';
-
-const SUB_FIELDS: SubField[] = ['time_min', 'time_sec', 'lactate', 'hr'];
+type EditingField = 'time' | 'lactate' | 'hr';
+type NumPadField = 'time_min' | 'time_sec' | 'lactate' | 'hr';
 
 const FIELD_META: Record<SubField, { label: string; unit: string; color: string; maxValue: number; decimalPlaces: number; icon: React.ReactNode }> = {
   time_min: { label: 'Minuten', unit: 'min', color: '#00fdc1', maxValue: 59, decimalPlaces: 0, icon: <Timer size={16} /> },
