@@ -32,7 +32,7 @@ const Admin = () => {
   const { data: users = [], isLoading } = useQuery<AdminUser[]>({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('admin_get_users');
+      const { data, error } = await (supabase.rpc as any)('admin_get_users');
       if (error) throw error;
       return data as AdminUser[];
     },
