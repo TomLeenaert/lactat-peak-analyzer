@@ -83,7 +83,7 @@ const COPY = {
     eyebrow: 'Free during beta. Full analysis. No card required.',
     heroTitleA: 'Know your thresholds.',
     heroTitleB: 'Train with data.',
-    heroDesc: 'LacTest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
+    heroDesc: 'MyLactest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
     cmdLabel: 'start',
     cmdText: 'lactest.app → analyse → results',
     cta1: 'Start your analysis →',
