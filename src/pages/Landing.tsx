@@ -69,7 +69,7 @@ const COPY = {
     stepLabels: ['Klaar!', 'Test.', 'Analyseer.', 'Train.'],
     stepHero: ['Jouw test. Jouw protocol.', 'Meet.', 'Data in. Duidelijkheid uit.', 'Zones, geen giswerk.'],
     steps: [
-      { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. LacTest genereert automatisch alle teststappen.' },
+      { title: 'Stel je protocol in', desc: 'Kies je afstand, startsnelheid en stapgrootte. MyLactest genereert automatisch alle teststappen.' },
       { title: 'Doe de veldtest', desc: 'Laat je atleet lopen en meet het lactaat na elke stap.' },
       { title: 'Directe resultaten', desc: 'Voer alles in via je mobiele app. Geen papier meer.' },
       { title: 'Train met data', desc: 'De volledige lactaatcurve, drempels en 5 trainingszones klaar in minder dan 10 seconden.' },
