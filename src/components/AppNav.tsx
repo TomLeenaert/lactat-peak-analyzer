@@ -19,9 +19,12 @@ interface AppNavProps {
 
 const ADMIN_EMAIL = 'tomleenaert@gmail.com';
 
+const DEMO_EMAIL = 'coach@demo.mylactest.com';
+
 const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavProps) => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+  const isDemo = user?.email === DEMO_EMAIL;
 
   const { data: profile } = useQuery({
     queryKey: ['profile-nav'],
@@ -44,6 +47,41 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
   const isAdmin = user?.email === ADMIN_EMAIL;
 
   return (
+    <>
+      {isDemo && (
+        <div
+          style={{
+            width: '100%',
+            background: 'rgba(189,157,255,0.08)',
+            borderBottom: '1px solid rgba(189,157,255,0.2)',
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '12px',
+          }}
+        >
+          <span style={{ color: 'rgba(255,255,255,0.6)' }}>Je bekijkt een demo account.</span>
+          <button
+            onClick={() => {
+              signOut().then(() => navigate('/auth'));
+            }}
+            style={{
+              color: '#bd9dff',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '12px',
+              fontWeight: 600,
+              padding: '4px 8px',
+            }}
+          >
+            Start gratis →
+          </button>
+        </div>
+      )}
     <nav
       style={{
         position: 'sticky',
@@ -209,6 +247,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
         )}
       </div>
     </nav>
+    </>
   );
 };
 
