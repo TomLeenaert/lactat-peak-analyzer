@@ -247,6 +247,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
         )}
       </div>
     </nav>
+    </>
   );
 };
 
