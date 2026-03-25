@@ -19,9 +19,12 @@ interface AppNavProps {
 
 const ADMIN_EMAIL = 'tomleenaert@gmail.com';
 
+const DEMO_EMAIL = 'coach@demo.mylactest.com';
+
 const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavProps) => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+  const isDemo = user?.email === DEMO_EMAIL;
 
   const { data: profile } = useQuery({
     queryKey: ['profile-nav'],
