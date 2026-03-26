@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -17,25 +18,44 @@ try {
 } catch { /* CI or no git */ }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: false,
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+
+  const configuredProjectId = env.VITE_SUPABASE_PROJECT_ID || env.VITE_SUPABASE_PROJECT_ID_PROD || "";
+  const configuredUrl = env.VITE_SUPABASE_URL || env.VITE_SUPABASE_URL_PROD || "";
+  const configuredKey =
+    env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    env.VITE_SUPABASE_PUBLISHABLE_KEY_PROD ||
+    env.VITE_SUPABASE_ANON_KEY ||
+    "";
+
+  const resolvedProjectId =
+    configuredProjectId || configuredUrl.match(/^https:\/\/([a-z0-9-]+)\.supabase\.co$/i)?.[1] || "";
+  const resolvedUrl = configuredUrl || (resolvedProjectId ? `https://${resolvedProjectId}.supabase.co` : "");
+
+  return {
+    server: {
+      host: "::",
+      port: 8080,
+      hmr: {
+        overlay: false,
+      },
     },
-  },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
-    __BUILD_DATE__: JSON.stringify(buildDate),
-    __BUILD_TIME__: JSON.stringify(buildTime),
-    __GIT_BRANCH__: JSON.stringify(gitBranch),
-  },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+    define: {
+      __APP_VERSION__: JSON.stringify(pkg.version),
+      __BUILD_DATE__: JSON.stringify(buildDate),
+      __BUILD_TIME__: JSON.stringify(buildTime),
+      __GIT_BRANCH__: JSON.stringify(gitBranch),
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(resolvedUrl),
+      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(configuredKey),
+      "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(resolvedProjectId),
     },
-    dedupe: ["react", "react-dom", "react/jsx-runtime"],
-  },
-}));
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+      dedupe: ["react", "react-dom", "react/jsx-runtime"],
+    },
+  };
+});
