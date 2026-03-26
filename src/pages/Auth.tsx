@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import logoSrc from '@/assets/screen.png';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -89,6 +90,27 @@ const Auth = () => {
       fontFamily: 'Inter, sans-serif',
     }}>
       <div style={{ width: '100%', maxWidth: '360px' }}>
+
+        {/* Back button */}
+        <Link to="/" style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          color: 'rgba(255,255,255,0.5)',
+          textDecoration: 'none',
+          fontSize: '13px',
+          fontFamily: 'Space Grotesk, monospace',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase' as const,
+          marginBottom: '24px',
+          transition: 'color 0.2s',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.85)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
+        >
+          <ArrowLeft size={16} />
+          {lang === 'nl' ? 'Terug' : 'Back'}
+        </Link>
 
         {/* Logo — hero-sized with glow */}
         <div style={{ textAlign: 'center', marginBottom: '40px', paddingTop: '8px' }}>
