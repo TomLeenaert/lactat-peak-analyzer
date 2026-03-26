@@ -71,10 +71,22 @@ const LactateChart = ({ results }: LactateChartProps) => {
               <Label value="Lactaat (mmol/L)" angle={-90} position="insideLeft" offset={5} className="fill-muted-foreground text-xs" />
             </YAxis>
             <Tooltip
-              formatter={(value: number, name: string) => [
-                `${value.toFixed(1)} ${name === 'fit' ? 'mmol/L (fit)' : 'mmol/L'}`,
-              ]}
-              labelFormatter={(v: number) => `${formatPace(v)} /km`}
+              content={({ active, payload }) => {
+                if (!active || !payload) return null;
+                const scatterPoint = payload.find(p => p.dataKey === 'lactate');
+                if (!scatterPoint) return null;
+                const speed = scatterPoint.payload?.speed as number;
+                const lactate = scatterPoint.value as number;
+                return (
+                  <div style={{
+                    background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px', padding: '8px 12px', fontSize: '12px',
+                  }}>
+                    <p style={{ fontWeight: 700, margin: 0 }}>{formatPace(speed)} /km</p>
+                    <p style={{ color: 'hsl(var(--primary))', margin: '2px 0 0' }}>{lactate.toFixed(1)} mmol/L</p>
+                  </div>
+                );
+              }}
             />
 
             {/* OBLA reference lines */}

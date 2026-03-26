@@ -286,6 +286,7 @@ const DataInputTab = ({
             color="#00fdc1"
             maxValue={59}
             decimalPlaces={0}
+            hideDisplay
           />
         </div>
       );
