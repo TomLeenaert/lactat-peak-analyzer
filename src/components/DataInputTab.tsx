@@ -7,6 +7,7 @@ import { formatPace, type StepData } from '@/lib/lactate-math';
 import { Trash2, Plus, Upload, Check, Timer, Droplets, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import NumPad from '@/components/NumPad';
+import { useLang } from '@/contexts/LanguageContext';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -78,6 +79,7 @@ const DataInputTab = ({
   const dist = parseFloat(stepDistance) || 1600;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { t } = useLang();
   const [isDragging, setIsDragging] = useState(false);
 
   // Sheet state: which step & which field are we editing?
@@ -150,7 +152,7 @@ const DataInputTab = ({
              findFirstArray(json));
         const steps = Array.isArray(rawSteps) ? rawSteps : [];
         if (!steps.length) {
-          toast({ title: 'Fout', description: 'Geen stappen gevonden in JSON bestand.', variant: 'destructive' });
+          toast({ title: t('common.error'), description: t('data.noStepsFound'), variant: 'destructive' });
           return;
         }
         const normalizedRows = steps.filter(isRecord);
@@ -161,7 +163,7 @@ const DataInputTab = ({
           return { speed, lactate: getNumber(row, 'lactate', 'lactaat'), hr: getNumber(row, 'hr', 'hartslag', 'heartrate'), watt: getNumber(row, 'watt', 'watts', 'power'), distance, time };
         });
         if (importedSteps.length === 0) {
-          toast({ title: 'Fout', description: 'Geen bruikbare stappen gevonden.', variant: 'destructive' });
+          toast({ title: t('common.error'), description: t('data.noUsableSteps'), variant: 'destructive' });
           return;
         }
         const athlete = getString(json, 'athlete', 'atleet');
@@ -173,9 +175,9 @@ const DataInputTab = ({
         if (resting) setRestingLactate(resting);
         if (distance) setStepDistance(distance);
         setTestData(importedSteps);
-        toast({ title: 'Geïmporteerd', description: `${importedSteps.length} stappen geladen.` });
+        toast({ title: t('data.imported'), description: `${importedSteps.length} ${t('data.stepsLoaded')}` });
       } catch {
-        toast({ title: 'Fout', description: 'Ongeldig JSON bestand.', variant: 'destructive' });
+        toast({ title: t('common.error'), description: t('data.invalidJson'), variant: 'destructive' });
       }
     };
     reader.readAsText(file);
@@ -185,7 +187,7 @@ const DataInputTab = ({
     e.preventDefault(); setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file && file.name.endsWith('.json')) processJsonFile(file);
-    else toast({ title: 'Fout', description: 'Alleen JSON bestanden.', variant: 'destructive' });
+    else toast({ title: t('common.error'), description: t('data.onlyJson'), variant: 'destructive' });
   };
 
   const handleJsonImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -281,7 +283,7 @@ const DataInputTab = ({
           <NumPad
             value={timeSubField === 'min' ? timeMin : timeSec}
             onChange={timeSubField === 'min' ? setTimeMin : setTimeSec}
-            label={timeSubField === 'min' ? 'Minuten' : 'Seconden'}
+            label={timeSubField === 'min' ? t('data.minutes') : t('data.seconds')}
             unit={timeSubField === 'min' ? 'min' : 'sec'}
             color="#00fdc1"
             maxValue={59}
@@ -294,13 +296,13 @@ const DataInputTab = ({
 
     if (editField === 'lactate') {
       return (
-        <NumPad value={numPadValue} onChange={setNumPadValue} label="Lactaat" unit="mmol/L" color="#6644ff" maxValue={25} decimalPlaces={1} />
+        <NumPad value={numPadValue} onChange={setNumPadValue} label={t('data.lactate')} unit="mmol/L" color="#6644ff" maxValue={25} decimalPlaces={1} />
       );
     }
 
     if (editField === 'hr') {
       return (
-        <NumPad value={numPadValue} onChange={setNumPadValue} label="Hartslag" unit="bpm" color="#ff6b2b" maxValue={220} decimalPlaces={0} />
+        <NumPad value={numPadValue} onChange={setNumPadValue} label={t('data.hr')} unit="bpm" color="#ff6b2b" maxValue={220} decimalPlaces={0} />
       );
     }
 
@@ -314,7 +316,7 @@ const DataInputTab = ({
     <>
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Stapgegevens</CardTitle>
+          <CardTitle className="text-lg">{t('data.stepData')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
@@ -330,13 +332,13 @@ const DataInputTab = ({
                 <div style={{ height: '100%', width: `${(filledCount / testData.length) * 100}%`, background: '#6644ff', borderRadius: '2px', transition: 'width 0.3s ease' }} />
               </div>
               <span style={{ fontSize: '12px', fontWeight: 600, color: '#a090ff', whiteSpace: 'nowrap' }}>
-                {filledCount}/{testData.length} stappen
+                {filledCount}/{testData.length} {t('data.steps')}
               </span>
             </div>
           )}
 
           {/* Step cards */}
-          <h4 className="text-base font-semibold pt-2">Stapgegevens</h4>
+          <h4 className="text-base font-semibold pt-2">{t('data.stepData')}</h4>
           <div className="space-y-3">
             {testData.map((row, i) => {
               const hasLactate = row.lactate > 0;
@@ -365,7 +367,7 @@ const DataInputTab = ({
                         {allFilled ? '✓' : i + 1}
                       </div>
                       <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-                        Stap {i + 1}
+                        {t('data.step')} {i + 1}
                       </span>
                       {row.speed > 0 && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -396,13 +398,13 @@ const DataInputTab = ({
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <FieldButton
                       stepIdx={i} field="time"
-                      icon={<Timer size={14} />} label="Tijd"
+                      icon={<Timer size={14} />} label={t('data.time')}
                       value={secsToDisplay(row.time || 0)}
                       color="#00fdc1" filled={hasTime}
                     />
                     <FieldButton
                       stepIdx={i} field="lactate"
-                      icon={<Droplets size={14} />} label="Lactaat"
+                      icon={<Droplets size={14} />} label={t('data.lactate')}
                       value={String(row.lactate)}
                       color="#6644ff" filled={hasLactate}
                     />
@@ -419,10 +421,10 @@ const DataInputTab = ({
           </div>
 
           <Button variant="secondary" size="sm" onClick={addRow} className="w-full">
-            <Plus className="h-4 w-4 mr-1" /> Stap toevoegen
+            <Plus className="h-4 w-4 mr-1" /> {t('data.addStep')}
           </Button>
           <Button className="w-full" onClick={onCalculate} style={{ background: 'linear-gradient(135deg, #6644ff, #8866ff)', border: 'none' }}>
-            🧮 Berekenen
+            {t('data.calculate')}
           </Button>
         </CardContent>
       </Card>
@@ -441,7 +443,7 @@ const DataInputTab = ({
 
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <span style={{ fontSize: '15px', fontWeight: 700, color: '#fff' }}>
-                Stap {editStep + 1}
+                {t('data.step')} {editStep + 1}
                 <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}> / {testData.length}</span>
               </span>
             </div>
@@ -460,7 +462,7 @@ const DataInputTab = ({
               }}
             >
               <Check size={20} />
-              Bevestigen
+              {t('common.confirm')}
             </button>
           </div>
         </>
