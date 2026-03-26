@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
 import { Trash2 } from 'lucide-react';
+import { useLang } from '@/contexts/LanguageContext';
 
 interface StoredThresholdResults {
   lt1Speed?: number;
@@ -30,6 +31,7 @@ const AthleteDetail = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t, lang } = useLang();
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', birth_date: '', sport: '', notes: '' });
 
@@ -70,7 +72,7 @@ const AthleteDetail = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['athlete', id] });
       setEditOpen(false);
-      toast({ title: 'Atleet bijgewerkt' });
+      toast({ title: t('detail.athleteUpdated') });
     },
   });
 
@@ -81,13 +83,13 @@ const AthleteDetail = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tests', id] });
-      toast({ title: 'Test verwijderd' });
+      toast({ title: t('detail.testDeleted') });
     },
   });
 
   if (isLoading || !athlete) return (
     <div style={{ minHeight: '100vh', background: '#0e0e0e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#adaaaa', fontFamily: 'Space Grotesk, sans-serif' }}>Laden...</p>
+      <p style={{ color: '#adaaaa', fontFamily: 'Space Grotesk, sans-serif' }}>{t('common.loading')}</p>
     </div>
   );
 
@@ -101,7 +103,6 @@ const AthleteDetail = () => {
   const latestLt1Speed = latestResults?.lt1?.best ?? latestResults?.lt1Speed ?? null;
   const latestLt2Speed = latestResults?.lt2?.best ?? latestResults?.lt2Speed ?? null;
 
-  // Avg tempo from all tests that have LT2 results
   const avgTempo = (() => {
     const lt2Speeds = tests
       .map(t => {
@@ -122,15 +123,17 @@ const AthleteDetail = () => {
       border: '1px solid rgba(189,157,255,0.25)',
       borderRadius: '2px', padding: '6px 14px', cursor: 'pointer',
     }}>
-      Edit
+      {t('common.edit')}
     </button>
   );
+
+  const dateLocale = lang === 'nl' ? 'nl-NL' : 'en-US';
 
   return (
     <div style={{ minHeight: '100vh', background: '#0e0e0e' }}>
       <AppNav
         backTo="/dashboard"
-        backLabel="Athletes"
+        backLabel={t('detail.athletes')}
         title="LacTest"
         rightContent={editButton}
       />
@@ -139,24 +142,15 @@ const AthleteDetail = () => {
 
         {/* Athlete profile header */}
         <div style={{
-          background: '#131313',
-          borderRadius: '2px',
-          padding: '24px',
-          marginBottom: '16px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '20px',
+          background: '#131313', borderRadius: '2px', padding: '24px', marginBottom: '16px',
+          display: 'flex', alignItems: 'flex-start', gap: '20px',
         }}>
-          {/* Avatar */}
           <div style={{
             width: '72px', height: '72px', flexShrink: 0,
-            background: '#201f1f',
-            border: '2px solid #bd9dff',
-            borderRadius: '4px',
+            background: '#201f1f', border: '2px solid #bd9dff', borderRadius: '4px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: '24px', fontWeight: 900, color: '#bd9dff',
-            letterSpacing: '-0.5px',
+            fontFamily: 'Space Grotesk, sans-serif', fontSize: '24px', fontWeight: 900,
+            color: '#bd9dff', letterSpacing: '-0.5px',
           }}>
             {getInitials(athlete.name)}
           </div>
@@ -164,10 +158,8 @@ const AthleteDetail = () => {
           <div style={{ flex: 1, minWidth: 0 }}>
             {athlete.sport && (
               <span style={{
-                display: 'inline-block',
-                background: '#006c50', color: '#dfffef',
-                fontSize: '9px', fontWeight: 900,
-                fontFamily: 'Space Grotesk, sans-serif',
+                display: 'inline-block', background: '#006c50', color: '#dfffef',
+                fontSize: '9px', fontWeight: 900, fontFamily: 'Space Grotesk, sans-serif',
                 letterSpacing: '0.15em', textTransform: 'uppercase',
                 padding: '2px 8px', borderRadius: '2px', marginBottom: '6px',
               }}>
@@ -175,10 +167,8 @@ const AthleteDetail = () => {
               </span>
             )}
             <h1 style={{
-              fontFamily: 'Space Grotesk, sans-serif',
-              fontSize: '26px', fontWeight: 900,
-              letterSpacing: '-0.5px', color: '#fff',
-              margin: '0 0 2px', lineHeight: 1.1,
+              fontFamily: 'Space Grotesk, sans-serif', fontSize: '26px', fontWeight: 900,
+              letterSpacing: '-0.5px', color: '#fff', margin: '0 0 2px', lineHeight: 1.1,
             }}>
               {athlete.name}
             </h1>
@@ -190,35 +180,24 @@ const AthleteDetail = () => {
           </div>
         </div>
 
-        {/* VO2 Max / key metric — large display */}
+        {/* Key metric */}
         {latestLt2Speed && (
-          <div style={{
-            background: '#131313',
-            borderRadius: '2px',
-            padding: '20px 24px',
-            marginBottom: '16px',
-          }}>
+          <div style={{ background: '#131313', borderRadius: '2px', padding: '20px 24px', marginBottom: '16px' }}>
             <p style={{
-              fontFamily: 'Space Grotesk, sans-serif',
-              fontSize: '9px', fontWeight: 700,
-              letterSpacing: '0.2em', textTransform: 'uppercase',
-              color: '#777575', marginBottom: '4px',
+              fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700,
+              letterSpacing: '0.2em', textTransform: 'uppercase', color: '#777575', marginBottom: '4px',
             }}>
-              T4mmol Precision
+              {t('detail.precision')}
             </p>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span style={{
-                fontFamily: 'Space Grotesk, sans-serif',
-                fontSize: '56px', fontWeight: 900,
-                color: '#00fdc1', lineHeight: 1,
-                letterSpacing: '-2px',
+                fontFamily: 'Space Grotesk, sans-serif', fontSize: '56px', fontWeight: 900,
+                color: '#00fdc1', lineHeight: 1, letterSpacing: '-2px',
                 textShadow: '0 0 20px rgba(0,253,193,0.3)',
               }}>
                 {formatPace(latestLt2Speed)}
               </span>
-              <span style={{ fontSize: '14px', color: '#adaaaa', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600 }}>
-                min/km
-              </span>
+              <span style={{ fontSize: '14px', color: '#adaaaa', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600 }}>min/km</span>
             </div>
           </div>
         )}
@@ -226,16 +205,16 @@ const AthleteDetail = () => {
         {/* Stats grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
           <div style={{ background: '#131313', borderRadius: '2px', padding: '16px' }}>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 6px' }}>Tests</p>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 6px' }}>{t('detail.testsLabel')}</p>
             <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '36px', fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1, letterSpacing: '-1px' }}>
               {tests.length}
             </p>
             {tests.length > 1 && (
-              <p style={{ fontSize: '11px', color: '#00fdc1', margin: '4px 0 0', fontWeight: 700 }}>↑ {tests.length - 1} sessies</p>
+              <p style={{ fontSize: '11px', color: '#00fdc1', margin: '4px 0 0', fontWeight: 700 }}>↑ {tests.length - 1} {t('detail.sessions')}</p>
             )}
           </div>
           <div style={{ background: '#131313', borderRadius: '2px', padding: '16px' }}>
-            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 6px' }}>Avg Tempo</p>
+            <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', margin: '0 0 6px' }}>{t('detail.avgTempo')}</p>
             <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '28px', fontWeight: 900, color: '#fff', margin: 0, lineHeight: 1, letterSpacing: '-0.5px' }}>
               {avgTempo ?? '—'}
             </p>
@@ -249,66 +228,52 @@ const AthleteDetail = () => {
         <button
           onClick={() => navigate(`/athlete/${id}/test`)}
           style={{
-            width: '100%',
-            height: '64px',
+            width: '100%', height: '64px',
             background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)',
-            border: 'none',
-            borderRadius: '2px',
-            color: '#fff',
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontWeight: 900,
-            fontSize: '16px',
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-            cursor: 'pointer',
-            marginBottom: '32px',
-            boxShadow: '0 8px 24px rgba(139,74,255,0.3)',
+            border: 'none', borderRadius: '2px', color: '#fff',
+            fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900, fontSize: '16px',
+            letterSpacing: '0.05em', textTransform: 'uppercase', cursor: 'pointer',
+            marginBottom: '32px', boxShadow: '0 8px 24px rgba(139,74,255,0.3)',
           }}
         >
-          + Nieuwe Test
+          {t('detail.newTest')}
         </button>
 
         {/* History */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <h2 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '13px', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#fff', margin: 0 }}>
-              History
+              {t('detail.history')}
             </h2>
             <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#777575' }}>
-              Last {tests.length} tests
+              {t('detail.lastTests').replace('{n}', String(tests.length))}
             </span>
           </div>
 
           {tests.length === 0 ? (
             <div style={{ background: '#131313', borderRadius: '2px', padding: '40px 24px', textAlign: 'center' }}>
-              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '14px', color: '#adaaaa' }}>Nog geen tests uitgevoerd.</p>
+              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '14px', color: '#adaaaa' }}>{t('detail.noTests')}</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {tests.map(t => {
-                const r = getStoredResults(t.results_json);
+              {tests.map(test => {
+                const r = getStoredResults(test.results_json);
                 const lt1Speed = r?.lt1?.best ?? r?.lt1Speed ?? null;
                 const lt2Speed = r?.lt2?.best ?? r?.lt2Speed ?? null;
                 const hasResults = lt1Speed != null || lt2Speed != null;
-                const steps = Array.isArray(t.steps_json) ? t.steps_json : [];
+                const steps = Array.isArray(test.steps_json) ? test.steps_json : [];
 
-                // Format date: "Feb 24, 2024" style
-                const dateStr = t.test_date ? new Date(t.test_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+                const dateStr = test.test_date ? new Date(test.test_date).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
                 return (
                   <button
-                    key={t.id}
-                    onClick={() => navigate(`/athlete/${id}/test/${t.id}`)}
+                    key={test.id}
+                    onClick={() => navigate(`/athlete/${id}/test/${test.id}`)}
                     style={{
-                      width: '100%', textAlign: 'left',
-                      background: '#131313',
-                      border: 'none',
-                      borderBottom: '1px solid #1a1919',
-                      padding: '16px 0',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      width: '100%', textAlign: 'left', background: '#131313',
+                      border: 'none', borderBottom: '1px solid #1a1919',
+                      padding: '16px 0', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                       WebkitTapHighlightColor: 'transparent',
                     }}
                   >
@@ -318,8 +283,8 @@ const AthleteDetail = () => {
                       </p>
                       <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '15px', fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.2px' }}>
                         {hasResults
-                          ? (lt2Speed ? `Lactate Threshold 2` : `Aerobic Threshold`)
-                          : `Test — ${steps.length} stappen`}
+                          ? (lt2Speed ? t('detail.lt2') : t('detail.lt1'))
+                          : `Test — ${steps.length} ${t('detail.steps')}`}
                       </p>
                     </div>
 
@@ -336,13 +301,12 @@ const AthleteDetail = () => {
                       )}
                       <span style={{ color: '#777575', fontSize: '18px' }}>›</span>
                       <button
-                        onClick={e => { e.stopPropagation(); if (confirm('Test verwijderen?')) deleteTest.mutate(t.id); }}
+                        onClick={e => { e.stopPropagation(); if (confirm(t('detail.deleteTest'))) deleteTest.mutate(test.id); }}
                         style={{
                           width: '28px', height: '28px',
                           background: 'rgba(239,68,68,0.07)',
                           border: '1px solid rgba(239,68,68,0.15)',
-                          borderRadius: '2px',
-                          color: 'rgba(239,68,68,0.6)',
+                          borderRadius: '2px', color: 'rgba(239,68,68,0.6)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           cursor: 'pointer', flexShrink: 0,
                         }}
@@ -362,15 +326,15 @@ const AthleteDetail = () => {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Atleet bewerken</DialogTitle>
-            <DialogDescription>Wijzig de gegevens van de atleet.</DialogDescription>
+            <DialogTitle>{t('detail.editAthlete')}</DialogTitle>
+            <DialogDescription>{t('detail.editDesc')}</DialogDescription>
           </DialogHeader>
           <form onSubmit={e => { e.preventDefault(); updateAthlete.mutate(editForm); }} className="space-y-4">
-            <Input placeholder="Naam *" value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} required />
+            <Input placeholder={t('dash.namePlaceholder')} value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} required />
             <Input type="date" value={editForm.birth_date} onChange={e => setEditForm(p => ({ ...p, birth_date: e.target.value }))} />
-            <Input placeholder="Sport" value={editForm.sport} onChange={e => setEditForm(p => ({ ...p, sport: e.target.value }))} />
-            <Input placeholder="Notities" value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))} />
-            <Button type="submit" className="w-full" disabled={updateAthlete.isPending}>Opslaan</Button>
+            <Input placeholder={t('detail.sport')} value={editForm.sport} onChange={e => setEditForm(p => ({ ...p, sport: e.target.value }))} />
+            <Input placeholder={t('detail.notes')} value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))} />
+            <Button type="submit" className="w-full" disabled={updateAthlete.isPending}>{t('common.save')}</Button>
           </form>
         </DialogContent>
       </Dialog>
