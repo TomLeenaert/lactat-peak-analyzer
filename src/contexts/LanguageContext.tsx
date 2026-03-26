@@ -180,6 +180,7 @@ const translations = {
     'results.anaerobicThreshold': 'Anaerobe drempel',
     'results.lactateCurve': 'Lactaatcurve',
     'results.shareWhatsApp': 'Deel via WhatsApp',
+    'results.shareImage': 'Deel als afbeelding',
     'results.copied': 'GEKOPIEERD',
     'results.copy': 'KOPIEER',
     'results.creatingLink': 'Link aanmaken...',
