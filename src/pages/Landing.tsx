@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import logoSrc from '@/assets/screen.png';
 import stepGetSetImg from '@/assets/step-getset.jpg';
 import stepTestImg from '@/assets/step-test.png';
@@ -168,6 +170,7 @@ const ROWS = [
 const Landing = () => {
   const navigate = useNavigate();
   const { lang, setLang } = useLang();
+  const { toast } = useToast();
   const t = COPY[lang];
 
   const [showEntry, setShowEntry] = useState(false);
@@ -268,15 +271,6 @@ const Landing = () => {
         </div>
         <div className="lp-nav-right">
           <button
-            className="lp-btn-demo"
-            onClick={() => {
-              const el = document.getElementById('demo');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-          >
-            {t.cta2}
-          </button>
-          <button
             className="lp-btn-lang"
             onClick={() => setLang(lang === 'nl' ? 'en' : 'nl')}
             title={lang === 'nl' ? 'Switch to English' : 'Schakel naar Nederlands'}
@@ -308,9 +302,17 @@ const Landing = () => {
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
               <button
                 className="lp-hero-cta-secondary"
-                onClick={() => {
-                  const el = document.getElementById('demo');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                onClick={async () => {
+                  try {
+                    const { error } = await supabase.auth.signInWithPassword({
+                      email: 'coach@demo.mylactest.com',
+                      password: 'DemoCoach2024!',
+                    });
+                    if (error) throw error;
+                    navigate('/dashboard');
+                  } catch (err: unknown) {
+                    toast({ title: 'Error', description: err instanceof Error ? err.message : 'Fout', variant: 'destructive' });
+                  }
                 }}
               >
                 {t.cta2} →
