@@ -391,6 +391,7 @@ const translations = {
     'results.anaerobicThreshold': 'Anaerobic threshold',
     'results.lactateCurve': 'Lactate curve',
     'results.shareWhatsApp': 'Share via WhatsApp',
+    'results.shareImage': 'Share as image',
     'results.copied': 'COPIED',
     'results.copy': 'COPY',
     'results.creatingLink': 'Creating link...',
