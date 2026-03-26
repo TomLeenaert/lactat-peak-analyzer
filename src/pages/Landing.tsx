@@ -5,7 +5,7 @@ import stepGetSetImg from '@/assets/step-getset.jpg';
 import stepTestImg from '@/assets/step-test.png';
 import stepAnalyzeImg from '@/assets/step-analyze.jpg';
 import stepTrainImg from '@/assets/step-train.png';
-import DemoSnapshot from '@/components/DemoSnapshot';
+import LandingDemo from '@/components/LandingDemo';
 
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
@@ -400,7 +400,7 @@ const Landing = () => {
 
       {/* ── Interactive Demo ── */}
       <section className="lp-section" id="demo" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-        <DemoSnapshot />
+        <LandingDemo />
       </section>
 
       {/* ── How it works ── */}
