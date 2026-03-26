@@ -139,6 +139,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <div ref={resultsRef} style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '2px' }}>
 
       {/* Threshold hero cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -260,15 +261,34 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
           );
         })}
       </div>
+      </div>{/* end ref wrapper */}
 
-      {/* WhatsApp share button */}
+      {/* Share as image button */}
       <button
-        onClick={() => handleWhatsApp()}
+        onClick={handleShareImage}
+        disabled={generatingImage}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           padding: '14px', borderRadius: '6px',
           border: '1px solid rgba(37,211,102,0.35)', background: 'rgba(37,211,102,0.08)',
           color: '#25d366', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px',
+          cursor: generatingImage ? 'wait' : 'pointer', transition: 'all 0.15s', fontFamily: 'Inter, sans-serif',
+        }}
+      >
+        <Image size={15} />
+        {generatingImage
+          ? (t('results.shareWhatsApp').includes('WhatsApp') ? '⏳...' : '⏳...')
+          : t('results.shareImage')}
+      </button>
+
+      {/* WhatsApp text share button */}
+      <button
+        onClick={() => handleWhatsApp()}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          padding: '14px', borderRadius: '6px',
+          border: '1px solid rgba(37,211,102,0.25)', background: 'rgba(37,211,102,0.04)',
+          color: '#25d366', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px',
           cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'Inter, sans-serif',
         }}
       >
