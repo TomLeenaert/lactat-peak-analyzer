@@ -5,6 +5,7 @@ import stepGetSetImg from '@/assets/step-getset.jpg';
 import stepTestImg from '@/assets/step-test.png';
 import stepAnalyzeImg from '@/assets/step-analyze.jpg';
 import stepTrainImg from '@/assets/step-train.png';
+import LandingDemo from '@/components/LandingDemo';
 
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
@@ -267,6 +268,15 @@ const Landing = () => {
         </div>
         <div className="lp-nav-right">
           <button
+            className="lp-btn-demo"
+            onClick={() => {
+              const el = document.getElementById('demo');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            {t.cta2}
+          </button>
+          <button
             className="lp-btn-lang"
             onClick={() => setLang(lang === 'nl' ? 'en' : 'nl')}
             title={lang === 'nl' ? 'Switch to English' : 'Schakel naar Nederlands'}
@@ -296,7 +306,6 @@ const Landing = () => {
             </div>
 <div className="lp-hero-actions">
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
-              <button className="lp-hero-cta-secondary" onClick={() => navigate('/demo')}>{t.cta2}</button>
             </div>
           </div>
 
@@ -389,7 +398,6 @@ const Landing = () => {
         </div>
       </section>
 
-
       {/* ── How it works ── */}
       <section className="lp-section lp-how-section" id="how-it-works">
         <div className="lp-center-head">
@@ -410,6 +418,11 @@ const Landing = () => {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── Interactive Demo ── */}
+      <section className="lp-section" id="demo" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+        <LandingDemo />
       </section>
 
       <section className="lp-section" id="features">
