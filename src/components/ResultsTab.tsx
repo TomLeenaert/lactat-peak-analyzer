@@ -3,6 +3,7 @@ import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR 
 import LactateChart from './LactateChart';
 import { supabase } from '@/integrations/supabase/client';
 import { Share2, Check, Link } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 
 interface ResultsTabProps {
   results: CalculationResults | null;
@@ -75,6 +76,35 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   const lt2HR = interpolateHR(lt2.best, speeds, hrs);
   const lt1Lac = polyEval(coeffs, lt1.best).toFixed(1);
   const lt2Lac = polyEval(coeffs, lt2.best).toFixed(1);
+
+  const buildWhatsAppMessage = () => {
+    if (!results) return '';
+    const { lt1, lt2 } = results;
+    const zones = getZones(results);
+    let msg = `🏃 *Lactaattest Resultaten*`;
+    if (athleteName) msg += `\n👤 ${athleteName}`;
+    if (testDate) msg += ` — ${testDate}`;
+    msg += `\n\n🟢 *Aerobe drempel (LT1)*: ${formatPace(lt1.best)} /km`;
+    if (lt1HR > 0) msg += ` (${lt1HR} bpm)`;
+    msg += ` — ${lt1Lac} mmol/L`;
+    msg += `\n🟠 *Anaerobe drempel (LT2)*: ${formatPace(lt2.best)} /km`;
+    if (lt2HR > 0) msg += ` (${lt2HR} bpm)`;
+    msg += ` — ${lt2Lac} mmol/L`;
+    msg += `\n\n📊 *Trainingszones:*`;
+    zones.forEach(z => {
+      msg += `\n${z.name}: ${formatPace(z.to)} – ${formatPace(z.from)} /km`;
+    });
+    msg += `\n\n_Via MyLactest_`;
+    return msg;
+  };
+
+  const handleWhatsApp = (phoneNumber?: string) => {
+    const msg = encodeURIComponent(buildWhatsAppMessage());
+    const url = phoneNumber
+      ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${msg}`
+      : `https://wa.me/?text=${msg}`;
+    window.open(url, '_blank');
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -253,6 +283,27 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       </div>
 
       {/* Share button */}
+      {/* WhatsApp share button */}
+      <button
+        onClick={() => handleWhatsApp()}
+        style={{
+          width: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          padding: '14px',
+          borderRadius: '6px',
+          border: '1px solid rgba(37,211,102,0.35)',
+          background: 'rgba(37,211,102,0.08)',
+          color: '#25d366',
+          fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px',
+          cursor: 'pointer',
+          transition: 'all 0.15s',
+          fontFamily: 'Inter, sans-serif',
+        }}
+      >
+        <MessageCircle size={15} />
+        Deel via WhatsApp
+      </button>
+
       {testId && (
         <div style={{ marginTop: '20px' }}>
           {shareUrl ? (
