@@ -3,12 +3,15 @@ import {
   ComposedChart, Line, Scatter, XAxis, YAxis, CartesianGrid, ReferenceLine,
   ResponsiveContainer, Tooltip, Label,
 } from 'recharts';
+import { useLang } from '@/contexts/LanguageContext';
 
 interface ZonesTabProps {
   results: CalculationResults | null;
 }
 
 const ZonesTab = ({ results }: ZonesTabProps) => {
+  const { t } = useLang();
+
   if (!results) {
     return (
       <div style={{
@@ -18,7 +21,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
         textAlign: 'center',
       }}>
         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif' }}>
-          Eerst berekenen om trainingszones te zien.
+          {t('zones.calculateFirst')}
         </p>
       </div>
     );
@@ -34,7 +37,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
         textAlign: 'center',
       }}>
         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif' }}>
-          Geen resultaten beschikbaar. Ga naar Data en klik op Berekenen.
+          {t('zones.noResults')}
         </p>
       </div>
     );
@@ -60,7 +63,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
             textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)',
             marginBottom: '16px', fontFamily: 'Inter, sans-serif',
           }}>
-            Hartslag vs Tempo
+            {t('zones.hrVsTempo')}
           </p>
           <div style={{ width: '100%', height: '280px' }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -75,7 +78,7 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
                   axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                   tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                 >
-                  <Label value="Tempo (min/km)" position="bottom" offset={20} style={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
+                  <Label value={t('zones.pace')} position="bottom" offset={20} style={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }} />
                 </XAxis>
                 <YAxis
                   domain={[hrMin, hrMax]}

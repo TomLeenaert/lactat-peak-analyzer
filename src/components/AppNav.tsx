@@ -4,26 +4,23 @@ import logoSrc from '@/assets/screen.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useLang } from '@/contexts/LanguageContext';
 
 interface AppNavProps {
-  /** If provided, shows a back arrow instead of the logo */
   backTo?: string;
   backLabel?: string;
-  /** Sub-title shown next to logo/back button */
   title?: string;
-  /** Extra content on the right side (e.g. a Save button) */
   rightContent?: React.ReactNode;
-  /** Hide the sign-out button (e.g. on public/demo pages) */
   hideSignOut?: boolean;
 }
 
 const ADMIN_EMAIL = 'tomleenaert@gmail.com';
-
 const DEMO_EMAIL = 'coach@demo.mylactest.com';
 
 const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavProps) => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+  const { t } = useLang();
   const isDemo = user?.email === DEMO_EMAIL;
 
   const { data: profile } = useQuery({
@@ -34,7 +31,6 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
         .select('tokens, unlimited' as any)
         .eq('user_id', user!.id)
         .single();
-
       if (error) throw error;
       return data as any;
     },
@@ -62,11 +58,9 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
             fontSize: '12px',
           }}
         >
-          <span style={{ color: 'rgba(255,255,255,0.6)' }}>Je bekijkt een demo account.</span>
+          <span style={{ color: 'rgba(255,255,255,0.6)' }}>{t('nav.demoNotice')}</span>
           <button
-            onClick={() => {
-              signOut().then(() => navigate('/auth'));
-            }}
+            onClick={() => { signOut().then(() => navigate('/auth')); }}
             style={{
               color: '#bd9dff',
               background: 'none',
@@ -78,7 +72,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
               padding: '4px 8px',
             }}
           >
-            Start gratis →
+            {t('nav.startFree')}
           </button>
         </div>
       )}
@@ -99,69 +93,33 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
         gap: '12px',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          minWidth: 0,
-          flex: 1,
-          overflow: 'hidden',
-        }}
-      >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1, overflow: 'hidden' }}>
         {backTo ? (
           <button
             onClick={() => navigate(backTo)}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              color: 'rgba(255,255,255,0.45)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '13px',
-              padding: '6px 0',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-              minHeight: '44px',
+              display: 'flex', alignItems: 'center', gap: '6px',
+              color: 'rgba(255,255,255,0.45)', background: 'none', border: 'none',
+              cursor: 'pointer', fontSize: '13px', padding: '6px 0',
+              whiteSpace: 'nowrap', flexShrink: 0, minHeight: '44px',
             }}
           >
             <ArrowLeft size={14} />
-            <span className="hidden sm:inline">{backLabel ?? 'Terug'}</span>
+            <span className="hidden sm:inline">{backLabel ?? t('common.back')}</span>
           </button>
         ) : (
-          <a
-            href="/"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: '#fff',
-              textDecoration: 'none',
-              flexShrink: 0,
-            }}
-          >
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', textDecoration: 'none', flexShrink: 0 }}>
             <img src={logoSrc} alt="MyLactest" style={{ width: '44px', height: '44px', objectFit: 'contain', mixBlendMode: 'lighten', filter: 'drop-shadow(0 2px 8px rgba(139,74,255,0.25))' }} />
-            <span style={{ fontSize: '17px', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>
-              MyLactest
-            </span>
+            <span style={{ fontSize: '17px', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700 }}>MyLactest</span>
           </a>
         )}
 
         {title && (
-          <span
-            className="hidden sm:block"
-            style={{
-              color: 'rgba(255,255,255,0.55)',
-              fontSize: '13px',
-              borderLeft: '1px solid rgba(255,255,255,0.12)',
-              paddingLeft: '10px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <span className="hidden sm:block" style={{
+            color: 'rgba(255,255,255,0.55)', fontSize: '13px',
+            borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '10px',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {title}
           </span>
         )}
@@ -173,19 +131,15 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
         {!hideSignOut && (tokens !== null || unlimited) && (
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              padding: '4px 10px',
-              borderRadius: '20px',
+              display: 'flex', alignItems: 'center', gap: '5px',
+              padding: '4px 10px', borderRadius: '20px',
               background: unlimited ? 'rgba(0,253,193,0.08)' : tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
               border: `1px solid ${unlimited ? 'rgba(0,253,193,0.25)' : tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
-              fontSize: '12px',
-              fontWeight: 600,
+              fontSize: '12px', fontWeight: 600,
               color: unlimited ? '#00fdc1' : tokens === 0 ? '#f87171' : '#a090ff',
               cursor: 'default',
             }}
-            title={unlimited ? 'Beta — onbeperkte analyses' : tokens === 0 ? 'Geen tokens meer' : `${tokens} analyse${tokens === 1 ? '' : 's'} beschikbaar`}
+            title={unlimited ? t('nav.betaUnlimited') : tokens === 0 ? t('nav.noTokens') : `${tokens} ${t('nav.tokensAvailable')}`}
           >
             <Coins size={12} />
             {unlimited ? '∞' : tokens}
@@ -197,21 +151,11 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
             onClick={() => navigate('/admin')}
             className="hidden sm:block"
             style={{
-              color: 'rgba(255,255,255,0.38)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '12px',
-              padding: '6px 8px',
-              borderRadius: '6px',
-              minHeight: '44px',
+              color: 'rgba(255,255,255,0.38)', background: 'none', border: 'none',
+              cursor: 'pointer', fontSize: '12px', padding: '6px 8px', borderRadius: '6px', minHeight: '44px',
             }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.75)';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.38)';
-            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.75)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.38)'; }}
           >
             Admin
           </button>
@@ -221,28 +165,16 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
           <button
             onClick={() => signOut().then(() => navigate('/auth'))}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              color: 'rgba(255,255,255,0.38)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '12px',
-              padding: '6px 8px',
-              borderRadius: '6px',
-              transition: 'color 0.15s',
-              minHeight: '44px',
+              display: 'flex', alignItems: 'center', gap: '5px',
+              color: 'rgba(255,255,255,0.38)', background: 'none', border: 'none',
+              cursor: 'pointer', fontSize: '12px', padding: '6px 8px', borderRadius: '6px',
+              transition: 'color 0.15s', minHeight: '44px',
             }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.75)';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.38)';
-            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.75)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.38)'; }}
           >
             <LogOut size={13} />
-            <span className="hidden sm:inline">Uitloggen</span>
+            <span className="hidden sm:inline">{t('nav.signOut')}</span>
           </button>
         )}
       </div>
