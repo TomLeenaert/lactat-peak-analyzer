@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
 import { supabase } from '@/integrations/supabase/client';
-import { Share2, Check, Link, MessageCircle } from 'lucide-react';
+import { Share2, Check, Link, MessageCircle, Download, Image } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
+import html2canvas from 'html2canvas';
 
 interface ResultsTabProps {
   results: CalculationResults | null;
@@ -17,6 +18,8 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   const [sharing, setSharing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleShare = async () => {
     if (!testId || !athleteName) return;
@@ -92,6 +95,46 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${msg}`
       : `https://wa.me/?text=${msg}`;
     window.open(url, '_blank');
+  };
+
+  const handleShareImage = async () => {
+    if (!resultsRef.current) return;
+    setGeneratingImage(true);
+    try {
+      const canvas = await html2canvas(resultsRef.current, {
+        backgroundColor: '#0a0a0f',
+        scale: 2,
+        useCORS: true,
+      });
+      const blob = await new Promise<Blob>((resolve) =>
+        canvas.toBlob((b) => resolve(b!), 'image/png')
+      );
+      const fileName = `lactaat-test${athleteName ? `-${athleteName.replace(/\s+/g, '-')}` : ''}${testDate ? `-${testDate}` : ''}.png`;
+
+      // Try Web Share API with file (works on mobile)
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        const shareData = { files: [file] };
+        if (navigator.canShare(shareData)) {
+          await navigator.share({
+            ...shareData,
+            text: buildWhatsAppMessage(),
+          });
+          return;
+        }
+      }
+      // Fallback: download the image
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Image generation failed:', e);
+    } finally {
+      setGeneratingImage(false);
+    }
   };
 
   return (
