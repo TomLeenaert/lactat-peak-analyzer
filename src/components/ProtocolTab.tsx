@@ -59,7 +59,7 @@ const ProtocolStep = ({ num, title, desc }: { num: string; title: string; desc: 
   </div>
 );
 
-const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProps) => {
+const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps, onNext }: ProtocolTabProps) => {
   const { t, lang } = useLang();
 
   const update = (field: keyof ProtocolSettings, value: number | boolean) => {
