@@ -12,17 +12,16 @@ interface NumPadProps {
 const NumPad = ({ value, onChange, label, unit, color = '#6644ff', maxValue = 30, decimalPlaces = 1, hideDisplay = false }: NumPadProps) => {
   const handleKey = (key: string) => {
     if (key === '←') {
-      onChange(value.slice(0, -1));
+      // Clear entire value on backspace so next digit starts fresh
+      onChange('');
       return;
     }
     if (key === '.' && value.includes('.')) return;
     if (key === '.' && value === '') { onChange('0.'); return; }
-    // max decimal places
     if (decimalPlaces === 0 && key === '.') return;
-    const parts = (value + key).split('.');
-    if (parts[1] && parts[1].length > decimalPlaces) return;
-    // max value
     const next = value + key;
+    const parts = next.split('.');
+    if (parts[1] && parts[1].length > decimalPlaces) return;
     if (parseFloat(next) > maxValue) return;
     onChange(next);
   };
@@ -78,7 +77,10 @@ const NumPad = ({ value, onChange, label, unit, color = '#6644ff', maxValue = 30
         {KEYS.map(key => (
           <button
             key={key}
-            onClick={() => handleKey(key)}
+            onPointerUp={(e) => {
+              e.preventDefault();
+              handleKey(key);
+            }}
             style={{
               height: '72px',
               fontSize: key === '←' ? '22px' : '28px',
@@ -92,21 +94,13 @@ const NumPad = ({ value, onChange, label, unit, color = '#6644ff', maxValue = 30
                 : '1px solid rgba(255,255,255,0.08)',
               borderRadius: '14px',
               cursor: 'pointer',
-              transition: 'all 0.1s',
+              transition: 'background 0.1s, transform 0.1s',
               fontFamily: '"Inter", system-ui, monospace',
               WebkitTapHighlightColor: 'transparent',
               userSelect: 'none',
+              touchAction: 'manipulation',
             }}
-            onPointerDown={e => {
-              (e.currentTarget as HTMLButtonElement).style.background =
-                key === '←' ? 'rgba(239,68,68,0.25)' : `${color}25`;
-              (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.95)';
-            }}
-            onPointerUp={e => {
-              (e.currentTarget as HTMLButtonElement).style.background =
-                key === '←' ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.05)';
-              (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-            }}
+            className="active:scale-95"
           >
             {key}
           </button>
