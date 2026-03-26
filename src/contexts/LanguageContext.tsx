@@ -54,6 +54,7 @@ const translations = {
     'common.delete': 'Verwijderen',
     'common.edit': 'Bewerken',
     'common.or': 'OF',
+    'common.next': 'Volgende',
     'common.unexpectedError': 'Er is een onverwachte fout opgetreden.',
     // AppNav
     'nav.demoNotice': 'Je bekijkt een demo account.',
@@ -263,6 +264,7 @@ const translations = {
     'common.delete': 'Delete',
     'common.edit': 'Edit',
     'common.or': 'OR',
+    'common.next': 'Next',
     'common.unexpectedError': 'An unexpected error occurred.',
     // AppNav
     'nav.demoNotice': 'You are viewing a demo account.',
