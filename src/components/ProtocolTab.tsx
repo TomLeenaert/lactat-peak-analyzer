@@ -4,18 +4,13 @@ import { Switch } from '@/components/ui/switch';
 import type { ProtocolSettings } from '@/lib/protocol-types';
 import { formatPace, formatPace400 } from '@/lib/lactate-math';
 import PaceInput, { PaceIncrementInput } from './PaceInput';
+import { useLang } from '@/contexts/LanguageContext';
 
 interface ProtocolTabProps {
   protocol: ProtocolSettings;
   setProtocol: (p: ProtocolSettings) => void;
   onGenerateSteps: () => void;
 }
-
-const prepSteps = [
-  { num: '01', title: '48u voor de test', desc: 'Geen zware training. Rust of lichte activiteit maximaal.' },
-  { num: '02', title: 'Voeding', desc: 'Geen voedsel 2u voor de test. Geen cafeïne 4u voor de test. Goed gehydrateerd. Normale koolhydraatinname de dag ervoor.' },
-  { num: '03', title: 'Materiaal', desc: 'Lactaatmeter (bv. Lactate Plus / Lactate Pro 2), teststrips, lancetten (28G), alcoholdoekjes, papieren handdoek, hartslagband, loopband (1% helling).' },
-];
 
 const S = {
   card: {
@@ -63,15 +58,9 @@ const ProtocolStep = ({ num, title, desc }: { num: string; title: string; desc: 
   </div>
 );
 
-function paceSecToSpeedIncrement(baseSpeedKmh: number, paceIncrementSec: number): number {
-  const basePaceMin = 60 / baseSpeedKmh;
-  const newPaceMin = basePaceMin - paceIncrementSec / 60;
-  if (newPaceMin <= 0) return 1;
-  const newSpeed = 60 / newPaceMin;
-  return newSpeed - baseSpeedKmh;
-}
-
 const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProps) => {
+  const { t, lang } = useLang();
+
   const update = (field: keyof ProtocolSettings, value: number | boolean) => {
     setProtocol({ ...protocol, [field]: value });
   };
@@ -86,42 +75,51 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
     currentSpeed = 60 / nextPaceMin;
   }
 
+  const warmupDesc = lang === 'nl'
+    ? `Lichte jog op 60-65% HFmax (~${formatPace(8)} /km). Bouw op tot licht bezweet. Eindig met 2–3 korte versnellingen (10s).`
+    : `Light jog at 60-65% HRmax (~${formatPace(8)} /km). Build up to a light sweat. Finish with 2–3 short accelerations (10s).`;
+
+  const stepsDesc = lang === 'nl'
+    ? `Loop ${protocol.stepDistance}m per stap. Start op ${formatPace(protocol.startSpeed)} /km, verhoog het tempo met ${protocol.paceIncrementSec}s per stap. Na elke stap: 30s pauze voor bloedafname.`
+    : `Run ${protocol.stepDistance}m per step. Start at ${formatPace(protocol.startSpeed)} /km, increase pace by ${protocol.paceIncrementSec}s per step. After each step: 30s pause for blood sample.`;
+
+  const allOutDesc = lang === 'nl'
+    ? `Na de laatste reguliere stap: maximale inspanning over ${protocol.allOutDistance}m. Meet hartslag en lactaat direct na afloop en na 1 min rust.`
+    : `After the last regular step: maximum effort over ${protocol.allOutDistance}m. Measure heart rate and lactate immediately after and after 1 min rest.`;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-      {/* Protocol instellen */}
+      {/* Protocol setup */}
       <div style={S.card}>
-        <p style={S.sectionLabel}>Protocol instellen</p>
+        <p style={S.sectionLabel}>{t('protocol.setup')}</p>
 
         <div style={{ background: 'rgba(189,157,255,0.06)', border: '1px solid rgba(189,157,255,0.15)', borderRadius: '6px', padding: '12px 14px', marginBottom: '18px' }}>
           <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
-            <span style={{ color: '#bd9dff', fontWeight: 600 }}>Protocol:</span> Stel starttempo, increment en stapafstand in voordat je begint.
+            <span style={{ color: '#bd9dff', fontWeight: 600 }}>Protocol:</span> {t('protocol.info')}
           </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '14px', marginBottom: '18px' }}>
           <div>
-            <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Starttempo (min/km)</Label>
+            <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('protocol.startPace')}</Label>
             <PaceInput speedKmh={protocol.startSpeed} onChange={v => update('startSpeed', v)} />
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '4px' }}>Eerste stap</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '4px' }}>{t('protocol.firstStep')}</p>
           </div>
           <div>
-            <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Increment (mm:ss sneller)</Label>
+            <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('protocol.increment')}</Label>
             <PaceIncrementInput seconds={protocol.paceIncrementSec} onChange={v => update('paceIncrementSec', v)} />
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '4px' }}>Sneller per stap</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '4px' }}>{t('protocol.fasterPerStep')}</p>
           </div>
           <div>
-            <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Stapafstand (meter)</Label>
+            <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('protocol.stepDistance')}</Label>
             <Input
-              type="number"
-              step="100"
-              min={400}
-              max={3000}
+              type="number" step="100" min={400} max={3000}
               value={protocol.stepDistance}
               onChange={e => update('stepDistance', parseInt(e.target.value) || 1600)}
               style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff' }}
             />
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '4px' }}>Typisch: 1200 / 1600 / 2000m</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', marginTop: '4px' }}>{t('protocol.typical')}</p>
           </div>
         </div>
 
@@ -129,17 +127,16 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
         <div style={{ border: '1px solid rgba(255,255,255,0.07)', borderRadius: '6px', padding: '14px', marginBottom: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: protocol.allOutEnabled ? '14px' : '0' }}>
             <div>
-              <p style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginBottom: '2px' }}>Laatste all-out inspanning</p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>Maximale inspanning voor VO₂max/MAS bepaling</p>
+              <p style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginBottom: '2px' }}>{t('protocol.allOut')}</p>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>{t('protocol.allOutDesc')}</p>
             </div>
             <Switch checked={protocol.allOutEnabled} onCheckedChange={v => update('allOutEnabled', v)} />
           </div>
           {protocol.allOutEnabled && (
             <div>
-              <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Afstand (meter)</Label>
+              <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>{t('protocol.allOutDistance')}</Label>
               <Input
-                type="number"
-                step="100"
+                type="number" step="100"
                 value={protocol.allOutDistance}
                 onChange={e => update('allOutDistance', parseInt(e.target.value) || 800)}
                 placeholder="bv. 800"
@@ -151,15 +148,13 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
 
         {/* Preview */}
         <div style={{ border: '1px solid rgba(255,255,255,0.07)', borderRadius: '6px', padding: '14px', marginBottom: '18px' }}>
-          <p style={S.sectionLabel}>Protocol preview</p>
+          <p style={S.sectionLabel}>{t('protocol.preview')}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {previewSpeeds.map((s, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: '12px',
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.05)',
-                borderRadius: '4px',
-                padding: '10px 12px',
+                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+                borderRadius: '4px', padding: '10px 12px',
               }}>
                 <span style={{
                   width: '22px', height: '22px', borderRadius: '3px',
@@ -177,10 +172,8 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
             {protocol.allOutEnabled && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '12px',
-                background: 'rgba(255,116,64,0.05)',
-                border: '1px solid rgba(255,116,64,0.2)',
-                borderRadius: '4px',
-                padding: '10px 12px',
+                background: 'rgba(255,116,64,0.05)', border: '1px solid rgba(255,116,64,0.2)',
+                borderRadius: '4px', padding: '10px 12px',
               }}>
                 <span style={{
                   width: '22px', height: '22px', borderRadius: '3px',
@@ -198,39 +191,33 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
         <button
           onClick={onGenerateSteps}
           style={{
-            width: '100%',
-            padding: '14px',
-            borderRadius: '6px',
-            border: 'none',
+            width: '100%', padding: '14px', borderRadius: '6px', border: 'none',
             background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)',
-            color: '#fff',
-            fontSize: '13px',
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            cursor: 'pointer',
-            fontFamily: 'Inter, sans-serif',
+            color: '#fff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px',
+            cursor: 'pointer', fontFamily: 'Inter, sans-serif',
           }}
         >
-          Genereer stappen naar Data Invoer
+          {t('protocol.generate')}
         </button>
       </div>
 
-      {/* Testprotocol richtlijnen */}
+      {/* Test protocol guidelines */}
       <div style={S.card}>
-        <p style={S.sectionLabel}>Voorbereiding</p>
-        {prepSteps.map((s, i) => <ProtocolStep key={i} {...s} />)}
+        <p style={S.sectionLabel}>{t('protocol.preparation')}</p>
+        <ProtocolStep num="01" title={t('protocol.prep1title')} desc={t('protocol.prep1desc')} />
+        <ProtocolStep num="02" title={t('protocol.prep2title')} desc={t('protocol.prep2desc')} />
+        <ProtocolStep num="03" title={t('protocol.prep3title')} desc={t('protocol.prep3desc')} />
 
-        <p style={{ ...S.sectionLabel, marginTop: '20px' }}>Testverloop</p>
-        <ProtocolStep num="01" title="Rustmeting" desc="Meet rustlactaat vóór de warming-up. Normaal: 0.5–1.5 mmol/L. Bij > 2.5 mmol/L: check voeding/stress." />
-        <ProtocolStep num="02" title="Warming-up (15 min)" desc={`Lichte jog op 60-65% HFmax (~${formatPace(8)} /km). Bouw op tot licht bezweet. Eindig met 2–3 korte versnellingen (10s).`} />
-        <ProtocolStep num="03" title={`Stappen van ${protocol.stepDistance}m`} desc={`Loop ${protocol.stepDistance}m per stap. Start op ${formatPace(protocol.startSpeed)} /km, verhoog het tempo met ${protocol.paceIncrementSec}s per stap. Na elke stap: 30s pauze voor bloedafname.`} />
-        <ProtocolStep num="04" title="Bloedafname" desc="Reinig prikplaats met alcohol. Prik, veeg eerste druppel weg, test de tweede druppel. Noteer: lactaat (mmol/L), hartslag (einde stap)." />
+        <p style={{ ...S.sectionLabel, marginTop: '20px' }}>{t('protocol.testProcedure')}</p>
+        <ProtocolStep num="01" title={t('protocol.restMeasure')} desc={t('protocol.restDesc')} />
+        <ProtocolStep num="02" title={t('protocol.warmup')} desc={warmupDesc} />
+        <ProtocolStep num="03" title={`${t('data.step')} — ${protocol.stepDistance}m`} desc={stepsDesc} />
+        <ProtocolStep num="04" title={t('protocol.bloodSample')} desc={t('protocol.bloodDesc')} />
         {protocol.allOutEnabled && (
-          <ProtocolStep num="05" title={`All-out: ${protocol.allOutDistance}m`} desc={`Na de laatste reguliere stap: maximale inspanning over ${protocol.allOutDistance}m. Meet hartslag en lactaat direct na afloop en na 1 min rust.`} />
+          <ProtocolStep num="05" title={`All-out: ${protocol.allOutDistance}m`} desc={allOutDesc} />
         )}
-        <ProtocolStep num={protocol.allOutEnabled ? '06' : '05'} title="Cooling down" desc="10–15 min uitlopen op lage intensiteit. Eventueel nog een laatste lactaatmeting na 5 min cooldown." />
+        <ProtocolStep num={protocol.allOutEnabled ? '06' : '05'} title={t('protocol.cooldown')} desc={t('protocol.cooldownDesc')} />
       </div>
-
     </div>
   );
 };
