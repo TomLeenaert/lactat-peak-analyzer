@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -18,25 +18,35 @@ try {
 } catch { /* sandbox or CI */ }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: false,
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  const supabaseUrl = env.VITE_SUPABASE_URL || "https://sjmwmcsuvcgebreubkge.supabase.co";
+  const supabasePublishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqbXdtY3N1dmNnZWJyZXVia2dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5OTQ0MzMsImV4cCI6MjA4ODU3MDQzM30.PjCnEO99rZXn6ny3g4jCmpD_cZeWu2dZdqiC4QSnvxc";
+  const supabaseProjectId = env.VITE_SUPABASE_PROJECT_ID || "sjmwmcsuvcgebreubkge";
+
+  return {
+    server: {
+      host: "::",
+      port: 8080,
+      hmr: {
+        overlay: false,
+      },
     },
-  },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
-    __BUILD_DATE__: JSON.stringify(buildDate),
-    __BUILD_TIME__: JSON.stringify(buildTime),
-    __GIT_BRANCH__: JSON.stringify(gitBranch),
-  },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+    define: {
+      __APP_VERSION__: JSON.stringify(pkg.version),
+      __BUILD_DATE__: JSON.stringify(buildDate),
+      __BUILD_TIME__: JSON.stringify(buildTime),
+      __GIT_BRANCH__: JSON.stringify(gitBranch),
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
+      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey),
+      "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(supabaseProjectId),
     },
-    dedupe: ["react", "react-dom", "react/jsx-runtime"],
-  },
-}));
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+      dedupe: ["react", "react-dom", "react/jsx-runtime"],
+    },
+  };
+});
