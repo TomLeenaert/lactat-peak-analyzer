@@ -318,11 +318,19 @@ export function getZones(results: CalculationResults): ZoneData[] {
   const lt2s = results.lt2.best;
   const maxSpeed = results.speeds[results.speeds.length - 1];
 
+  // Ensure Zone 3 has minimum width: at least 0.3 km/h gap
+  const zone3Top = lt2s * 0.95;
+  const minZoneWidth = 0.3; // km/h
+  const adjustedZone3Top = (zone3Top - lt1s) < minZoneWidth ? lt1s + minZoneWidth : zone3Top;
+  // If adjusted zone3Top exceeds lt2s, cap it and split evenly
+  const finalZone3Top = Math.min(adjustedZone3Top, lt2s - minZoneWidth * 0.5);
+  const zone4Start = finalZone3Top;
+
   return [
     { name: 'Zone 1', label: 'Herstel', color: '#60a5fa', from: 0, to: lt1s * 0.85, desc: 'Zeer licht, actief herstel' },
     { name: 'Zone 2', label: 'Aeroob (Endurance)', color: '#34d399', from: lt1s * 0.85, to: lt1s, desc: 'Duurloop, vetverbranding, basis' },
-    { name: 'Zone 3', label: 'Tempo', color: '#fbbf24', from: lt1s, to: lt2s * 0.95, desc: 'Stevig tempo, marathon/HM-tempo' },
-    { name: 'Zone 4', label: 'Drempel', color: '#f97316', from: lt2s * 0.95, to: lt2s, desc: 'Rond anaerobe drempel, 10K-tempo' },
+    { name: 'Zone 3', label: 'Tempo', color: '#fbbf24', from: lt1s, to: finalZone3Top, desc: 'Stevig tempo, marathon/HM-tempo' },
+    { name: 'Zone 4', label: 'Drempel', color: '#f97316', from: zone4Start, to: lt2s, desc: 'Rond anaerobe drempel, 10K-tempo' },
     { name: 'Zone 5', label: 'VO₂max', color: '#ef4444', from: lt2s, to: maxSpeed * 1.1, desc: 'Intervallen, maximale inspanning' },
   ];
 }

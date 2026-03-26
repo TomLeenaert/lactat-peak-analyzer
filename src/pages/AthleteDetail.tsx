@@ -101,8 +101,18 @@ const AthleteDetail = () => {
   const latestLt1Speed = latestResults?.lt1?.best ?? latestResults?.lt1Speed ?? null;
   const latestLt2Speed = latestResults?.lt2?.best ?? latestResults?.lt2Speed ?? null;
 
-  // Avg tempo from all tests (simulated from lt2)
-  const avgTempo = latestLt2Speed ? formatPace(latestLt2Speed) : null;
+  // Avg tempo from all tests that have LT2 results
+  const avgTempo = (() => {
+    const lt2Speeds = tests
+      .map(t => {
+        const r = getStoredResults(t.results_json);
+        return r?.lt2?.best ?? r?.lt2Speed ?? null;
+      })
+      .filter((s): s is number => s != null && s > 0);
+    if (lt2Speeds.length === 0) return null;
+    const avg = lt2Speeds.reduce((a, b) => a + b, 0) / lt2Speeds.length;
+    return formatPace(avg);
+  })();
 
   const editButton = (
     <button onClick={openEdit} style={{
