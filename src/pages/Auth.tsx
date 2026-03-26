@@ -308,6 +308,41 @@ const Auth = () => {
 
         </div>
 
+          <button
+            onClick={async () => {
+              setSubmitting(true);
+              try {
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: 'coach@demo.mylactest.com',
+                  password: 'DemoCoach2024!',
+                });
+                if (error) throw error;
+                navigate('/dashboard');
+              } catch (err: unknown) {
+                toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
+              } finally {
+                setSubmitting(false);
+              }
+            }}
+            disabled={submitting}
+            style={{
+              width: '100%',
+              height: '52px',
+              background: 'rgba(0,253,193,0.06)',
+              border: '1px solid rgba(0,253,193,0.25)',
+              borderRadius: '2px',
+              color: '#00fdc1',
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontWeight: 700,
+              fontSize: '13px',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              opacity: submitting ? 0.7 : 1,
+            }}
+          >
+            Bekijk demo →
+          </button>
 
         {/* Language toggle */}
         <div style={{ marginTop: '16px', textAlign: 'center' }}>
