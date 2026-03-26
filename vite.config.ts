@@ -2,19 +2,20 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-import { readFileSync } from "fs";
-import { execSync } from "child_process";
-
-const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf-8"));
-
-// Build metadata: version + date/time + branch
-const now = new Date();
-const buildDate = now.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric" });
-const buildTime = now.toLocaleTimeString("nl-BE", { hour: "2-digit", minute: "2-digit", hour12: false });
+let pkg = { version: "0.0.0" };
+let buildDate = "";
+let buildTime = "";
 let gitBranch = "unknown";
+
 try {
+  const { readFileSync } = await import("fs");
+  const { execSync } = await import("child_process");
+  pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf-8"));
+  const now = new Date();
+  buildDate = now.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  buildTime = now.toLocaleTimeString("nl-BE", { hour: "2-digit", minute: "2-digit", hour12: false });
   gitBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
-} catch { /* CI or no git */ }
+} catch { /* sandbox or CI */ }
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
