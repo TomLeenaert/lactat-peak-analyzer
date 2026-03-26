@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
 import { supabase } from '@/integrations/supabase/client';
-import { Share2, Check, Link, MessageCircle } from 'lucide-react';
+import { Share2, Check, Link, MessageCircle, Download, Image } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
+import html2canvas from 'html2canvas';
 
 interface ResultsTabProps {
   results: CalculationResults | null;
@@ -17,6 +18,8 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   const [sharing, setSharing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleShare = async () => {
     if (!testId || !athleteName) return;
@@ -94,8 +97,49 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     window.open(url, '_blank');
   };
 
+  const handleShareImage = async () => {
+    if (!resultsRef.current) return;
+    setGeneratingImage(true);
+    try {
+      const canvas = await html2canvas(resultsRef.current, {
+        backgroundColor: '#0a0a0f',
+        scale: 2,
+        useCORS: true,
+      });
+      const blob = await new Promise<Blob>((resolve) =>
+        canvas.toBlob((b) => resolve(b!), 'image/png')
+      );
+      const fileName = `lactaat-test${athleteName ? `-${athleteName.replace(/\s+/g, '-')}` : ''}${testDate ? `-${testDate}` : ''}.png`;
+
+      // Try Web Share API with file (works on mobile)
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        const shareData = { files: [file] };
+        if (navigator.canShare(shareData)) {
+          await navigator.share({
+            ...shareData,
+            text: buildWhatsAppMessage(),
+          });
+          return;
+        }
+      }
+      // Fallback: download the image
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Image generation failed:', e);
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <div ref={resultsRef} style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '2px' }}>
 
       {/* Threshold hero cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -217,15 +261,34 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
           );
         })}
       </div>
+      </div>{/* end ref wrapper */}
 
-      {/* WhatsApp share button */}
+      {/* Share as image button */}
       <button
-        onClick={() => handleWhatsApp()}
+        onClick={handleShareImage}
+        disabled={generatingImage}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           padding: '14px', borderRadius: '6px',
           border: '1px solid rgba(37,211,102,0.35)', background: 'rgba(37,211,102,0.08)',
           color: '#25d366', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px',
+          cursor: generatingImage ? 'wait' : 'pointer', transition: 'all 0.15s', fontFamily: 'Inter, sans-serif',
+        }}
+      >
+        <Image size={15} />
+        {generatingImage
+          ? (t('results.shareWhatsApp').includes('WhatsApp') ? '⏳...' : '⏳...')
+          : t('results.shareImage')}
+      </button>
+
+      {/* WhatsApp text share button */}
+      <button
+        onClick={() => handleWhatsApp()}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          padding: '14px', borderRadius: '6px',
+          border: '1px solid rgba(37,211,102,0.25)', background: 'rgba(37,211,102,0.04)',
+          color: '#25d366', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px',
           cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'Inter, sans-serif',
         }}
       >
