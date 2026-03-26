@@ -170,6 +170,7 @@ const ROWS = [
 const Landing = () => {
   const navigate = useNavigate();
   const { lang, setLang } = useLang();
+  const { toast } = useToast();
   const t = COPY[lang];
 
   const [showEntry, setShowEntry] = useState(false);
