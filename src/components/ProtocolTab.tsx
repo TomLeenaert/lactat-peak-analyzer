@@ -10,6 +10,7 @@ interface ProtocolTabProps {
   protocol: ProtocolSettings;
   setProtocol: (p: ProtocolSettings) => void;
   onGenerateSteps: () => void;
+  onNext?: () => void;
 }
 
 const S = {
@@ -218,6 +219,30 @@ const ProtocolTab = ({ protocol, setProtocol, onGenerateSteps }: ProtocolTabProp
         )}
         <ProtocolStep num={protocol.allOutEnabled ? '06' : '05'} title={t('protocol.cooldown')} desc={t('protocol.cooldownDesc')} />
       </div>
+
+      {/* Next step button */}
+      {onNext && (
+        <button
+          onClick={onNext}
+          style={{
+            width: '100%',
+            padding: '16px',
+            background: 'linear-gradient(135deg, #6644ff 0%, #8b4aff 100%)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: 700,
+            fontFamily: 'Space Grotesk, monospace',
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            cursor: 'pointer',
+            marginTop: '16px',
+          }}
+        >
+          {t('common.next')} →
+        </button>
+      )}
     </div>
   );
 };
