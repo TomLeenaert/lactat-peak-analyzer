@@ -398,11 +398,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* ── Interactive Demo ── */}
-      <section className="lp-section" id="demo" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
-        <LandingDemo />
-      </section>
-
       {/* ── How it works ── */}
       <section className="lp-section lp-how-section" id="how-it-works">
         <div className="lp-center-head">
@@ -423,6 +418,11 @@ const Landing = () => {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* ── Interactive Demo ── */}
+      <section className="lp-section" id="demo" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+        <LandingDemo />
       </section>
 
       <section className="lp-section" id="features">
