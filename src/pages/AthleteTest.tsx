@@ -148,7 +148,7 @@ const AthleteTest = () => {
         <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
         {activeTab === 'protocol' && (
-          <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
+          <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} onNext={() => setActiveTab('data')} />
         )}
         {activeTab === 'data' && (
           <DataInputTab
