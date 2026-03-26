@@ -9,8 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
 import logoSrc from '@/assets/screen.png';
+import { useLang } from '@/contexts/LanguageContext';
 
-const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
+const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Unexpected error';
 
 const getSportInitial = (sport?: string | null) => (sport ?? 'L').charAt(0).toUpperCase();
 
@@ -19,6 +20,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLang();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newAthlete, setNewAthlete] = useState({ name: '', birth_date: '', sport: '', notes: '' });
 
@@ -69,9 +71,9 @@ const Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ['athletes'] });
       setDialogOpen(false);
       setNewAthlete({ name: '', birth_date: '', sport: '', notes: '' });
-      toast({ title: 'Atleet toegevoegd' });
+      toast({ title: t('dash.athleteAdded') });
     },
-    onError: (err: unknown) => toast({ title: 'Fout', description: getErrorMessage(err), variant: 'destructive' }),
+    onError: (err: unknown) => toast({ title: t('common.error'), description: getErrorMessage(err), variant: 'destructive' }),
   });
 
   const deleteAthlete = useMutation({
@@ -81,7 +83,7 @@ const Dashboard = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['athletes'] });
-      toast({ title: 'Atleet verwijderd' });
+      toast({ title: t('dash.athleteDeleted') });
     },
   });
 
@@ -90,19 +92,18 @@ const Dashboard = () => {
 
   const navRight = editingClub ? (
     <form onSubmit={e => { e.preventDefault(); updateClubName.mutate(clubNameInput); setEditingClub(false); }} style={{ display: 'flex', gap: '8px' }}>
-      <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} style={{ height: '28px', width: '140px', fontSize: '13px' }} placeholder="Clubnaam" />
-      <Button type="submit" size="sm" variant="outline" style={{ height: '28px', fontSize: '12px' }}>Opslaan</Button>
+      <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} style={{ height: '28px', width: '140px', fontSize: '13px' }} placeholder={t('dash.clubName')} />
+      <Button type="submit" size="sm" variant="outline" style={{ height: '28px', fontSize: '12px' }}>{t('common.save')}</Button>
     </form>
   ) : (
     <button
       onClick={() => { setClubNameInput(profile?.club_name || ''); setEditingClub(true); }}
       style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.38)', fontSize: '12px', padding: '4px 8px', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700 }}
     >
-      {profile?.club_name || 'Mijn Club'}
+      {profile?.club_name || t('dash.myClub')}
     </button>
   );
 
-  // Get last lactate from test results
   const getLastLactate = (testResults: { test_date?: string; results_json?: Record<string, unknown> }[]) => {
     if (!testResults?.length) return null;
     const sorted = [...testResults].sort((a, b) => (b.test_date || '').localeCompare(a.test_date || ''));
@@ -119,80 +120,50 @@ const Dashboard = () => {
 
       <main style={{ padding: '24px 24px 120px' }}>
 
-        {/* Status + Title */}
         <section style={{ marginBottom: '24px' }}>
           <span style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontWeight: 700,
-            fontSize: '11px',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: '#00fdc1',
-            display: 'block',
-            marginBottom: '4px',
+            fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: '11px',
+            letterSpacing: '0.2em', textTransform: 'uppercase', color: '#00fdc1',
+            display: 'block', marginBottom: '4px',
           }}>
-            Status: Arctic High
+            {t('dash.status')}
           </span>
           <h2 style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: '48px',
-            fontWeight: 900,
-            letterSpacing: '-2px',
-            lineHeight: 1,
-            color: '#fff',
-            margin: '0 0 20px',
-            textTransform: 'uppercase',
+            fontFamily: 'Space Grotesk, sans-serif', fontSize: '48px', fontWeight: 900,
+            letterSpacing: '-2px', lineHeight: 1, color: '#fff',
+            margin: '0 0 20px', textTransform: 'uppercase',
           }}>
-            ATHLETES
+            {t('dash.athletes').toUpperCase()}
           </h2>
 
-          {/* Add button — gradient CTA */}
           <button
             onClick={() => setDialogOpen(true)}
             style={{
-              width: '100%',
-              height: '72px',
+              width: '100%', height: '72px',
               background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)',
-              border: 'none',
-              borderRadius: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0 28px',
-              cursor: 'pointer',
+              border: 'none', borderRadius: '4px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '0 28px', cursor: 'pointer',
               boxShadow: '0 8px 32px rgba(139,74,255,0.35)',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
             <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900, fontSize: '18px', letterSpacing: '-0.5px', color: '#fff' }}>
-              + Atleet toevoegen
+              {t('dash.addAthlete')}
             </span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </button>
         </section>
 
-        {/* Loading */}
         {isLoading && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '20px' }}>
-            <img
-              src={logoSrc}
-              alt=""
-              style={{
-                width: '56px',
-                height: '56px',
-                objectFit: 'contain',
-                mixBlendMode: 'lighten',
-                opacity: 0.6,
-                animation: 'pulse 2s ease-in-out infinite',
-              }}
-            />
+            <img src={logoSrc} alt="" style={{ width: '56px', height: '56px', objectFit: 'contain', mixBlendMode: 'lighten', opacity: 0.6, animation: 'pulse 2s ease-in-out infinite' }} />
             <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, letterSpacing: '0.1em' }}>
-              Laden...
+              {t('common.loading')}
             </span>
           </div>
         )}
 
-        {/* Athlete bento cards */}
         {!isLoading && athletes.length > 0 && (
           <section style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '48px' }}>
             {athletes.map((a, idx) => {
@@ -207,71 +178,47 @@ const Dashboard = () => {
                   key={a.id}
                   onClick={() => navigate(`/athlete/${a.id}`)}
                   style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    background: '#201f1f',
-                    border: 'none',
-                    borderLeft: `4px solid ${accentColor}`,
-                    borderRadius: '2px',
-                    padding: '24px',
-                    minHeight: '180px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-                    WebkitTapHighlightColor: 'transparent',
+                    width: '100%', textAlign: 'left', background: '#201f1f',
+                    border: 'none', borderLeft: `4px solid ${accentColor}`,
+                    borderRadius: '2px', padding: '24px', minHeight: '180px',
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                    justifyContent: 'space-between', position: 'relative', overflow: 'hidden',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.4)', WebkitTapHighlightColor: 'transparent',
                   }}
                 >
-                  {/* Sport letter watermark */}
                   <div style={{
                     position: 'absolute', top: '12px', right: '16px',
                     fontSize: '64px', opacity: 0.08, lineHeight: 1,
                     fontFamily: 'Space Grotesk, sans-serif', fontWeight: 900,
-                    color: accentColor,
-                    pointerEvents: 'none',
+                    color: accentColor, pointerEvents: 'none',
                   }}>
                     {sportInitial}
                   </div>
 
-                  {/* Top: status chip + name */}
                   <div>
                     <span style={{
                       display: 'inline-block',
                       background: isActive ? '#006c50' : '#262626',
                       color: isActive ? '#dfffef' : '#adaaaa',
-                      fontSize: '10px',
-                      fontWeight: 900,
+                      fontSize: '10px', fontWeight: 900,
                       fontFamily: 'Space Grotesk, sans-serif',
-                      letterSpacing: '0.15em',
-                      textTransform: 'uppercase',
-                      padding: '3px 8px',
-                      borderRadius: '2px',
-                      marginBottom: '8px',
+                      letterSpacing: '0.15em', textTransform: 'uppercase',
+                      padding: '3px 8px', borderRadius: '2px', marginBottom: '8px',
                     }}>
-                      {isActive ? 'Active Test' : 'Ready'}
+                      {isActive ? t('dash.activeTest') : t('dash.ready')}
                     </span>
                     <h3 style={{
-                      fontFamily: 'Space Grotesk, sans-serif',
-                      fontSize: '28px',
-                      fontWeight: 900,
-                      letterSpacing: '-0.5px',
-                      color: '#fff',
-                      margin: 0,
-                      lineHeight: 1.1,
-                      textTransform: 'uppercase',
+                      fontFamily: 'Space Grotesk, sans-serif', fontSize: '28px', fontWeight: 900,
+                      letterSpacing: '-0.5px', color: '#fff', margin: 0, lineHeight: 1.1, textTransform: 'uppercase',
                     }}>
                       {a.name.toUpperCase()}
                     </h3>
                   </div>
 
-                  {/* Bottom: metric + arrow */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '16px' }}>
                     <div>
                       <p style={{ fontSize: '10px', fontWeight: 700, color: '#777575', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px', fontFamily: 'Space Grotesk, sans-serif' }}>
-                        {lastLactate ? 'Laatste Lactaat' : (a.sport || 'Geen tests')}
+                        {lastLactate ? t('dash.lastLactate') : (a.sport || t('dash.noTests'))}
                       </p>
                       {lastLactate ? (
                         <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '28px', fontWeight: 900, color: accentColor, margin: 0, lineHeight: 1 }}>
@@ -279,7 +226,7 @@ const Dashboard = () => {
                         </p>
                       ) : (
                         <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '16px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-                          {testCount} tests
+                          {testCount} {t('dash.tests')}
                         </p>
                       )}
                     </div>
@@ -291,45 +238,24 @@ const Dashboard = () => {
           </section>
         )}
 
-        {/* Empty state — Systeem Klaarmaken */}
         {!isLoading && athletes.length === 0 && (
-          <section style={{
-            background: '#131313',
-            padding: '40px 24px',
-            marginTop: '24px',
-            borderRadius: '2px',
-          }}>
+          <section style={{ background: '#131313', padding: '40px 24px', marginTop: '24px', borderRadius: '2px' }}>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <div style={{
-                width: '80px', height: '80px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                margin: '0 auto 16px',
-              }}>
-                <img
-                  src={logoSrc}
-                  alt=""
-                  style={{
-                    width: '72px',
-                    height: '72px',
-                    objectFit: 'contain',
-                    mixBlendMode: 'lighten',
-                    filter: 'drop-shadow(0 4px 16px rgba(139,74,255,0.25))',
-                    opacity: 0.7,
-                  }}
-                />
+              <div style={{ width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <img src={logoSrc} alt="" style={{ width: '72px', height: '72px', objectFit: 'contain', mixBlendMode: 'lighten', filter: 'drop-shadow(0 4px 16px rgba(139,74,255,0.25))', opacity: 0.7 }} />
               </div>
               <h4 style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '22px', fontWeight: 900, letterSpacing: '-0.5px', textTransform: 'uppercase', color: '#fff', margin: '0 0 8px' }}>
-                Systeem Klaarmaken
+                {t('dash.systemReady')}
               </h4>
               <p style={{ fontSize: '14px', color: '#adaaaa', lineHeight: 1.6, maxWidth: '280px', margin: '0 auto' }}>
-                Geen actieve atleten gevonden. Volg de protocol stappen voor een zuivere meting.
+                {t('dash.noAthletes')}
               </p>
             </div>
 
             {[
-              { n: '01', title: 'Voeg atleet toe', desc: 'Importeer profiel of maak een nieuwe coach-ID aan.' },
-              { n: '02', title: 'Koppel Sensoren', desc: 'Zorg dat de Bluetooth analyzer is ingeschakeld.' },
-              { n: '03', title: 'Start de Test', desc: 'De data-flow start automatisch na de eerste strip.', accent: true },
+              { n: '01', title: t('dash.step1title'), desc: t('dash.step1desc') },
+              { n: '02', title: t('dash.step2title'), desc: t('dash.step2desc') },
+              { n: '03', title: t('dash.step3title'), desc: t('dash.step3desc'), accent: true },
             ].map(step => (
               <div key={step.n} style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '24px' }}>
                 <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '36px', fontWeight: 900, color: '#777575', opacity: 0.4, lineHeight: 1, flexShrink: 0 }}>{step.n}</span>
@@ -343,16 +269,15 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* Add athlete dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogContent>
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nieuwe atleet</DialogTitle>
-            <DialogDescription>Voer de naam van de atleet in.</DialogDescription>
+            <DialogTitle>{t('dash.newAthlete')}</DialogTitle>
+            <DialogDescription>{t('dash.enterName')}</DialogDescription>
           </DialogHeader>
           <form onSubmit={e => { e.preventDefault(); addAthlete.mutate(newAthlete); }} className="space-y-4">
             <Input
-              placeholder="Naam *"
+              placeholder={t('dash.namePlaceholder')}
               value={newAthlete.name}
               onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))}
               required
@@ -370,7 +295,7 @@ const Dashboard = () => {
                 letterSpacing: '-0.3px', cursor: 'pointer',
               }}
             >
-              {addAthlete.isPending ? 'Bezig...' : 'Toevoegen'}
+              {addAthlete.isPending ? t('dash.adding') : t('dash.add')}
             </button>
           </form>
         </DialogContent>

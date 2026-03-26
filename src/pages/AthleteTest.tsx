@@ -12,12 +12,14 @@ import { calculate, type StepData, type CalculationResults } from '@/lib/lactate
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
+import { useLang } from '@/contexts/LanguageContext';
 
 const AthleteTest = () => {
   const { id: athleteId, testId } = useParams<{ id: string; testId?: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useLang();
 
   const [activeTab, setActiveTab] = useState('protocol');
   const [protocol, setProtocol] = useState<ProtocolSettings>(DEFAULT_PROTOCOL);
@@ -31,7 +33,6 @@ const AthleteTest = () => {
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
 
-  // Load existing test if viewing
   const { data: existingTest } = useQuery({
     queryKey: ['test', testId],
     queryFn: async () => {
@@ -83,19 +84,19 @@ const AthleteTest = () => {
     setStepDistance(String(protocol.stepDistance));
     setStepIncrement(String(protocol.stepIncrement));
     setActiveTab('data');
-    toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen klaargezet.` });
-  }, [protocol, toast]);
+    toast({ title: t('test.stepsGenerated'), description: `${steps.length} ${t('test.stepsReady')}` });
+  }, [protocol, toast, t]);
 
   const onCalculate = useCallback(() => {
     const result = calculate(testData, parseFloat(restingLactate) || 0);
     if (typeof result === 'string') {
-      toast({ title: 'Fout', description: result, variant: 'destructive' });
+      toast({ title: t('common.error'), description: result, variant: 'destructive' });
       return;
     }
     setResults(result);
     setActiveTab('analyze');
-    toast({ title: 'Berekening voltooid' });
-  }, [testData, restingLactate, toast]);
+    toast({ title: t('test.calculationDone') });
+  }, [testData, restingLactate, toast, t]);
 
   const saveTest = useMutation({
     mutationFn: async () => {
@@ -116,10 +117,10 @@ const AthleteTest = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tests', athleteId] });
-      toast({ title: 'Test opgeslagen' });
+      toast({ title: t('test.testSaved') });
       navigate(`/athlete/${athleteId}`);
     },
-    onError: (err: Error) => toast({ title: 'Fout', description: err.message, variant: 'destructive' }),
+    onError: (err: Error) => toast({ title: t('common.error'), description: err.message, variant: 'destructive' }),
   });
 
   const saveButton = results ? (
@@ -130,7 +131,7 @@ const AthleteTest = () => {
       style={{ background: '#6644ff', border: 'none', color: '#fff', fontSize: '13px' }}
     >
       <Save className="h-3.5 w-3.5 mr-1.5" />
-      {saveTest.isPending ? 'Opslaan...' : 'Opslaan'}
+      {saveTest.isPending ? t('common.saving') : t('common.save')}
     </Button>
   ) : undefined;
 
@@ -138,8 +139,8 @@ const AthleteTest = () => {
     <div className="min-h-screen bg-background">
       <AppNav
         backTo={`/athlete/${athleteId}`}
-        backLabel="Alle atleten"
-        title={`${testId ? 'Test bekijken' : 'Nieuwe test'}${athlete?.name ? ` — ${athlete.name}` : ''}`}
+        backLabel={t('test.allAthletes')}
+        title={`${testId ? t('test.viewTest') : t('test.newTest')}${athlete?.name ? ` — ${athlete.name}` : ''}`}
         rightContent={saveButton}
       />
 

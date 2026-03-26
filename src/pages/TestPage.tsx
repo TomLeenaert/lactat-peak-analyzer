@@ -9,6 +9,7 @@ import StepNav from '@/components/StepNav';
 import { calculate, type StepData, type CalculationResults } from '@/lib/lactate-math';
 import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
+import { useLang } from '@/contexts/LanguageContext';
 
 const QUICK_PROTOCOL: ProtocolSettings = {
   startSpeed: 10,
@@ -25,6 +26,7 @@ const TestPage = () => {
   const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLang();
   const isQuick = type === 'quick';
 
   const defaultProtocol = isQuick ? QUICK_PROTOCOL : DEFAULT_PROTOCOL;
@@ -56,19 +58,19 @@ const TestPage = () => {
     setStepDistance(String(protocol.stepDistance));
     setStepIncrement(String(protocol.stepIncrement));
     setActiveTab('data');
-    toast({ title: 'Stappen gegenereerd', description: `${steps.length} stappen klaargezet.` });
-  }, [protocol, toast]);
+    toast({ title: t('test.stepsGenerated'), description: `${steps.length} ${t('test.stepsReady')}` });
+  }, [protocol, toast, t]);
 
   const onCalculate = useCallback(() => {
     const result = calculate(testData, parseFloat(restingLactate) || 0);
     if (typeof result === 'string') {
-      toast({ title: 'Fout', description: result, variant: 'destructive' });
+      toast({ title: t('common.error'), description: result, variant: 'destructive' });
       return;
     }
     setResults(result);
     setActiveTab('analyze');
-    toast({ title: 'Berekening voltooid' });
-  }, [testData, restingLactate, toast]);
+    toast({ title: t('test.calculationDone') });
+  }, [testData, restingLactate, toast, t]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,7 +80,7 @@ const TestPage = () => {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-base sm:text-lg font-semibold truncate">
-            {isQuick ? 'Veldtest' : 'Inspanningstest'}
+            {isQuick ? t('test.fieldTest') : t('test.labTest')}
           </h1>
         </div>
       </header>

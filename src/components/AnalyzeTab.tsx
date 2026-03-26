@@ -1,6 +1,7 @@
 import { type CalculationResults } from '@/lib/lactate-math';
 import ResultsTab from '@/components/ResultsTab';
 import ZonesTab from '@/components/ZonesTab';
+import { useLang } from '@/contexts/LanguageContext';
 
 interface AnalyzeTabProps {
   results: CalculationResults | null;
@@ -10,6 +11,8 @@ interface AnalyzeTabProps {
 }
 
 const AnalyzeTab = ({ results, testId, athleteName, testDate }: AnalyzeTabProps) => {
+  const { t } = useLang();
+
   if (!results) {
     return (
       <div style={{
@@ -19,7 +22,7 @@ const AnalyzeTab = ({ results, testId, athleteName, testDate }: AnalyzeTabProps)
         textAlign: 'center',
       }}>
         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.25)', fontFamily: 'Inter, sans-serif' }}>
-          Eerst data invoeren en berekenen om resultaten te zien.
+          {t('results.calculateFirst')}
         </p>
       </div>
     );

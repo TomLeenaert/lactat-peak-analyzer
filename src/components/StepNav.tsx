@@ -1,16 +1,20 @@
+import { useLang } from '@/contexts/LanguageContext';
+
 interface StepNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   hasResults: boolean;
 }
 
-const STEPS = [
-  { key: 'protocol', label: 'GET SET.' },
-  { key: 'data',     label: 'TEST.' },
-  { key: 'analyze',  label: 'ANALYZE.' },
-];
-
 const StepNav = ({ activeTab, onTabChange, hasResults }: StepNavProps) => {
+  const { t } = useLang();
+
+  const STEPS = [
+    { key: 'protocol', label: t('step.getSet') },
+    { key: 'data',     label: t('step.test') },
+    { key: 'analyze',  label: t('step.analyze') },
+  ];
+
   return (
     <div style={{
       position: 'relative',
