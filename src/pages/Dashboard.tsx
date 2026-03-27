@@ -220,17 +220,11 @@ const Dashboard = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '16px' }}>
                     <div>
                       <p style={{ fontSize: '10px', fontWeight: 700, color: '#777575', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px', fontFamily: 'Space Grotesk, sans-serif' }}>
-                        {lastLactate ? t('dash.lastLactate') : (a.sport || t('dash.noTests'))}
+                        {a.sport || t('dash.noTests')}
                       </p>
-                      {lastLactate ? (
-                        <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '28px', fontWeight: 900, color: accentColor, margin: 0, lineHeight: 1 }}>
-                          {lastLactate} <span style={{ fontSize: '12px', fontWeight: 400, opacity: 0.7 }}>mmol/L</span>
-                        </p>
-                      ) : (
-                        <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '16px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-                          {testCount} {t('dash.tests')}
-                        </p>
-                      )}
+                      <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '16px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                        {testCount} {t('dash.tests')}
+                      </p>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <button
