@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
 import logoSrc from '@/assets/screen.png';
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const { t } = useLang();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newAthlete, setNewAthlete] = useState({ name: '', birth_date: '', sport: '', notes: '' });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; testCount: number } | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ['profile'],
@@ -230,7 +232,20 @@ const Dashboard = () => {
                         </p>
                       )}
                     </div>
-                    <span style={{ color: '#777575', fontSize: '20px', lineHeight: 1 }}>›</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: a.id, name: a.name, testCount }); }}
+                        style={{
+                          background: 'rgba(255,60,60,0.1)', border: '1px solid rgba(255,60,60,0.2)',
+                          borderRadius: '4px', padding: '6px 8px', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                        title="Verwijder"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff3c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                      </button>
+                      <span style={{ color: '#777575', fontSize: '20px', lineHeight: 1 }}>›</span>
+                    </div>
                   </div>
                 </button>
               );
@@ -300,6 +315,27 @@ const Dashboard = () => {
           </form>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Atleet verwijderen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget && deleteTarget.testCount > 0
+                ? `"${deleteTarget.name}" heeft ${deleteTarget.testCount} test(en). Alle testdata wordt permanent verwijderd.`
+                : `Weet je zeker dat je "${deleteTarget?.name}" wilt verwijderen?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleer</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteTarget) { deleteAthlete.mutate(deleteTarget.id); setDeleteTarget(null); } }}
+              style={{ background: '#dc2626' }}
+            >
+              Verwijder
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
