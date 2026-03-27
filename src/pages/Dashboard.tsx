@@ -315,6 +315,27 @@ const Dashboard = () => {
           </form>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Atleet verwijderen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget && deleteTarget.testCount > 0
+                ? `"${deleteTarget.name}" heeft ${deleteTarget.testCount} test(en). Alle testdata wordt permanent verwijderd.`
+                : `Weet je zeker dat je "${deleteTarget?.name}" wilt verwijderen?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleer</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteTarget) { deleteAthlete.mutate(deleteTarget.id); setDeleteTarget(null); } }}
+              style={{ background: '#dc2626' }}
+            >
+              Verwijder
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
