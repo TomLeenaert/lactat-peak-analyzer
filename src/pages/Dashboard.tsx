@@ -24,6 +24,7 @@ const Dashboard = () => {
   const { t } = useLang();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newAthlete, setNewAthlete] = useState({ name: '', birth_date: '', sport: '', notes: '' });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string; testCount: number } | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ['profile'],
