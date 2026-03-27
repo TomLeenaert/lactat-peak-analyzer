@@ -232,7 +232,20 @@ const Dashboard = () => {
                         </p>
                       )}
                     </div>
-                    <span style={{ color: '#777575', fontSize: '20px', lineHeight: 1 }}>›</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: a.id, name: a.name, testCount }); }}
+                        style={{
+                          background: 'rgba(255,60,60,0.1)', border: '1px solid rgba(255,60,60,0.2)',
+                          borderRadius: '4px', padding: '6px 8px', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                        title={t('dash.deleteAthlete') || 'Verwijder'}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff3c3c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                      </button>
+                      <span style={{ color: '#777575', fontSize: '20px', lineHeight: 1 }}>›</span>
+                    </div>
                   </div>
                 </button>
               );
