@@ -89,7 +89,7 @@ const COPY = {
     heroDesc: 'MyLactest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
     cmdLabel: 'start',
     cmdText: 'mylactest.app → analyse → results',
-    cta1: 'Start your analysis →',
+    cta1: 'Start free →',
     cta2: 'View demo',
     featKicker: "What's included",
     featTitleA: 'Everything you need to coach smarter.',
