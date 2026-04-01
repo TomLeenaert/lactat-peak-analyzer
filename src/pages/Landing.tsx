@@ -35,7 +35,7 @@ const COPY = {
       { title: 'Volledige lactaatcurve', desc: 'Nauwkeurige curve met datapunten, modelfit en belangrijke referentiemarkers. Helder inzicht in de fysiologie van je atleet.' },
       { title: 'Wetenschappelijke drempelanalyse', desc: 'Meerdere gevalideerde methoden gecombineerd tot één duidelijk resultaat. Geen black box. Robuuste, evidence-based resultaten.' },
       { title: '5 kant-en-klare trainingszones', desc: 'Directe zones voor tempo en hartslag. Train met precisie vanaf dag één.' },
-      { title: 'Betaal per gebruik. Geen abonnement.', desc: 'Betaal enkel wanneer je een test uitvoert. Simpel. Transparant. Schaalt met jou.' },
+      { title: 'Gratis te gebruiken. Altijd.', desc: 'Geen creditcard. Geen abonnement. Gewoon gratis.' },
       { title: 'Gebouwd voor echte tests', desc: 'Ontworpen voor coaches, clubs en atleten. Geen labomstandigheden nodig. Werkt waar je traint.' },
     ],
     cmpKicker: 'Vergelijking',
