@@ -37,7 +37,7 @@ const Auth = () => {
       } else {
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin },
+          options: { data: { full_name: `${firstName} ${lastName}`.trim(), first_name: firstName, last_name: lastName }, emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
         toast({ title: lang === 'nl' ? 'Account aangemaakt' : 'Account created', description: lang === 'nl' ? 'Controleer je e-mail.' : 'Check your email.' });
