@@ -18,7 +18,8 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ const Auth = () => {
       } else {
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin },
+          options: { data: { full_name: `${firstName} ${lastName}`.trim(), first_name: firstName, last_name: lastName }, emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
         toast({ title: lang === 'nl' ? 'Account aangemaakt' : 'Account created', description: lang === 'nl' ? 'Controleer je e-mail.' : 'Check your email.' });
@@ -171,10 +172,10 @@ const Auth = () => {
           }}>
             {isLogin ? (lang === 'nl' ? 'Inloggen' : 'Sign in') : (lang === 'nl' ? 'Account aanmaken' : 'Create account')}
           </h1>
-          <p style={{ fontSize: '13px', color: '#adaaaa', margin: 0, fontWeight: 400 }}>
+          <p style={{ fontSize: '13px', color: '#adaaaa', margin: 0, fontWeight: 400, lineHeight: 1.5 }}>
             {isLogin
               ? (lang === 'nl' ? 'Log in met je e-mail en wachtwoord.' : 'Log in with your email and password.')
-              : (lang === 'nl' ? 'Maak een gratis coachaccount aan.' : 'Create a free coach account.')}
+              : (lang === 'nl' ? 'Maak een gratis account aan en krijg direct toegang tot volledige lactaatanalyse. Geen creditcard nodig.' : 'Create a free account and get instant access to full lactate analysis. No credit card needed.')}
           </p>
         </div>
 
@@ -182,19 +183,35 @@ const Auth = () => {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {!isLogin && (
-            <div style={{ position: 'relative' }}>
-              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-                {lang === 'nl' ? 'Naam' : 'Name'}
-              </p>
-              <input
-                style={inputStyle}
-                placeholder={lang === 'nl' ? 'Jouw naam' : 'Your name'}
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                required
-                onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
-                onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
+                  {lang === 'nl' ? 'Voornaam' : 'First name'}
+                </p>
+                <input
+                  style={inputStyle}
+                  placeholder={lang === 'nl' ? 'Jan' : 'John'}
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                  required
+                  onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
+                  onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+              </div>
+              <div>
+                <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
+                  {lang === 'nl' ? 'Achternaam' : 'Last name'}
+                </p>
+                <input
+                  style={inputStyle}
+                  placeholder={lang === 'nl' ? 'Peeters' : 'Doe'}
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                  required
+                  onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
+                  onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+              </div>
             </div>
           )}
 

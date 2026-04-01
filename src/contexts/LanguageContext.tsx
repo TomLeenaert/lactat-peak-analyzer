@@ -60,8 +60,8 @@ const translations = {
     'nav.demoNotice': 'Je bekijkt een demo account.',
     'nav.startFree': 'Start gratis →',
     'nav.signOut': 'Uitloggen',
-    'nav.betaUnlimited': 'Beta — onbeperkte analyses',
-    'nav.noTokens': 'Geen tokens meer',
+    'nav.betaUnlimited': 'Onbeperkte analyses',
+    'nav.noTokens': 'Geen analyses meer',
     'nav.tokensAvailable': 'analyse(s) beschikbaar',
     // StepNav
     'step.getSet': 'PROTOCOL',
@@ -271,8 +271,8 @@ const translations = {
     'nav.demoNotice': 'You are viewing a demo account.',
     'nav.startFree': 'Start free →',
     'nav.signOut': 'Sign out',
-    'nav.betaUnlimited': 'Beta — unlimited analyses',
-    'nav.noTokens': 'No tokens left',
+    'nav.betaUnlimited': 'Unlimited analyses',
+    'nav.noTokens': 'No analyses left',
     'nav.tokensAvailable': 'analysis/analyses available',
     // StepNav
     'step.getSet': 'PROTOCOL',
