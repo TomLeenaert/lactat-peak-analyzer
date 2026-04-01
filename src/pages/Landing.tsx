@@ -106,10 +106,10 @@ const COPY = {
     cmpKicker: 'Comparison',
     cmpTitleA: 'Lab-level insight.',
     cmpTitleB: 'Without lab-level cost.',
-    cmpLead: 'A professional threshold test often costs €300–500 and several business days. MyLactest does it for €9.95 in seconds.',
+    cmpLead: 'A professional threshold test often costs €300–500 and several business days. MyLactest does it for free in seconds.',
     cmpHeaders: ['Criteria', 'Lab test', 'MyLactest', 'Spreadsheet'],
     cmpRows: [
-      ['Cost', '€300–500', '€9.95', '€0 + manual work'],
+      ['Cost', '€300–500', 'Free', '€0 + manual work'],
       ['Turnaround', '1–3 business days', '<60 sec', '2–4 hours'],
     ],
     ctaTitleA: 'Stop guessing.',
