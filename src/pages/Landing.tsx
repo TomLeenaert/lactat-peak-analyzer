@@ -116,7 +116,7 @@ const COPY = {
     ctaTitleB: 'Start training with data.',
     ctaDesc: 'Your first analysis in under 5 minutes.',
     ctaBtn: 'Start free analysis →',
-    ctaNote: '€9.95 only at report download — no subscription',
+    ctaNote: 'Completely free — no subscription needed',
     sceneTitle: 'New lactate test',
     sceneAthlete: 'Sarah Vermeulen - Running',
     analyse: 'Analyse thresholds',
