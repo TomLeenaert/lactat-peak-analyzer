@@ -172,10 +172,10 @@ const Auth = () => {
           }}>
             {isLogin ? (lang === 'nl' ? 'Inloggen' : 'Sign in') : (lang === 'nl' ? 'Account aanmaken' : 'Create account')}
           </h1>
-          <p style={{ fontSize: '13px', color: '#adaaaa', margin: 0, fontWeight: 400 }}>
+          <p style={{ fontSize: '13px', color: '#adaaaa', margin: 0, fontWeight: 400, lineHeight: 1.5 }}>
             {isLogin
               ? (lang === 'nl' ? 'Log in met je e-mail en wachtwoord.' : 'Log in with your email and password.')
-              : (lang === 'nl' ? 'Maak een gratis coachaccount aan.' : 'Create a free coach account.')}
+              : (lang === 'nl' ? 'Maak een gratis account aan en krijg direct toegang tot volledige lactaatanalyse. Geen creditcard nodig.' : 'Create a free account and get instant access to full lactate analysis. No credit card needed.')}
           </p>
         </div>
 
