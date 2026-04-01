@@ -100,7 +100,7 @@ const COPY = {
       { title: 'Full lactate curve', desc: 'Accurate curve with data points, model fit and key reference markers. Clear insight into your athlete\'s physiology.' },
       { title: 'Science-based threshold analysis', desc: 'Multiple validated methods combined into one clear outcome. No black box. Just robust, evidence-based results.' },
       { title: '5 ready-to-use training zones', desc: 'Instant zones for pace and heart rate. Train with precision from day one.' },
-      { title: 'Pay per use. No subscription.', desc: 'Only pay when you run a test. Simple. Transparent. Scales with you.' },
+      { title: 'Free to use. Always.', desc: 'No credit card. No subscription. Just free.' },
       { title: 'Built for real-world testing', desc: 'Designed for coaches, clubs and athletes. No lab conditions required. Works where you actually train.' },
     ],
     cmpKicker: 'Comparison',
