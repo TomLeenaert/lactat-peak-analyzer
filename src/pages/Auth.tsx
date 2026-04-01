@@ -183,19 +183,35 @@ const Auth = () => {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {!isLogin && (
-            <div style={{ position: 'relative' }}>
-              <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
-                {lang === 'nl' ? 'Naam' : 'Name'}
-              </p>
-              <input
-                style={inputStyle}
-                placeholder={lang === 'nl' ? 'Jouw naam' : 'Your name'}
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                required
-                onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
-                onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
+                  {lang === 'nl' ? 'Voornaam' : 'First name'}
+                </p>
+                <input
+                  style={inputStyle}
+                  placeholder={lang === 'nl' ? 'Jan' : 'John'}
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                  required
+                  onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
+                  onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+              </div>
+              <div>
+                <p style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '9px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#777575', marginBottom: '6px' }}>
+                  {lang === 'nl' ? 'Achternaam' : 'Last name'}
+                </p>
+                <input
+                  style={inputStyle}
+                  placeholder={lang === 'nl' ? 'Peeters' : 'Doe'}
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                  required
+                  onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
+                  onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+              </div>
             </div>
           )}
 

@@ -271,8 +271,8 @@ const translations = {
     'nav.demoNotice': 'You are viewing a demo account.',
     'nav.startFree': 'Start free →',
     'nav.signOut': 'Sign out',
-    'nav.betaUnlimited': 'Beta — unlimited analyses',
-    'nav.noTokens': 'No tokens left',
+    'nav.betaUnlimited': 'Unlimited analyses',
+    'nav.noTokens': 'No analyses left',
     'nav.tokensAvailable': 'analysis/analyses available',
     // StepNav
     'step.getSet': 'PROTOCOL',
