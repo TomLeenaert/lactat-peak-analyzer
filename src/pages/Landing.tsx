@@ -18,7 +18,7 @@ const COPY = {
     navFeat: 'Mogelijkheden',
     navPrice: 'Vergelijking',
     navStart: 'Start gratis →',
-    eyebrow: 'Gratis tijdens de bèta. Volledige analyse. Geen kaart nodig.',
+    eyebrow: 'Gratis · Geen creditcard nodig',
     heroTitleA: 'Ken je drempels.',
     heroTitleB: 'Train met data.',
     heroDesc: 'MyLactest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
