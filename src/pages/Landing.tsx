@@ -18,13 +18,13 @@ const COPY = {
     navFeat: 'Mogelijkheden',
     navPrice: 'Vergelijking',
     navStart: 'Start gratis →',
-    eyebrow: 'Gratis tijdens de bèta. Volledige analyse. Geen kaart nodig.',
+    eyebrow: 'Gratis · Geen creditcard nodig',
     heroTitleA: 'Ken je drempels.',
     heroTitleB: 'Train met data.',
     heroDesc: 'MyLactest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
     cmdLabel: 'start',
     cmdText: 'mylactest.app → analyseer → resultaten',
-    cta1: 'Start je analyse →',
+    cta1: 'Start gratis →',
     cta2: 'Bekijk demo',
     featKicker: 'Wat is inbegrepen',
     featTitleA: 'Alles om slimmer te coachen.',
@@ -35,23 +35,23 @@ const COPY = {
       { title: 'Volledige lactaatcurve', desc: 'Nauwkeurige curve met datapunten, modelfit en belangrijke referentiemarkers. Helder inzicht in de fysiologie van je atleet.' },
       { title: 'Wetenschappelijke drempelanalyse', desc: 'Meerdere gevalideerde methoden gecombineerd tot één duidelijk resultaat. Geen black box. Robuuste, evidence-based resultaten.' },
       { title: '5 kant-en-klare trainingszones', desc: 'Directe zones voor tempo en hartslag. Train met precisie vanaf dag één.' },
-      { title: 'Betaal per gebruik. Geen abonnement.', desc: 'Betaal enkel wanneer je een test uitvoert. Simpel. Transparant. Schaalt met jou.' },
+      { title: 'Gratis te gebruiken. Altijd.', desc: 'Geen creditcard. Geen abonnement. Gewoon gratis.' },
       { title: 'Gebouwd voor echte tests', desc: 'Ontworpen voor coaches, clubs en atleten. Geen labomstandigheden nodig. Werkt waar je traint.' },
     ],
     cmpKicker: 'Vergelijking',
     cmpTitleA: 'Lab-niveau inzicht.',
-    cmpTitleB: 'Zonder lab-niveau kosten.',
-    cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. MyLactest doet het voor €9.95 in seconden.',
+    cmpTitleB: 'Zonder lab-niveau gedoe.',
+    cmpLead: 'Een professionele drempeltest kost al snel €300–500 en meerdere werkdagen. MyLactest doet het gratis in seconden.',
     cmpHeaders: ['Criterium', 'Labtest', 'MyLactest', 'Spreadsheet'],
     cmpRows: [
-      ['Kostprijs', '€300–500', '€9.95', '€0 + manueel werk'],
+      ['Kostprijs', '€300–500', 'Gratis', '€0 + manueel werk'],
       ['Doorlooptijd', '1–3 werkdagen', '<60 sec', '2–4 uur'],
     ],
     ctaTitleA: 'Stop met gokken.',
     ctaTitleB: 'Train op basis van data.',
     ctaDesc: 'Je eerste analyse in minder dan 5 minuten.',
     ctaBtn: 'Start gratis analyse →',
-    ctaNote: '€9.95 enkel bij rapport-download — geen abonnement',
+    ctaNote: 'Volledig gratis — geen abonnement nodig',
     sceneTitle: 'Nieuwe lactaattest',
     sceneAthlete: 'Sarah Vermeulen - Lopen',
     analyse: 'Analyseer drempels',
@@ -83,13 +83,13 @@ const COPY = {
     navFeat: 'Features',
     navPrice: 'Comparison',
     navStart: 'Start free →',
-    eyebrow: 'Free during beta. Full analysis. No card required.',
+    eyebrow: 'Free · No credit card needed',
     heroTitleA: 'Know your thresholds.',
     heroTitleB: 'Train with data.',
     heroDesc: 'MyLactest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
     cmdLabel: 'start',
     cmdText: 'mylactest.app → analyse → results',
-    cta1: 'Start your analysis →',
+    cta1: 'Start free →',
     cta2: 'View demo',
     featKicker: "What's included",
     featTitleA: 'Everything you need to coach smarter.',
@@ -100,23 +100,23 @@ const COPY = {
       { title: 'Full lactate curve', desc: 'Accurate curve with data points, model fit and key reference markers. Clear insight into your athlete\'s physiology.' },
       { title: 'Science-based threshold analysis', desc: 'Multiple validated methods combined into one clear outcome. No black box. Just robust, evidence-based results.' },
       { title: '5 ready-to-use training zones', desc: 'Instant zones for pace and heart rate. Train with precision from day one.' },
-      { title: 'Pay per use. No subscription.', desc: 'Only pay when you run a test. Simple. Transparent. Scales with you.' },
+      { title: 'Free to use. Always.', desc: 'No credit card. No subscription. Just free.' },
       { title: 'Built for real-world testing', desc: 'Designed for coaches, clubs and athletes. No lab conditions required. Works where you actually train.' },
     ],
     cmpKicker: 'Comparison',
     cmpTitleA: 'Lab-level insight.',
     cmpTitleB: 'Without lab-level cost.',
-    cmpLead: 'A professional threshold test often costs €300–500 and several business days. MyLactest does it for €9.95 in seconds.',
+    cmpLead: 'A professional threshold test often costs €300–500 and several business days. MyLactest does it for free in seconds.',
     cmpHeaders: ['Criteria', 'Lab test', 'MyLactest', 'Spreadsheet'],
     cmpRows: [
-      ['Cost', '€300–500', '€9.95', '€0 + manual work'],
+      ['Cost', '€300–500', 'Free', '€0 + manual work'],
       ['Turnaround', '1–3 business days', '<60 sec', '2–4 hours'],
     ],
     ctaTitleA: 'Stop guessing.',
     ctaTitleB: 'Start training with data.',
     ctaDesc: 'Your first analysis in under 5 minutes.',
     ctaBtn: 'Start free analysis →',
-    ctaNote: '€9.95 only at report download — no subscription',
+    ctaNote: 'Completely free — no subscription needed',
     sceneTitle: 'New lactate test',
     sceneAthlete: 'Sarah Vermeulen - Running',
     analyse: 'Analyse thresholds',
@@ -276,6 +276,26 @@ const Landing = () => {
             title={lang === 'nl' ? 'Switch to English' : 'Schakel naar Nederlands'}
           >
             {lang === 'nl' ? 'EN' : 'NL'}
+          </button>
+          <button
+            className="lp-btn-login"
+            onClick={() => navigate('/auth')}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.15)',
+              color: 'rgba(255,255,255,0.7)',
+              padding: '6px 16px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
+          >
+            Inloggen
           </button>
         </div>
       </nav>
