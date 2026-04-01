@@ -277,6 +277,26 @@ const Landing = () => {
           >
             {lang === 'nl' ? 'EN' : 'NL'}
           </button>
+          <button
+            className="lp-btn-login"
+            onClick={() => navigate('/auth')}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.15)',
+              color: 'rgba(255,255,255,0.7)',
+              padding: '6px 16px',
+              borderRadius: '6px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
+          >
+            Inloggen
+          </button>
         </div>
       </nav>
       <section className="lp-hero-wrap" id="how">

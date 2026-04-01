@@ -23,23 +23,6 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
   const { t } = useLang();
   const isDemo = user?.email === DEMO_EMAIL;
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile-nav'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('tokens, unlimited' as any)
-        .eq('user_id', user!.id)
-        .single();
-      if (error) throw error;
-      return data as any;
-    },
-    enabled: !!user && !hideSignOut,
-    staleTime: 10_000,
-  });
-
-  const tokens = profile?.tokens ?? null;
-  const unlimited = profile?.unlimited ?? false;
   const isAdmin = user?.email === ADMIN_EMAIL;
 
   return (
