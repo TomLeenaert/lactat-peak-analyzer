@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ArrowLeft, Coins } from 'lucide-react';
+import { LogOut, ArrowLeft } from 'lucide-react';
 import logoSrc from '@/assets/screen.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
