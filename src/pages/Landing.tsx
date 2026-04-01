@@ -51,7 +51,7 @@ const COPY = {
     ctaTitleB: 'Train op basis van data.',
     ctaDesc: 'Je eerste analyse in minder dan 5 minuten.',
     ctaBtn: 'Start gratis analyse →',
-    ctaNote: '€9.95 enkel bij rapport-download — geen abonnement',
+    ctaNote: 'Volledig gratis — geen abonnement nodig',
     sceneTitle: 'Nieuwe lactaattest',
     sceneAthlete: 'Sarah Vermeulen - Lopen',
     analyse: 'Analyseer drempels',
