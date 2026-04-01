@@ -60,8 +60,8 @@ const translations = {
     'nav.demoNotice': 'Je bekijkt een demo account.',
     'nav.startFree': 'Start gratis →',
     'nav.signOut': 'Uitloggen',
-    'nav.betaUnlimited': 'Beta — onbeperkte analyses',
-    'nav.noTokens': 'Geen tokens meer',
+    'nav.betaUnlimited': 'Onbeperkte analyses',
+    'nav.noTokens': 'Geen analyses meer',
     'nav.tokensAvailable': 'analyse(s) beschikbaar',
     // StepNav
     'step.getSet': 'PROTOCOL',
