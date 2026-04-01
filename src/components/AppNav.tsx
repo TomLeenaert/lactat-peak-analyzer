@@ -128,23 +128,6 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {rightContent}
 
-        {!hideSignOut && (tokens !== null || unlimited) && (
-          <div
-            style={{
-              display: 'flex', alignItems: 'center', gap: '5px',
-              padding: '4px 10px', borderRadius: '20px',
-              background: unlimited ? 'rgba(0,253,193,0.08)' : tokens === 0 ? 'rgba(239,68,68,0.12)' : 'rgba(102,68,255,0.12)',
-              border: `1px solid ${unlimited ? 'rgba(0,253,193,0.25)' : tokens === 0 ? 'rgba(239,68,68,0.25)' : 'rgba(102,68,255,0.25)'}`,
-              fontSize: '12px', fontWeight: 600,
-              color: unlimited ? '#00fdc1' : tokens === 0 ? '#f87171' : '#a090ff',
-              cursor: 'default',
-            }}
-            title={unlimited ? t('nav.betaUnlimited') : tokens === 0 ? t('nav.noTokens') : `${tokens} ${t('nav.tokensAvailable')}`}
-          >
-            <Coins size={12} />
-            {unlimited ? '∞' : tokens}
-          </div>
-        )}
 
         {isAdmin && (
           <button
