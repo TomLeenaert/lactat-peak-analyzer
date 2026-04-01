@@ -83,7 +83,7 @@ const COPY = {
     navFeat: 'Features',
     navPrice: 'Comparison',
     navStart: 'Start free →',
-    eyebrow: 'Free during beta. Full analysis. No card required.',
+    eyebrow: 'Free · No credit card needed',
     heroTitleA: 'Know your thresholds.',
     heroTitleB: 'Train with data.',
     heroDesc: 'MyLactest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
