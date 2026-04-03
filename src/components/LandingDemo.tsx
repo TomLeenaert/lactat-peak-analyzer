@@ -76,7 +76,7 @@ const StepProtocol = () => {
 const StepData = () => (
   <div style={{ maxWidth: '520px', margin: '0 auto' }}>
     <DemoCard>
-      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '16px' }}>Veldtest data — Sarah Vermeulen</div>
+      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '16px' }}>Veldtest data — Persoon A</div>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
         <thead>
           <tr>
