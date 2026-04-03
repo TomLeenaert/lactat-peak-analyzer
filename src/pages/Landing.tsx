@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import logoSrc from '@/assets/screen.png';
@@ -184,6 +185,9 @@ const Landing = () => {
   const [showThresh2, setShowThresh2] = useState(false);
   const [showZones, setShowZones] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
 
   useEffect(() => {
     const timers: number[] = [];
@@ -298,7 +302,35 @@ const Landing = () => {
             Inloggen
           </button>
         </div>
+        <button className="lp-hamburger" onClick={() => setMobileMenuOpen(true)} aria-label="Menu">
+          <Menu size={24} />
+        </button>
       </nav>
+
+      {/* Mobile menu overlay */}
+      <div className={`lp-mobile-overlay ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="lp-mobile-menu">
+          <button className="lp-mobile-close" onClick={closeMobileMenu} aria-label="Sluiten">
+            <X size={24} />
+          </button>
+          <div className="lp-mobile-menu-links">
+            <a href="#how-it-works" onClick={closeMobileMenu}>{t.navHow}</a>
+            <a href="#features" onClick={closeMobileMenu}>{t.navFeat}</a>
+            <button
+              className="lp-btn-lang"
+              onClick={() => { setLang(lang === 'nl' ? 'en' : 'nl'); closeMobileMenu(); }}
+            >
+              {lang === 'nl' ? 'EN' : 'NL'}
+            </button>
+            <button
+              className="lp-mobile-login-btn"
+              onClick={() => { navigate('/auth'); closeMobileMenu(); }}
+            >
+              Inloggen
+            </button>
+          </div>
+        </div>
+      </div>
       <section className="lp-hero-wrap" id="how">
         {/* Brand — centered above both columns */}
         <div className="lp-hero-brand">
