@@ -31,10 +31,10 @@ const DemoCard = ({ children }: { children: ReactNode }) => (
 const StepProtocol = () => {
   const proto = [
     { label: 'Sport', value: 'Lopen' },
-    { label: 'Afstand per stap', value: '1.600 m' },
-    { label: 'Startsnelheid', value: '9 km/u' },
-    { label: 'Stapgrootte', value: '+1 km/u' },
-    { label: 'Aantal stappen', value: '8 stappen' },
+    { label: 'Afstand per stap', value: '1.200 m' },
+    { label: 'Startsnelheid', value: '10 km/u' },
+    { label: 'Stapgrootte', value: '+1.5 km/u' },
+    { label: 'Aantal stappen', value: '5 stappen' },
   ];
 
   return (
@@ -42,11 +42,11 @@ const StepProtocol = () => {
       <DemoCard>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg,#6644ff,#00c9a7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
-            S
+            A
           </div>
           <div>
             <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>Atleet</div>
-            <div style={{ fontSize: '18px', color: '#fff', fontWeight: 700 }}>Sarah Vermeulen</div>
+            <div style={{ fontSize: '18px', color: '#fff', fontWeight: 700 }}>Persoon A</div>
           </div>
         </div>
 
@@ -66,7 +66,7 @@ const StepProtocol = () => {
 
         <div style={{ marginTop: '20px', padding: '10px 14px', background: 'rgba(0,201,167,0.1)', border: '1px solid rgba(0,201,167,0.25)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span>✓</span>
-          <span style={{ fontSize: '13px', color: 'rgba(0,201,167,0.9)', fontWeight: 600 }}>8 teststappen klaar — start de veldtest</span>
+          <span style={{ fontSize: '13px', color: 'rgba(0,201,167,0.9)', fontWeight: 600 }}>5 teststappen klaar — start de veldtest</span>
         </div>
       </DemoCard>
     </div>
@@ -76,7 +76,7 @@ const StepProtocol = () => {
 const StepData = () => (
   <div style={{ maxWidth: '520px', margin: '0 auto' }}>
     <DemoCard>
-      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '16px' }}>Veldtest data — Sarah Vermeulen</div>
+      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '16px' }}>Veldtest data — Persoon A</div>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
         <thead>
           <tr>
