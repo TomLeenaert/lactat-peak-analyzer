@@ -66,7 +66,7 @@ const StepProtocol = () => {
 
         <div style={{ marginTop: '20px', padding: '10px 14px', background: 'rgba(0,201,167,0.1)', border: '1px solid rgba(0,201,167,0.25)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span>✓</span>
-          <span style={{ fontSize: '13px', color: 'rgba(0,201,167,0.9)', fontWeight: 600 }}>8 teststappen klaar — start de veldtest</span>
+          <span style={{ fontSize: '13px', color: 'rgba(0,201,167,0.9)', fontWeight: 600 }}>5 teststappen klaar — start de veldtest</span>
         </div>
       </DemoCard>
     </div>
