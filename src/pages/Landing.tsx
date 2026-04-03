@@ -185,6 +185,9 @@ const Landing = () => {
   const [showThresh2, setShowThresh2] = useState(false);
   const [showZones, setShowZones] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
 
   useEffect(() => {
     const timers: number[] = [];
