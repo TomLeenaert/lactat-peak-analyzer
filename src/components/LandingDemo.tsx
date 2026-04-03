@@ -42,11 +42,11 @@ const StepProtocol = () => {
       <DemoCard>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg,#6644ff,#00c9a7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
-            S
+            A
           </div>
           <div>
             <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>Atleet</div>
-            <div style={{ fontSize: '18px', color: '#fff', fontWeight: 700 }}>Sarah Vermeulen</div>
+            <div style={{ fontSize: '18px', color: '#fff', fontWeight: 700 }}>Persoon A</div>
           </div>
         </div>
 
