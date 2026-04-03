@@ -31,10 +31,10 @@ const DemoCard = ({ children }: { children: ReactNode }) => (
 const StepProtocol = () => {
   const proto = [
     { label: 'Sport', value: 'Lopen' },
-    { label: 'Afstand per stap', value: '1.600 m' },
-    { label: 'Startsnelheid', value: '9 km/u' },
-    { label: 'Stapgrootte', value: '+1 km/u' },
-    { label: 'Aantal stappen', value: '8 stappen' },
+    { label: 'Afstand per stap', value: '1.200 m' },
+    { label: 'Startsnelheid', value: '10 km/u' },
+    { label: 'Stapgrootte', value: '+1.5 km/u' },
+    { label: 'Aantal stappen', value: '5 stappen' },
   ];
 
   return (
