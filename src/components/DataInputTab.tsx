@@ -345,17 +345,72 @@ const DataInputTab = ({
               const hasHR = row.hr > 0;
               const hasTime = (row.time || 0) > 0;
               const allFilled = hasLactate && hasHR && hasTime;
+              const isFinal = i === testData.length - 1 && testData.length > 1;
+              const rowDist = row.distance || dist;
+
+              const updateFinalDistance = (val: string) => {
+                const newDist = parseFloat(val) || 0;
+                const newData = [...testData];
+                const r = { ...newData[i], distance: newDist };
+                if (r.time && r.time > 0) r.speed = calcSpeed(newDist, r.time);
+                newData[i] = r;
+                setTestData(newData);
+              };
 
               return (
                 <div key={i} style={{
-                  border: allFilled ? '1px solid rgba(0,253,193,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                  border: isFinal
+                    ? '2px solid rgba(255,107,43,0.55)'
+                    : allFilled ? '1px solid rgba(0,253,193,0.3)' : '1px solid rgba(255,255,255,0.06)',
                   borderRadius: '16px',
                   padding: '14px 16px',
-                  background: allFilled ? 'rgba(0,253,193,0.03)' : 'rgba(255,255,255,0.02)',
+                  background: isFinal
+                    ? 'rgba(255,107,43,0.06)'
+                    : allFilled ? 'rgba(0,253,193,0.03)' : 'rgba(255,255,255,0.02)',
+                  boxShadow: isFinal ? '0 0 0 4px rgba(255,107,43,0.08)' : undefined,
                 }}>
+                  {isFinal && (
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      gap: '10px', flexWrap: 'wrap',
+                      marginBottom: '12px', paddingBottom: '10px',
+                      borderBottom: '1px dashed rgba(255,107,43,0.3)',
+                    }}>
+                      <span style={{
+                        fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px',
+                        color: '#ff6b2b', textTransform: 'uppercase',
+                        background: 'rgba(255,107,43,0.15)',
+                        border: '1px solid rgba(255,107,43,0.4)',
+                        borderRadius: '6px', padding: '4px 10px',
+                      }}>
+                        ⚡ FINAL STAGE — ALL OUT
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          Afstand
+                        </Label>
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          value={row.distance || ''}
+                          onChange={(e) => updateFinalDistance(e.target.value)}
+                          placeholder={String(dist)}
+                          style={{
+                            width: '90px', height: '32px', fontSize: '14px',
+                            fontFamily: 'monospace', fontWeight: 700,
+                            textAlign: 'right', padding: '0 8px',
+                            background: 'rgba(255,107,43,0.08)',
+                            borderColor: 'rgba(255,107,43,0.4)',
+                            color: '#fff',
+                          }}
+                        />
+                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>m</span>
+                      </div>
+                    </div>
+                  )}
                   {/* Step header */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                       <div style={{
                         width: '30px', height: '30px', borderRadius: '50%',
                         background: allFilled ? 'rgba(0,253,193,0.2)' : 'rgba(255,255,255,0.06)',
@@ -369,6 +424,17 @@ const DataInputTab = ({
                       <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
                         {t('data.step')} {i + 1}
                       </span>
+                      {!isFinal && (
+                        <span style={{
+                          fontSize: '11px', fontWeight: 700, fontFamily: 'monospace',
+                          color: 'rgba(255,255,255,0.55)',
+                          background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '6px', padding: '2px 7px',
+                        }}>
+                          {rowDist} m
+                        </span>
+                      )}
                       {row.speed > 0 && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{
