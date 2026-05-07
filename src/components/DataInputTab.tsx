@@ -348,7 +348,7 @@ const DataInputTab = ({
               const isFinal = i === testData.length - 1 && testData.length > 1;
               const rowDist = row.distance || dist;
 
-              const updateFinalDistance = (val: string) => {
+              const updateStepDistance = (val: string) => {
                 const newDist = parseFloat(val) || 0;
                 const newData = [...testData];
                 const r = { ...newData[i], distance: newDist };
