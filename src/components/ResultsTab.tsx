@@ -2,9 +2,11 @@ import { useState, useRef } from 'react';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from './LactateChart';
 import { supabase } from '@/integrations/supabase/client';
-import { Share2, Check, Link, MessageCircle, Download, Image } from 'lucide-react';
+import { Share2, Check, Link, MessageCircle, Download, Image, FileText } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import logoSrc from '@/assets/screen.png';
 
 interface ResultsTabProps {
   results: CalculationResults | null;
