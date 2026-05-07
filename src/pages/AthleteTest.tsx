@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import ProtocolTab from '@/components/ProtocolTab';
+
 import DataInputTab from '@/components/DataInputTab';
 import AnalyzeTab from '@/components/AnalyzeTab';
 import AppNav from '@/components/AppNav';
@@ -21,7 +21,7 @@ const AthleteTest = () => {
   const { toast } = useToast();
   const { t } = useLang();
 
-  const [activeTab, setActiveTab] = useState('protocol');
+  const [activeTab, setActiveTab] = useState('data');
   const [protocol, setProtocol] = useState<ProtocolSettings>(DEFAULT_PROTOCOL);
   const [testData, setTestData] = useState<StepData[]>(
     Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 }))
@@ -147,10 +147,7 @@ const AthleteTest = () => {
       <main className="max-w-[900px] mx-auto px-4 py-2 pb-6">
         <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
-        {activeTab === 'protocol' && (
-          <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} onNext={() => setActiveTab('data')} />
-        )}
-        {activeTab === 'data' && (
+        {(activeTab === 'data' || activeTab === 'protocol') && (
           <DataInputTab
             testData={testData} setTestData={setTestData}
             athleteName={athleteName} setAthleteName={setAthleteName}
@@ -159,6 +156,7 @@ const AthleteTest = () => {
             stepDistance={stepDistance} setStepDistance={setStepDistance}
             stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
             onCalculate={onCalculate}
+            protocol={protocol} setProtocol={setProtocol}
           />
         )}
         {activeTab === 'analyze' && (

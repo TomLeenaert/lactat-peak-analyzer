@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import ProtocolTab from '@/components/ProtocolTab';
+
 import DataInputTab from '@/components/DataInputTab';
 import AnalyzeTab from '@/components/AnalyzeTab';
 import StepNav from '@/components/StepNav';
@@ -31,7 +31,7 @@ const TestPage = () => {
 
   const defaultProtocol = isQuick ? QUICK_PROTOCOL : DEFAULT_PROTOCOL;
 
-  const [activeTab, setActiveTab] = useState('protocol');
+  const [activeTab, setActiveTab] = useState('data');
   const [protocol, setProtocol] = useState<ProtocolSettings>(defaultProtocol);
   const [testData, setTestData] = useState<StepData[]>(
     Array.from({ length: defaultProtocol.numberOfSteps }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 }))
@@ -88,10 +88,7 @@ const TestPage = () => {
       <main className="max-w-[900px] mx-auto px-3 sm:px-4 py-2 sm:py-4">
         <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
-        {activeTab === 'protocol' && (
-          <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} />
-        )}
-        {activeTab === 'data' && (
+        {(activeTab === 'data' || activeTab === 'protocol') && (
           <DataInputTab
             testData={testData} setTestData={setTestData}
             athleteName={athleteName} setAthleteName={setAthleteName}
@@ -100,6 +97,7 @@ const TestPage = () => {
             stepDistance={stepDistance} setStepDistance={setStepDistance}
             stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
             onCalculate={onCalculate}
+            protocol={protocol} setProtocol={setProtocol}
           />
         )}
         {activeTab === 'analyze' && (

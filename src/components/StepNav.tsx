@@ -10,7 +10,6 @@ const StepNav = ({ activeTab, onTabChange, hasResults }: StepNavProps) => {
   const { t } = useLang();
 
   const STEPS = [
-    { key: 'protocol', label: t('step.getSet') },
     { key: 'data',     label: t('step.test') },
     { key: 'analyze',  label: t('step.analyze') },
   ];

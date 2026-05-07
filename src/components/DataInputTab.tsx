@@ -8,6 +8,8 @@ import { Trash2, Plus, Upload, Check, Timer, Droplets, Heart } from 'lucide-reac
 import { useToast } from '@/hooks/use-toast';
 import NumPad from '@/components/NumPad';
 import { useLang } from '@/contexts/LanguageContext';
+import ProtocolBar from '@/components/ProtocolBar';
+import type { ProtocolSettings } from '@/lib/protocol-types';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -23,6 +25,8 @@ interface DataInputTabProps {
   stepIncrement: string;
   setStepIncrement: (v: string) => void;
   onCalculate: () => void;
+  protocol?: ProtocolSettings;
+  setProtocol?: (p: ProtocolSettings) => void;
 }
 
 type EditingField = 'time' | 'lactate' | 'hr';
@@ -75,6 +79,7 @@ const DataInputTab = ({
   stepDistance, setStepDistance,
   stepIncrement, setStepIncrement,
   onCalculate,
+  protocol, setProtocol,
 }: DataInputTabProps) => {
   const dist = parseFloat(stepDistance) || 1600;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -314,6 +319,16 @@ const DataInputTab = ({
 
   return (
     <>
+      {protocol && setProtocol && (
+        <ProtocolBar
+          protocol={protocol}
+          setProtocol={setProtocol}
+          testData={testData}
+          setTestData={setTestData}
+          setStepDistance={setStepDistance}
+          setStepIncrement={setStepIncrement}
+        />
+      )}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">{t('data.stepData')}</CardTitle>
