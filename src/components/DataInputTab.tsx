@@ -8,6 +8,8 @@ import { Trash2, Plus, Upload, Check, Timer, Droplets, Heart } from 'lucide-reac
 import { useToast } from '@/hooks/use-toast';
 import NumPad from '@/components/NumPad';
 import { useLang } from '@/contexts/LanguageContext';
+import ProtocolBar from '@/components/ProtocolBar';
+import type { ProtocolSettings } from '@/lib/protocol-types';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -23,6 +25,8 @@ interface DataInputTabProps {
   stepIncrement: string;
   setStepIncrement: (v: string) => void;
   onCalculate: () => void;
+  protocol?: ProtocolSettings;
+  setProtocol?: (p: ProtocolSettings) => void;
 }
 
 type EditingField = 'time' | 'lactate' | 'hr';
