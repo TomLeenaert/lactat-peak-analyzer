@@ -319,6 +319,16 @@ const DataInputTab = ({
 
   return (
     <>
+      {protocol && setProtocol && (
+        <ProtocolBar
+          protocol={protocol}
+          setProtocol={setProtocol}
+          testData={testData}
+          setTestData={setTestData}
+          setStepDistance={setStepDistance}
+          setStepIncrement={setStepIncrement}
+        />
+      )}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">{t('data.stepData')}</CardTitle>
