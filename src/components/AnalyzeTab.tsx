@@ -1,6 +1,5 @@
 import { type CalculationResults } from '@/lib/lactate-math';
 import ResultsTab from '@/components/ResultsTab';
-import ZonesTab from '@/components/ZonesTab';
 import { useLang } from '@/contexts/LanguageContext';
 
 interface AnalyzeTabProps {
@@ -31,7 +30,6 @@ const AnalyzeTab = ({ results, testId, athleteName, testDate }: AnalyzeTabProps)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <ResultsTab results={results} testId={testId} athleteName={athleteName} testDate={testDate} />
-      <ZonesTab results={results} />
     </div>
   );
 };

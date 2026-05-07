@@ -227,16 +227,16 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
             background: 'radial-gradient(circle, rgba(0,229,122,0.15) 0%, transparent 70%)',
             pointerEvents: 'none',
           }} />
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#00e57a', opacity: 0.8, marginBottom: '10px' }}>
+          <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#00e57a', marginBottom: '12px' }}>
             {t('results.aerobicThreshold')}
           </p>
-          <p style={{ fontSize: '32px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '2px' }}>{formatPace(lt1.best)}</p>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>/km</p>
+          <p style={{ fontSize: '40px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '4px' }}>{formatPace(lt1.best)}</p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', marginBottom: '12px' }}>/km</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
             {lt1HR > 0 && (
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#00e57a', background: 'rgba(0,229,122,0.1)', padding: '3px 8px', borderRadius: '6px' }}>{lt1HR} bpm</span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#00e57a', background: 'rgba(0,229,122,0.15)', padding: '4px 10px', borderRadius: '6px' }}>{lt1HR} bpm</span>
             )}
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: '6px' }}>{lt1Lac} mmol/L</span>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: '6px' }}>{lt1Lac} mmol/L</span>
           </div>
         </div>
 
@@ -252,38 +252,38 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
             background: 'radial-gradient(circle, rgba(255,107,43,0.15) 0%, transparent 70%)',
             pointerEvents: 'none',
           }} />
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#ff6b2b', opacity: 0.8, marginBottom: '10px' }}>
+          <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#ff6b2b', marginBottom: '12px' }}>
             {t('results.anaerobicThreshold')}
           </p>
-          <p style={{ fontSize: '32px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '2px' }}>{formatPace(lt2.best)}</p>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>/km</p>
+          <p style={{ fontSize: '40px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '4px' }}>{formatPace(lt2.best)}</p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', marginBottom: '12px' }}>/km</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
             {lt2HR > 0 && (
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#ff6b2b', background: 'rgba(255,107,43,0.1)', padding: '3px 8px', borderRadius: '6px' }}>{lt2HR} bpm</span>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#ff6b2b', background: 'rgba(255,107,43,0.15)', padding: '4px 10px', borderRadius: '6px' }}>{lt2HR} bpm</span>
             )}
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: '6px' }}>{lt2Lac} mmol/L</span>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: '6px' }}>{lt2Lac} mmol/L</span>
           </div>
         </div>
       </div>
 
       {/* Lactate curve */}
       <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '16px' }}>
-        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '12px' }}>
+        <p style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '12px' }}>
           {t('results.lactateCurve')}
         </p>
         <LactateChart results={results} />
       </div>
 
       {/* Zone bar */}
-      <div style={{ borderRadius: '12px', overflow: 'hidden', height: '32px', display: 'flex', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ borderRadius: '12px', overflow: 'hidden', height: '36px', display: 'flex', border: '1px solid rgba(255,255,255,0.06)' }}>
         {zones.map(z => {
           const width = Math.max(((z.to - z.from) / totalRange) * 100, 5);
           return (
             <div key={z.name} style={{
               width: `${width}%`, background: z.color,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '10px', fontWeight: 800, color: '#fff',
-              textShadow: '0 1px 3px rgba(0,0,0,0.5)', letterSpacing: '0.5px',
+              fontSize: '12px', fontWeight: 800, color: '#fff',
+              textShadow: '0 1px 3px rgba(0,0,0,0.6)', letterSpacing: '0.5px',
             }}>
               {z.name.replace('Zone ', 'Z')}
             </div>
@@ -301,32 +301,32 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
 
           return (
             <div key={z.name} style={{
-              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
-              borderLeft: `4px solid ${z.color}`, borderRadius: '12px', padding: '12px 14px',
+              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+              borderLeft: `4px solid ${z.color}`, borderRadius: '12px', padding: '14px 16px',
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '2px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: z.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>{z.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: z.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#fff' }}>{z.name}</span>
                   </div>
-                  <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginLeft: '15px' }}>{z.label}</span>
+                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginLeft: '17px' }}>{z.label}</span>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, color: '#fff', marginBottom: '2px' }}>
+                  <p style={{ fontSize: '14px', fontFamily: 'monospace', fontWeight: 700, color: '#fff', marginBottom: '3px' }}>
                     {formatPace(z.to)} – {formatPace(z.from)} /km
                   </p>
                   {hrFrom > 0 && (
-                    <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', marginBottom: '1px' }}>
+                    <p style={{ fontSize: '13px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.7)', marginBottom: '2px' }}>
                       {hrFrom} – {hrTo} bpm
                     </p>
                   )}
-                  <p style={{ fontSize: '11px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)' }}>
+                  <p style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.5)' }}>
                     {lacFrom} – {lacTo} mmol/L
                   </p>
                 </div>
               </div>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '8px', lineHeight: 1.5 }} className="hidden sm:block">
+              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginTop: '10px', lineHeight: 1.5 }} className="hidden sm:block">
                 {z.desc}
               </p>
             </div>
