@@ -147,10 +147,7 @@ const AthleteTest = () => {
       <main className="max-w-[900px] mx-auto px-4 py-2 pb-6">
         <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
-        {activeTab === 'protocol' && (
-          <ProtocolTab protocol={protocol} setProtocol={setProtocol} onGenerateSteps={onGenerateSteps} onNext={() => setActiveTab('data')} />
-        )}
-        {activeTab === 'data' && (
+        {(activeTab === 'data' || activeTab === 'protocol') && (
           <DataInputTab
             testData={testData} setTestData={setTestData}
             athleteName={athleteName} setAthleteName={setAthleteName}
@@ -159,6 +156,7 @@ const AthleteTest = () => {
             stepDistance={stepDistance} setStepDistance={setStepDistance}
             stepIncrement={stepIncrement} setStepIncrement={setStepIncrement}
             onCalculate={onCalculate}
+            protocol={protocol} setProtocol={setProtocol}
           />
         )}
         {activeTab === 'analyze' && (
