@@ -366,7 +366,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
         }}
       >
         <FileText size={15} />
-        {generatingPdf ? '⏳ PDF...' : (t('results.sharePdf') || 'Download als PDF')}
+        {generatingPdf ? '⏳ PDF...' : 'Download als PDF'}
       </button>
 
       {/* WhatsApp text share button */}
