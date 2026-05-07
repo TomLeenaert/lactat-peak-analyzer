@@ -21,6 +21,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleShare = async () => {
