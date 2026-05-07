@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import ProtocolTab from '@/components/ProtocolTab';
+
 import DataInputTab from '@/components/DataInputTab';
 import AnalyzeTab from '@/components/AnalyzeTab';
 import StepNav from '@/components/StepNav';
