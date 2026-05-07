@@ -353,6 +353,22 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
           : t('results.shareImage')}
       </button>
 
+      {/* PDF export button */}
+      <button
+        onClick={handlePdfExport}
+        disabled={generatingPdf}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          padding: '14px', borderRadius: '6px',
+          border: '1px solid rgba(189,157,255,0.35)', background: 'rgba(189,157,255,0.08)',
+          color: '#bd9dff', fontSize: '13px', fontWeight: 700, letterSpacing: '0.5px',
+          cursor: generatingPdf ? 'wait' : 'pointer', transition: 'all 0.15s', fontFamily: 'Inter, sans-serif',
+        }}
+      >
+        <FileText size={15} />
+        {generatingPdf ? '⏳ PDF...' : (t('results.sharePdf') || 'Download als PDF')}
+      </button>
+
       {/* WhatsApp text share button */}
       <button
         onClick={() => handleWhatsApp()}
