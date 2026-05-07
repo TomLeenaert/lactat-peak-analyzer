@@ -31,7 +31,7 @@ const TestPage = () => {
 
   const defaultProtocol = isQuick ? QUICK_PROTOCOL : DEFAULT_PROTOCOL;
 
-  const [activeTab, setActiveTab] = useState('protocol');
+  const [activeTab, setActiveTab] = useState('data');
   const [protocol, setProtocol] = useState<ProtocolSettings>(defaultProtocol);
   const [testData, setTestData] = useState<StepData[]>(
     Array.from({ length: defaultProtocol.numberOfSteps }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 }))
