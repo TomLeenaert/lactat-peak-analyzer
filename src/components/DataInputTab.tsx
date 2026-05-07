@@ -393,7 +393,7 @@ const DataInputTab = ({
                           type="number"
                           inputMode="numeric"
                           value={row.distance || ''}
-                          onChange={(e) => updateFinalDistance(e.target.value)}
+                          onChange={(e) => updateStepDistance(e.target.value)}
                           placeholder={String(dist)}
                           style={{
                             width: '90px', height: '32px', fontSize: '14px',
