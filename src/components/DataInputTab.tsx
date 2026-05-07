@@ -425,15 +425,29 @@ const DataInputTab = ({
                         {t('data.step')} {i + 1}
                       </span>
                       {!isFinal && (
-                        <span style={{
-                          fontSize: '11px', fontWeight: 700, fontFamily: 'monospace',
-                          color: 'rgba(255,255,255,0.55)',
+                        <div style={{
+                          display: 'flex', alignItems: 'center', gap: '4px',
                           background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: '6px', padding: '2px 7px',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                          borderRadius: '6px', padding: '2px 6px',
                         }}>
-                          {rowDist} m
-                        </span>
+                          <Input
+                            type="number"
+                            inputMode="numeric"
+                            value={row.distance ?? ''}
+                            onChange={(e) => updateStepDistance(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            placeholder={String(dist)}
+                            style={{
+                              width: '58px', height: '22px', fontSize: '11px',
+                              fontFamily: 'monospace', fontWeight: 700,
+                              textAlign: 'right', padding: '0 4px',
+                              background: 'transparent', border: 'none',
+                              color: 'rgba(255,255,255,0.85)',
+                            }}
+                          />
+                          <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>m</span>
+                        </div>
                       )}
                       {row.speed > 0 && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
