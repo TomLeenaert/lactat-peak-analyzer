@@ -135,6 +135,9 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error('Image generation failed:', e);
+    } finally {
+      setGeneratingImage(false);
+    }
   };
 
   const handlePdfExport = async () => {
