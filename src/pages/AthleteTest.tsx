@@ -21,7 +21,7 @@ const AthleteTest = () => {
   const { toast } = useToast();
   const { t } = useLang();
 
-  const [activeTab, setActiveTab] = useState('protocol');
+  const [activeTab, setActiveTab] = useState('data');
   const [protocol, setProtocol] = useState<ProtocolSettings>(DEFAULT_PROTOCOL);
   const [testData, setTestData] = useState<StepData[]>(
     Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0 }))
