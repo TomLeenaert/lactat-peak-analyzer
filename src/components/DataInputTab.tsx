@@ -79,6 +79,7 @@ const DataInputTab = ({
   stepDistance, setStepDistance,
   stepIncrement, setStepIncrement,
   onCalculate,
+  protocol, setProtocol,
 }: DataInputTabProps) => {
   const dist = parseFloat(stepDistance) || 1600;
   const fileInputRef = useRef<HTMLInputElement>(null);
