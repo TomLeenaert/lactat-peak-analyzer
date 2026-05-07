@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import ProtocolTab from '@/components/ProtocolTab';
+
 import DataInputTab from '@/components/DataInputTab';
 import AnalyzeTab from '@/components/AnalyzeTab';
 import AppNav from '@/components/AppNav';
