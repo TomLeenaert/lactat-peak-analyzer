@@ -120,7 +120,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_overview: { Args: never; Returns: Json }
     }
     Enums: {
       [_ in never]: never
