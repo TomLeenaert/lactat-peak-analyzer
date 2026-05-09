@@ -2,10 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import AppNav from '@/components/AppNav';
 import { Users, FlaskConical, Share2, Activity, MessageCircle, FileText, Image as ImageIcon, Link as LinkIcon, Eye } from 'lucide-react';
-
-const ADMIN_EMAIL = 'tomleenaert@gmail.com';
 
 interface TopUser {
   user_id: string;
