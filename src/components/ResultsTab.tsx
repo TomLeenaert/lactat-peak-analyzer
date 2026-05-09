@@ -131,6 +131,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
             ...shareData,
             text: buildWhatsAppMessage(),
           });
+          trackEvent('share_image', { method: 'native_share' });
           return;
         }
       }
@@ -141,6 +142,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       a.download = fileName;
       a.click();
       URL.revokeObjectURL(url);
+      trackEvent('share_image', { method: 'download' });
     } catch (e) {
       console.error('Image generation failed:', e);
     } finally {
