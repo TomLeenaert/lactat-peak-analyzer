@@ -24,6 +24,12 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  const trackEvent = (event_type: string, metadata: Record<string, unknown> = {}) => {
+    (supabase.rpc as any)('log_event', { p_event_type: event_type, p_metadata: { ...metadata, test_id: testId ?? null } })
+      .then(() => {})
+      .catch(() => {});
+  };
+
   const handleShare = async () => {
     if (!testId || !athleteName) return;
     setSharing(true);
@@ -38,6 +44,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       setShareUrl(url);
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      trackEvent('share_link');
       setTimeout(() => setCopied(false), 3000);
     } catch (e) {
       console.error(e);
@@ -97,6 +104,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     const url = phoneNumber
       ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${msg}`
       : `https://wa.me/?text=${msg}`;
+    trackEvent('share_whatsapp');
     window.open(url, '_blank');
   };
 
@@ -123,6 +131,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
             ...shareData,
             text: buildWhatsAppMessage(),
           });
+          trackEvent('share_image', { method: 'native_share' });
           return;
         }
       }
@@ -133,6 +142,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       a.download = fileName;
       a.click();
       URL.revokeObjectURL(url);
+      trackEvent('share_image', { method: 'download' });
     } catch (e) {
       console.error('Image generation failed:', e);
     } finally {
@@ -202,6 +212,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
 
       const fileName = `mylactest${athleteName ? `-${athleteName.replace(/\s+/g, '-')}` : ''}${testDate ? `-${testDate}` : ''}.pdf`;
       pdf.save(fileName);
+      trackEvent('share_pdf');
     } catch (e) {
       console.error('PDF generation failed:', e);
     } finally {

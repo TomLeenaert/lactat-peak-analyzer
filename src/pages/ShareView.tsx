@@ -27,6 +27,12 @@ const ShareView = () => {
         .single();
       if (testErr || !test) throw new Error('Testresultaat niet gevonden');
 
+      // Log a public view event (non-blocking)
+      (supabase.rpc as any)('log_event', {
+        p_event_type: 'share_link_view',
+        p_metadata: { test_id: (share as any).test_result_id },
+      }).then(() => {}).catch(() => {});
+
       return {
         athleteName: (share as any).athlete_name,
         testDate: (share as any).test_date || test.test_date,
