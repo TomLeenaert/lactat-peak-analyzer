@@ -104,6 +104,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     const url = phoneNumber
       ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${msg}`
       : `https://wa.me/?text=${msg}`;
+    trackEvent('share_whatsapp');
     window.open(url, '_blank');
   };
 
