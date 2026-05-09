@@ -24,6 +24,12 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  const trackEvent = (event_type: string, metadata: Record<string, unknown> = {}) => {
+    (supabase.rpc as any)('log_event', { p_event_type: event_type, p_metadata: { ...metadata, test_id: testId ?? null } })
+      .then(() => {})
+      .catch(() => {});
+  };
+
   const handleShare = async () => {
     if (!testId || !athleteName) return;
     setSharing(true);
@@ -38,6 +44,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       setShareUrl(url);
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      trackEvent('share_link');
       setTimeout(() => setCopied(false), 3000);
     } catch (e) {
       console.error(e);
