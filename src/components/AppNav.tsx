@@ -3,6 +3,7 @@ import { LogOut, ArrowLeft } from 'lucide-react';
 import logoSrc from '@/assets/screen.png';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/contexts/LanguageContext';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 interface AppNavProps {
   backTo?: string;
@@ -12,7 +13,6 @@ interface AppNavProps {
   hideSignOut?: boolean;
 }
 
-const ADMIN_EMAIL = 'tomleenaert@gmail.com';
 const DEMO_EMAIL = 'coach@demo.mylactest.com';
 
 const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavProps) => {
@@ -20,8 +20,7 @@ const AppNav = ({ backTo, backLabel, title, rightContent, hideSignOut }: AppNavP
   const { signOut, user } = useAuth();
   const { t } = useLang();
   const isDemo = user?.email === DEMO_EMAIL;
-
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const { isAdmin } = useIsAdmin();
 
   return (
     <>
