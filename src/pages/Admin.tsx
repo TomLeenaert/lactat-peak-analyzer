@@ -99,7 +99,8 @@ const formatRelative = (iso: string) => {
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: roleLoading } = useIsAdmin();
 
   const { data, isLoading, error } = useQuery<Overview>({
     queryKey: ['admin-overview'],
@@ -108,11 +109,15 @@ const Admin = () => {
       if (error) throw error;
       return data as Overview;
     },
-    enabled: !!user,
+    enabled: !!user && isAdmin,
     refetchInterval: 60_000,
   });
 
-  if (user && user.email !== ADMIN_EMAIL) {
+  if (authLoading || roleLoading) {
+    return <div style={{ minHeight: '100vh', background: '#0c0d11', color: '#888', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Laden...</div>;
+  }
+
+  if (!user || !isAdmin) {
     navigate('/dashboard');
     return null;
   }
