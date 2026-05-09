@@ -212,6 +212,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
 
       const fileName = `mylactest${athleteName ? `-${athleteName.replace(/\s+/g, '-')}` : ''}${testDate ? `-${testDate}` : ''}.pdf`;
       pdf.save(fileName);
+      trackEvent('share_pdf');
     } catch (e) {
       console.error('PDF generation failed:', e);
     } finally {
