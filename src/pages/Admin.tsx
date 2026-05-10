@@ -139,6 +139,7 @@ const Admin = () => {
   const totals = data?.totals;
   const testsSeries = buildDailySeries(data?.tests_per_day ?? []);
   const signupsSeries = buildDailySeries(data?.signups_per_day ?? []);
+  const visitorsSeries = buildDailySeries(data?.visitors_per_day ?? []);
 
   const shareTotal = data?.share_breakdown.reduce((s, b) => s + Number(b.count), 0) ?? 0;
   const recent = (data?.recent_activity ?? []).slice(0, 25);
