@@ -177,6 +177,7 @@ const Admin = () => {
             { icon: <Users size={16} />, label: 'Atleten', value: totals?.athletes ?? '—', sub: '', color: '#fbbf24' },
             { icon: <FlaskConical size={16} />, label: 'Testen', value: totals?.tests ?? '—', sub: totals ? `${totals.tests_last_7d} deze week · ${totals.tests_last_30d} 30d` : '', color: '#00c9a7' },
             { icon: <Share2 size={16} />, label: 'Deelacties', value: totals?.share_events_total ?? '—', sub: 'WhatsApp, PDF, link, ...', color: '#f97316' },
+            { icon: <Globe size={16} />, label: 'Bezoekers', value: totals?.visitors_total ?? '—', sub: totals ? `${totals.visitors_last_7d} deze week · ~${totals.visitors_unique_30d} uniek 30d` : '', color: '#60a5fa' },
           ].map(s => (
             <div key={s.label} style={card}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: s.color, marginBottom: '8px', fontSize: '12px', fontWeight: 600 }}>
