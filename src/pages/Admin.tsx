@@ -25,6 +25,15 @@ interface ActivityRow {
 interface DayBucket { day: string; count: number; }
 interface ShareBucket { event_type: string; count: number; }
 
+interface CoachRow {
+  user_id: string;
+  full_name: string | null;
+  club_name: string | null;
+  email: string | null;
+  test_count: number;
+  export_count: number;
+  last_export_at: string | null;
+}
 interface Overview {
   totals: {
     users: number;
@@ -39,6 +48,7 @@ interface Overview {
   tests_per_day: DayBucket[];
   signups_per_day: DayBucket[];
   top_users: TopUser[];
+  coaches_overview: CoachRow[];
   recent_activity: ActivityRow[];
 }
 
@@ -171,6 +181,85 @@ const Admin = () => {
               {s.sub && <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '6px' }}>{s.sub}</div>}
             </div>
           ))}
+        </div>
+
+        {/* Coaches overview — simple view: name + tests + export status */}
+        <div style={{ ...card, marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
+              Coaches — testen & export
+            </div>
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
+              {data?.coaches_overview?.length ?? 0} coaches · "Tot export" = test gedeeld via WhatsApp/PDF/link
+            </div>
+          </div>
+          {!data?.coaches_overview?.length ? (
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>Nog geen coaches.</div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <thead>
+                  <tr style={{ textAlign: 'left', color: 'rgba(255,255,255,0.4)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Coach</th>
+                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }}>Testen</th>
+                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>Tot export</th>
+                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }}>Exports</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.coaches_overview.map(c => {
+                    const completed = c.export_count > 0;
+                    return (
+                      <tr key={c.user_id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <td style={{ padding: '10px' }}>
+                          <div style={{ color: '#fff', fontWeight: 500 }}>
+                            {c.full_name || <span style={{ color: 'rgba(255,255,255,0.3)' }}>(geen naam)</span>}
+                          </div>
+                          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
+                            {c.club_name || c.email}
+                          </div>
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'right', color: '#fff', fontWeight: 600 }}>
+                          {c.test_count}
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'center' }}>
+                          {c.test_count === 0 ? (
+                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>—</span>
+                          ) : completed ? (
+                            <span style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '4px',
+                              padding: '3px 8px', borderRadius: '999px',
+                              background: 'rgba(0,201,167,0.12)', color: '#00c9a7',
+                              fontSize: '11px', fontWeight: 600,
+                            }}>
+                              ✓ Ja
+                            </span>
+                          ) : (
+                            <span style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '4px',
+                              padding: '3px 8px', borderRadius: '999px',
+                              background: 'rgba(248,113,113,0.10)', color: '#f87171',
+                              fontSize: '11px', fontWeight: 600,
+                            }}>
+                              Niet afgerond
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
+                          {c.export_count}
+                          {c.last_export_at && (
+                            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>
+                              laatst {formatRelative(c.last_export_at)}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Trends */}
