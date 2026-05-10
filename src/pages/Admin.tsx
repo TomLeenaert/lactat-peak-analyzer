@@ -43,10 +43,14 @@ interface Overview {
     tests_last_30d: number;
     new_users_last_30d: number;
     share_events_total: number;
+    visitors_total: number;
+    visitors_last_7d: number;
+    visitors_unique_30d: number;
   };
   share_breakdown: ShareBucket[];
   tests_per_day: DayBucket[];
   signups_per_day: DayBucket[];
+  visitors_per_day: DayBucket[];
   top_users: TopUser[];
   coaches_overview: CoachRow[];
   recent_activity: ActivityRow[];
