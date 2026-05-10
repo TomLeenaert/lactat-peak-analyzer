@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import AppNav from '@/components/AppNav';
-import { Users, FlaskConical, Share2, Activity, MessageCircle, FileText, Image as ImageIcon, Link as LinkIcon, Eye } from 'lucide-react';
+import { Users, FlaskConical, Share2, Activity, MessageCircle, FileText, Image as ImageIcon, Link as LinkIcon, Eye, Globe } from 'lucide-react';
 
 interface TopUser {
   user_id: string;
@@ -43,10 +43,14 @@ interface Overview {
     tests_last_30d: number;
     new_users_last_30d: number;
     share_events_total: number;
+    visitors_total: number;
+    visitors_last_7d: number;
+    visitors_unique_30d: number;
   };
   share_breakdown: ShareBucket[];
   tests_per_day: DayBucket[];
   signups_per_day: DayBucket[];
+  visitors_per_day: DayBucket[];
   top_users: TopUser[];
   coaches_overview: CoachRow[];
   recent_activity: ActivityRow[];
@@ -135,6 +139,7 @@ const Admin = () => {
   const totals = data?.totals;
   const testsSeries = buildDailySeries(data?.tests_per_day ?? []);
   const signupsSeries = buildDailySeries(data?.signups_per_day ?? []);
+  const visitorsSeries = buildDailySeries(data?.visitors_per_day ?? []);
 
   const shareTotal = data?.share_breakdown.reduce((s, b) => s + Number(b.count), 0) ?? 0;
   const recent = (data?.recent_activity ?? []).slice(0, 25);
@@ -172,6 +177,7 @@ const Admin = () => {
             { icon: <Users size={16} />, label: 'Atleten', value: totals?.athletes ?? '—', sub: '', color: '#fbbf24' },
             { icon: <FlaskConical size={16} />, label: 'Testen', value: totals?.tests ?? '—', sub: totals ? `${totals.tests_last_7d} deze week · ${totals.tests_last_30d} 30d` : '', color: '#00c9a7' },
             { icon: <Share2 size={16} />, label: 'Deelacties', value: totals?.share_events_total ?? '—', sub: 'WhatsApp, PDF, link, ...', color: '#f97316' },
+            { icon: <Globe size={16} />, label: 'Bezoekers', value: totals?.visitors_total ?? '—', sub: totals ? `${totals.visitors_last_7d} deze week · ~${totals.visitors_unique_30d} uniek 30d` : '', color: '#60a5fa' },
           ].map(s => (
             <div key={s.label} style={card}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: s.color, marginBottom: '8px', fontSize: '12px', fontWeight: 600 }}>
@@ -344,6 +350,19 @@ const Admin = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
               <span>{signupsSeries[0]?.label}</span>
               <span>{signupsSeries[signupsSeries.length - 1]?.label}</span>
+            </div>
+          </div>
+          <div style={card}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Bezoekers — laatste 30 dagen</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
+                {visitorsSeries.reduce((s, d) => s + d.count, 0)} pageviews
+              </div>
+            </div>
+            <BarChart data={visitorsSeries} color="#60a5fa" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
+              <span>{visitorsSeries[0]?.label}</span>
+              <span>{visitorsSeries[visitorsSeries.length - 1]?.label}</span>
             </div>
           </div>
         </div>
