@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import AppNav from '@/components/AppNav';
-import { Users, FlaskConical, Share2, Activity, MessageCircle, FileText, Image as ImageIcon, Link as LinkIcon, Eye } from 'lucide-react';
+import { Users, FlaskConical, Share2, Activity, MessageCircle, FileText, Image as ImageIcon, Link as LinkIcon, Eye, Globe } from 'lucide-react';
 
 interface TopUser {
   user_id: string;
