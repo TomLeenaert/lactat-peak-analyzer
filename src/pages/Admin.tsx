@@ -185,12 +185,57 @@ const Admin = () => {
 
         {/* Coaches overview — simple view: name + tests + export status */}
         <div style={{ ...card, marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
               Coaches — testen & export
             </div>
-            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
-              {data?.coaches_overview?.length ?? 0} coaches · "Tot export" = test gedeeld via WhatsApp/PDF/link
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
+                {data?.coaches_overview?.length ?? 0} coaches
+              </div>
+              <button
+                onClick={() => {
+                  const rows = data?.coaches_overview ?? [];
+                  const header = ['Naam', 'Email', 'Club', 'Testen', 'Exports', 'Laatste export'];
+                  const csv = [header, ...rows.map(c => [
+                    c.full_name ?? '',
+                    c.email ?? '',
+                    c.club_name ?? '',
+                    String(c.test_count),
+                    String(c.export_count),
+                    c.last_export_at ?? '',
+                  ])].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `coaches-${new Date().toISOString().slice(0,10)}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 12px', borderRadius: '8px', cursor: 'pointer',
+                  background: 'rgba(0,201,167,0.12)', color: '#00c9a7',
+                  border: '1px solid rgba(0,201,167,0.3)', fontSize: '12px', fontWeight: 600,
+                }}
+              >
+                ⬇ Export CSV
+              </button>
+              <button
+                onClick={() => {
+                  const emails = (data?.coaches_overview ?? []).map(c => c.email).filter(Boolean).join(',');
+                  if (emails) window.location.href = `mailto:?bcc=${emails}`;
+                }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 12px', borderRadius: '8px', cursor: 'pointer',
+                  background: 'rgba(102,68,255,0.12)', color: '#a090ff',
+                  border: '1px solid rgba(102,68,255,0.3)', fontSize: '12px', fontWeight: 600,
+                }}
+              >
+                ✉ Mail allemaal
+              </button>
             </div>
           </div>
           {!data?.coaches_overview?.length ? (
