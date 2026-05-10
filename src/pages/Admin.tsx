@@ -246,6 +246,7 @@ const Admin = () => {
                 <thead>
                   <tr style={{ textAlign: 'left', color: 'rgba(255,255,255,0.4)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Coach</th>
+                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Email</th>
                     <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }}>Testen</th>
                     <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>Tot export</th>
                     <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }}>Exports</th>
@@ -261,10 +262,20 @@ const Admin = () => {
                             {c.full_name || <span style={{ color: 'rgba(255,255,255,0.3)' }}>(geen naam)</span>}
                           </div>
                           <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
-                            {c.club_name || c.email}
+                            {c.club_name || '—'}
                           </div>
                         </td>
-                        <td style={{ padding: '10px', textAlign: 'right', color: '#fff', fontWeight: 600 }}>
+                        <td style={{ padding: '10px' }}>
+                          {c.email ? (
+                            <a href={`mailto:${c.email}?subject=${encodeURIComponent('myLactest — ' + (c.test_count > 0 ? `je ${c.test_count} test(en)` : 'welkom'))}`}
+                               style={{ color: '#60a5fa', fontSize: '12px', textDecoration: 'none' }}>
+                              {c.email}
+                            </a>
+                          ) : (
+                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>—</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'right', color: '#fff', fontWeight: 700, fontSize: '15px' }}>
                           {c.test_count}
                         </td>
                         <td style={{ padding: '10px', textAlign: 'center' }}>
