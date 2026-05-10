@@ -25,6 +25,15 @@ interface ActivityRow {
 interface DayBucket { day: string; count: number; }
 interface ShareBucket { event_type: string; count: number; }
 
+interface CoachRow {
+  user_id: string;
+  full_name: string | null;
+  club_name: string | null;
+  email: string | null;
+  test_count: number;
+  export_count: number;
+  last_export_at: string | null;
+}
 interface Overview {
   totals: {
     users: number;
@@ -39,6 +48,7 @@ interface Overview {
   tests_per_day: DayBucket[];
   signups_per_day: DayBucket[];
   top_users: TopUser[];
+  coaches_overview: CoachRow[];
   recent_activity: ActivityRow[];
 }
 
