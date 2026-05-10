@@ -19,6 +19,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Admin from "./pages/Admin";
 import ShareView from "./pages/ShareView";
 import NotFound from "./pages/NotFound";
+import PageViewTracker from "./components/PageViewTracker";
 
 const queryClient = new QueryClient();
 
