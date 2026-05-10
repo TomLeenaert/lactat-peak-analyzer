@@ -352,6 +352,19 @@ const Admin = () => {
               <span>{signupsSeries[signupsSeries.length - 1]?.label}</span>
             </div>
           </div>
+          <div style={card}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Bezoekers — laatste 30 dagen</div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
+                {visitorsSeries.reduce((s, d) => s + d.count, 0)} pageviews
+              </div>
+            </div>
+            <BarChart data={visitorsSeries} color="#60a5fa" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>
+              <span>{visitorsSeries[0]?.label}</span>
+              <span>{visitorsSeries[visitorsSeries.length - 1]?.label}</span>
+            </div>
+          </div>
         </div>
 
         {/* Share method breakdown */}
