@@ -80,7 +80,6 @@ const DataInputTab = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { t } = useLang();
-  const [isDragging, setIsDragging] = useState(false);
 
   // ── Update helpers ─────────────────────────────────────────────────────
   const updateRow = (idx: number, patch: Partial<StepData>) => {
