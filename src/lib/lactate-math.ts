@@ -55,7 +55,7 @@ export interface FitQuality {
 export type WarningSeverity = 'info' | 'warning';
 export interface CalcWarning {
   severity: WarningSeverity;
-  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC';
+  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT';
   message: string;
   affectedStep?: number;
 }
@@ -380,6 +380,34 @@ function checkMonotonicity(coeffsAsc: number[], xs: XScale, xMin: number, xMax: 
   }
 }
 
+/**
+ * Detecteer een submaximale all-out trede.
+ * Heuristiek: de laatste trede is een "all-out" als haar snelheidssprong t.o.v.
+ * de vorige trede duidelijk groter is dan de mediaan van de eerdere sprongen
+ * (>= 1.6x). Een echte maximale inspanning verwachten we lactaat-stijging van
+ * minstens ~3 mmol/L boven de voorlaatste trede. Anders waarschuwing.
+ */
+function checkAllOutSubmaximal(speeds: number[], lactates: number[], warnings: CalcWarning[]) {
+  if (speeds.length < 4) return;
+  const n = speeds.length;
+  const increments: number[] = [];
+  for (let i = 1; i < n - 1; i++) increments.push(speeds[i] - speeds[i - 1]);
+  if (increments.length === 0) return;
+  const sorted = [...increments].sort((a, b) => a - b);
+  const medInc = sorted[Math.floor(sorted.length / 2)];
+  const lastJump = speeds[n - 1] - speeds[n - 2];
+  if (medInc <= 0 || lastJump < medInc * 1.6) return; // geen all-out detectie
+  const lactateRise = lactates[n - 1] - lactates[n - 2];
+  if (lactateRise < 3.0) {
+    warnings.push({
+      severity: 'warning',
+      code: 'SUBMAXIMAL_ALLOUT',
+      message: `All-out bij ${speeds[n - 1].toFixed(1)} km/h lijkt submaximaal (lactaat slechts +${lactateRise.toFixed(1)} mmol/L boven vorige trede). Overweeg deze trede uit te sluiten — een echte maximale inspanning geeft meestal ≥ 3 mmol/L extra stijging.`,
+      affectedStep: n - 1,
+    });
+  }
+}
+
 // ============ HOOFDFUNCTIE ============
 
 export function calculate(testData: StepData[], restingLactate: number): CalculationResults | string {
@@ -451,6 +479,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
   detectOutliers(speeds, lactates, coeffsAsc, xScale, warnings);
   checkMonotonicity(coeffsAsc, xScale, xMin, xMax, warnings);
+  checkAllOutSubmaximal(speeds, lactates, warnings);
 
   // --- LT1 ---
   const minActiveLac = Math.min(...lactates.slice(0, 3));
