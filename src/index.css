@@ -180,3 +180,24 @@
 }
 .wb-tick { animation: wb-tick-up 150ms ease-out; }
 .wb-transition { transition: all 150ms ease-out; }
+
+/* Hide number input spinners (desktop-first, geen pijltjes) */
+.no-spin::-webkit-outer-spin-button,
+.no-spin::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.no-spin { -moz-appearance: textfield; appearance: textfield; }
+
+/* Focus-grow voor sheet-cellen */
+.wb-cell {
+  transition: transform 120ms ease-out, box-shadow 120ms ease-out, background 120ms ease-out, border-color 120ms ease-out;
+}
+.wb-cell:focus {
+  transform: scale(1.18);
+  transform-origin: center;
+  background: rgba(99,102,241,0.10) !important;
+  border-color: var(--wb-indigo) !important;
+  box-shadow: 0 6px 20px -8px rgba(99,102,241,0.55), 0 0 0 3px rgba(99,102,241,0.18);
+  position: relative;
+  z-index: 5;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
