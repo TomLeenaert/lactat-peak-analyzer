@@ -278,7 +278,7 @@ const DataInputTab = ({
     color: 'var(--wb-text)',
     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
     fontVariantNumeric: 'tabular-nums',
-    fontSize: '14px',
+    fontSize: '16px',
     fontWeight: 500,
     textAlign: 'right',
     outline: 'none',
@@ -355,7 +355,7 @@ const DataInputTab = ({
 
       {/* ── Workbench: two-column layout ───────────────────── */}
       <div
-        className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_480px] xl:grid-cols-[minmax(0,1fr)_560px]"
+        className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]"
       >
 
         {/* LEFT — spreadsheet */}
@@ -379,15 +379,15 @@ const DataInputTab = ({
 
           <div style={{ overflowX: 'auto' }}>
             <table ref={tableRef} style={{
-              width: '100%', borderCollapse: 'collapse', fontSize: '13px',
+              width: '100%', borderCollapse: 'collapse', fontSize: '15px',
             }}>
               <thead>
                 <tr style={{ background: 'var(--wb-bg)' }}>
                   {['#', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
                     <th key={i} style={{
-                      padding: '9px 8px', textAlign: i === 0 ? 'center' : 'right',
-                      fontSize: '10.5px', fontWeight: 700,
-                      color: 'var(--wb-text-mute)', textTransform: 'uppercase',
+                      padding: '12px 10px', textAlign: i === 0 ? 'center' : 'right',
+                      fontSize: '12px', fontWeight: 700,
+                      color: 'var(--wb-text-dim)', textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       borderBottom: '1px solid var(--wb-border)',
                     }}>{h}</th>
@@ -414,7 +414,7 @@ const DataInputTab = ({
                       }}
                     >
                       {/* # */}
-                      <td style={{ padding: '8px', textAlign: 'center', width: '40px' }}>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', width: '48px' }}>
                         <div style={{
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                           width: '24px', height: '24px', borderRadius: '6px',
@@ -429,7 +429,7 @@ const DataInputTab = ({
                       </td>
 
                       {/* Time mm:ss */}
-                      <td style={{ padding: '8px 6px', width: '130px' }}>
+                      <td style={{ padding: '12px 8px', width: '130px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                           <input
                             type="number" min="0" max="99"
@@ -454,7 +454,7 @@ const DataInputTab = ({
                       </td>
 
                       {/* Lactate */}
-                      <td style={{ padding: '8px 6px', width: '100px' }}>
+                      <td style={{ padding: '12px 8px', width: '100px' }}>
                         <input
                           type="number" step="0.1" min="0" max="25"
                           value={row.lactate || ''}
@@ -467,7 +467,7 @@ const DataInputTab = ({
                       </td>
 
                       {/* HR */}
-                      <td style={{ padding: '8px 6px', width: '90px' }}>
+                      <td style={{ padding: '12px 8px', width: '90px' }}>
                         <input
                           type="number" min="0" max="220"
                           value={row.hr || ''}
