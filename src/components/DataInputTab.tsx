@@ -211,7 +211,16 @@ const DataInputTab = ({
       }
     }
   };
+  // Heuristiek: lijkt deze tekst op testdata (cijfers/eenheden) of is het een vraag?
+  const looksLikeTestData = (txt: string) => {
+    const lower = txt.toLowerCase();
+    const hasUnit = /(mmol|bpm|km\/h|km|:\d{2})/.test(lower);
+    const digits = (txt.match(/\d/g) || []).length;
+    return hasUnit && digits >= 4;
+  };
+
   const handleComposerSubmit = async () => {
+    // 1) Afbeelding → altijd inlezen via parse-test-image
     if (pastedImage) {
       const res = await fetch(pastedImage);
       const blob = await res.blob();
@@ -219,25 +228,51 @@ const DataInputTab = ({
       await parseImageFile(file);
       return;
     }
+
     const txt = pasteText.trim();
-    if (!txt) { toast({ title: 'Niets om in te lezen', description: 'Plak een screenshot of tekst, of voeg een bestand toe.', variant: 'destructive' }); return; }
-    setParsing(true);
+    if (!txt) {
+      toast({ title: 'Niets te versturen', description: 'Plak een screenshot, typ je testdata of stel een vraag.', variant: 'destructive' });
+      return;
+    }
+
+    // 2) Lijkt op testdata? → inlezen
+    if (looksLikeTestData(txt)) {
+      setParsing(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        const imported = mapAiSteps(data);
+        if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' }); return; }
+        const rl = data?.resting_lactate;
+        if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
+        setTestData(imported);
+        setNeedsValidation(true);
+        setPasteText('');
+        toast({ title: 'Tekst ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
+      } catch (err) {
+        toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
+      } finally { setParsing(false); }
+      return;
+    }
+
+    // 3) Anders → gesprek met de assistent
+    const userMsg = { role: 'user' as const, content: txt };
+    const nextMessages = [...chatMessages, userMsg];
+    setChatMessages(nextMessages);
+    setPasteText('');
+    setChatBusy(true);
     try {
-      const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
+      const { data, error } = await supabase.functions.invoke('lactate-chat', {
+        body: { messages: nextMessages.map(m => ({ role: m.role, content: m.content })) },
+      });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      const imported = mapAiSteps(data);
-      if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' }); return; }
-      const rl = data?.resting_lactate;
-      if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
-      setTestData(imported);
-      setNeedsValidation(true);
-      setShowPaste(false);
-      setPasteText('');
-      toast({ title: 'Tekst ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
+      const reply: string = data?.reply || '…';
+      setChatMessages([...nextMessages, { role: 'assistant', content: reply }]);
     } catch (err) {
-      toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
-    } finally { setParsing(false); }
+      setChatMessages([...nextMessages, { role: 'assistant', content: `Sorry, er ging iets mis: ${(err as Error).message}` }]);
+    } finally { setChatBusy(false); }
   };
 
   // ── derived ──────────────────────────────────────────────
