@@ -226,6 +226,7 @@ const DataInputTab = ({
     }
   };
 
+  const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
   const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
 
   const filledCount = testData.filter(r => r.lactate > 0).length;
