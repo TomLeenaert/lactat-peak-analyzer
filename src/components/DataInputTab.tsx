@@ -66,6 +66,19 @@ const DataInputTab = ({
   const [pastedImage, setPastedImage] = useState<string | null>(null);
   const [pastedFileName, setPastedFileName] = useState<string | null>(null);
   const [protocolOpen, setProtocolOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'assistant' | 'user'; content: string }>>([
+    {
+      role: 'assistant',
+      content:
+        'Hi 👋 Ik help je met deze test.\n\n' +
+        '• Vul **tijd, lactaat en HR** per trede in (Tab/Enter om snel te navigeren).\n' +
+        '• Stel **afstand per trede** bovenaan in (standaard 1600 m).\n' +
+        '• **Plak een screenshot** of klik op 📎 — ik lees je papieren testblad automatisch in.\n' +
+        '• Vanaf 3 ingevulde tredes klik je op **Genereer rapport**.\n\n' +
+        'Vraag me gerust om uitleg.',
+    },
+  ]);
+  const [chatBusy, setChatBusy] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
 
