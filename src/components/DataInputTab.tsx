@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo } from 'react';
 import {
   Trash2, Plus, Image as ImageIcon, AlertTriangle, Check, Loader2,
-  ClipboardPaste, Zap, ChevronDown, Settings2, FileJson, Keyboard,
+  Zap, Settings2, FileJson, Keyboard, X, ArrowUp, Paperclip, MessageSquarePlus,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
