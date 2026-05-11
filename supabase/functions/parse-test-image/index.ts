@@ -22,15 +22,15 @@ interface ParsedSheet {
 }
 
 const SYSTEM_PROMPT = `Je leest een foto of screenshot van een papieren of digitaal meetblad van een lactaattest (loop- of fietstest).
-Extraheer ALLE testtredes uit de tabel en geef een strikt JSON-object terug — geen uitleg, geen markdown.
+Extraheer ALLE testtrappen uit de tabel en geef een strikt JSON-object terug — geen uitleg, geen markdown.
 
 Schema:
 {
   "resting_lactate": <number|null>,   // rustlactaat in mmol/L als zichtbaar, anders null
   "steps": [
     {
-      "distance": <number|null>,      // afstand per trede in METERS (1.2 km -> 1200, 0.6 km -> 600). null als onbekend.
-      "time_sec": <number|null>,      // totale duur trede in seconden. "0:07:36" -> 456. "7:36" -> 456.
+      "distance": <number|null>,      // afstand per trap in METERS (1.2 km -> 1200, 0.6 km -> 600). null als onbekend.
+      "time_sec": <number|null>,      // totale duur trap in seconden. "0:07:36" -> 456. "7:36" -> 456.
       "speed": <number|null>,         // km/h als zichtbaar, anders null
       "lactate": <number|null>,       // mmol/L
       "hr": <number|null>             // bpm
@@ -43,7 +43,7 @@ Regels:
 - Komma is decimaalteken (1,7 -> 1.7).
 - Tijden kunnen mm:ss of h:mm:ss zijn.
 - Afstanden zijn vaak in km (1,2 -> 1200 m).
-- Behoud de volgorde van de tredes zoals op het blad.
+- Behoud de volgorde van de trappen zoals op het blad.
 - Als een veld onleesbaar is, gebruik null. Maak NIETS op.
 - Geef ALLEEN het JSON-object terug, niets anders.`;
 
