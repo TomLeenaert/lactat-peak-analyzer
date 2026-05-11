@@ -546,7 +546,7 @@ const DataInputTab = ({
             }}>
               <thead>
                 <tr style={{ background: 'var(--wb-bg)' }}>
-                  {['#', 'Afstand', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
+                  {['#', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
                     <th key={i} style={{
                       padding: '9px 8px', textAlign: i === 0 ? 'center' : 'right',
                       fontSize: '10.5px', fontWeight: 700,
@@ -575,14 +575,12 @@ const DataInputTab = ({
                         borderLeft: isFinal ? '2px solid var(--wb-amber)' : '2px solid transparent',
                         background: isFinal ? 'rgba(245,158,11,0.03)' : 'transparent',
                       }}
-                      onMouseEnter={(e) => { if (!isFinal) e.currentTarget.style.background = 'rgba(255,255,255,0.015)'; }}
-                      onMouseLeave={(e) => { if (!isFinal) e.currentTarget.style.background = 'transparent'; }}
                     >
                       {/* # */}
-                      <td style={{ padding: '6px 8px', textAlign: 'center', width: '36px' }}>
+                      <td style={{ padding: '8px', textAlign: 'center', width: '40px' }}>
                         <div style={{
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                          width: '22px', height: '22px', borderRadius: '6px',
+                          width: '24px', height: '24px', borderRadius: '6px',
                           background: allFilled ? 'rgba(52,211,153,0.12)' : 'var(--wb-bg)',
                           border: `1px solid ${allFilled ? 'rgba(52,211,153,0.35)' : 'var(--wb-border-2)'}`,
                           color: allFilled ? 'var(--wb-emerald)' : 'var(--wb-text-mute)',
@@ -593,72 +591,54 @@ const DataInputTab = ({
                         </div>
                       </td>
 
-                      {/* Distance */}
-                      <td style={{ padding: '4px 4px', width: '90px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="number" inputMode="numeric"
-                            value={row.distance ?? ''}
-                            onChange={(e) => updateStepDistanceFor(i, e.target.value)}
-                            placeholder={String(dist)}
-                            aria-label={`Trede ${i + 1} afstand`}
-                            style={cellInput}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
-                          />
-                          <span style={unitStyle}>m</span>
-                        </div>
-                      </td>
-
                       {/* Time mm:ss */}
-                      <td style={{ padding: '4px 4px', width: '110px' }}>
+                      <td style={{ padding: '8px 6px', width: '130px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                           <input
-                            type="number" inputMode="numeric" min="0" max="99"
+                            type="number" min="0" max="99"
                             value={minVal || ''}
                             onChange={(e) => updateTime(i, parseInt(e.target.value) || 0, secVal)}
                             placeholder="mm"
                             aria-label={`Trede ${i + 1} minuten`}
+                            className="wb-cell no-spin"
                             style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
                           />
                           <span style={{ color: 'var(--wb-text-mute)', fontWeight: 700 }}>:</span>
                           <input
-                            type="number" inputMode="numeric" min="0" max="59"
+                            type="number" min="0" max="59"
                             value={secVal || ''}
                             onChange={(e) => updateTime(i, minVal, parseInt(e.target.value) || 0)}
                             placeholder="ss"
                             aria-label={`Trede ${i + 1} seconden`}
+                            className="wb-cell no-spin"
                             style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
                           />
                         </div>
                       </td>
 
                       {/* Lactate */}
-                      <td style={{ padding: '4px 4px', width: '88px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="number" inputMode="decimal" step="0.1" min="0" max="25"
-                            value={row.lactate || ''}
-                            onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
-                            placeholder="—"
-                            aria-label={`Trede ${i + 1} lactaat`}
-                            style={cellInput}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
-                          />
-                        </div>
+                      <td style={{ padding: '8px 6px', width: '100px' }}>
+                        <input
+                          type="number" step="0.1" min="0" max="25"
+                          value={row.lactate || ''}
+                          onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
+                          placeholder="—"
+                          aria-label={`Trede ${i + 1} lactaat`}
+                          className="wb-cell no-spin"
+                          style={cellInput}
+                        />
                       </td>
 
                       {/* HR */}
-                      <td style={{ padding: '4px 4px', width: '72px' }}>
+                      <td style={{ padding: '8px 6px', width: '90px' }}>
                         <input
-                          type="number" inputMode="numeric" min="0" max="220"
+                          type="number" min="0" max="220"
                           value={row.hr || ''}
                           onChange={(e) => updateRow(i, { hr: parseInt(e.target.value) || 0 })}
                           placeholder="—"
                           aria-label={`Trede ${i + 1} hartslag`}
+                          className="wb-cell no-spin"
                           style={cellInput}
-                          onFocus={cellInputFocus} onBlur={cellInputBlur}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && i === testData.length - 1) {
                               e.preventDefault();
