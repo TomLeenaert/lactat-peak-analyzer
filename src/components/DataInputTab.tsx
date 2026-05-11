@@ -742,7 +742,7 @@ const DataInputTab = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                   onClick={() => imageInputRef.current?.click()}
-                  disabled={parsing}
+                  disabled={parsing || chatBusy}
                   className="wb-focus wb-transition"
                   aria-label="Bestand toevoegen"
                   title="Foto / screenshot toevoegen"
@@ -759,7 +759,7 @@ const DataInputTab = ({
                 </div>
                 <button
                   onClick={handleComposerSubmit}
-                  disabled={parsing || (!pasteText.trim() && !pastedImage)}
+                  disabled={parsing || chatBusy || (!pasteText.trim() && !pastedImage)}
                   className="wb-focus wb-transition"
                   aria-label="Versturen"
                   style={{
@@ -768,11 +768,11 @@ const DataInputTab = ({
                     background: 'var(--wb-indigo)', color: '#fff',
                     border: '1px solid var(--wb-indigo-dim)',
                     fontSize: '13px', fontWeight: 600, cursor: 'pointer',
-                    opacity: (parsing || (!pasteText.trim() && !pastedImage)) ? 0.5 : 1,
+                    opacity: (parsing || chatBusy || (!pasteText.trim() && !pastedImage)) ? 0.5 : 1,
                   }}
                 >
-                  {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp size={15} />}
-                  {parsing ? 'Inlezen…' : 'Versturen'}
+                  {(parsing || chatBusy) ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp size={15} />}
+                  {parsing ? 'Inlezen…' : chatBusy ? 'Bezig…' : 'Versturen'}
                 </button>
               </div>
             </div>
