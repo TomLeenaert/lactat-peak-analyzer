@@ -44,6 +44,7 @@ const AthleteTest = () => {
       setTestDate(data.test_date);
 
       if (steps && steps.filter(r => r.speed > 0 && r.lactate > 0).length >= 4) {
+        // restLac wordt intern bepaald (min lactaat) als 0 → deterministisch bij herladen
         const calcResult = calculate(steps, 0);
         if (typeof calcResult !== 'string') {
           setResults(calcResult);
