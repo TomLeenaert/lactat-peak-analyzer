@@ -72,6 +72,17 @@ const TestPage = () => {
     toast({ title: t('test.calculationDone') });
   }, [testData, restingLactate, toast, t]);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        if (testData.some(r => r.lactate > 0)) onCalculate();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onCalculate, testData]);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--wb-bg)' }}>
       <header style={{
