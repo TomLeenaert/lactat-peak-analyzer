@@ -55,7 +55,7 @@ export interface FitQuality {
 export type WarningSeverity = 'info' | 'warning';
 export interface CalcWarning {
   severity: WarningSeverity;
-  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT';
+  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT' | 'BASELINE_FLOORED' | 'LT_GAP_LARGE';
   message: string;
   affectedStep?: number;
 }
@@ -483,8 +483,19 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
   // --- LT1 ---
   const minActiveLac = Math.min(...lactates.slice(0, 3));
+  // Sanity-floor: baseline onder 1.5 mmol/L is fysiologisch onwaarschijnlijk bij
+  // een actieve atleet → ondergrens van 1.5 gebruiken voor Baseline+0.5.
+  const BASELINE_FLOOR = 1.5;
+  const baselineLac = Math.max(restLac, BASELINE_FLOOR);
+  if (restLac < BASELINE_FLOOR) {
+    warnings.push({
+      severity: 'info',
+      code: 'BASELINE_FLOORED',
+      message: `Gedetecteerde baseline (${restLac.toFixed(1)} mmol/L) lag onder ${BASELINE_FLOOR.toFixed(1)} — een ondergrens van ${BASELINE_FLOOR.toFixed(1)} mmol/L is gebruikt voor de Aerobic Threshold om vertekening door een te lage eerste trede te vermijden.`,
+    });
+  }
   const lt1_obla = findSpeedAtLactateOrNull(coeffs, 2.0, xMin, xMax);
-  const lt1_bsln = findSpeedAtLactateOrNull(coeffs, restLac + 0.5, xMin, xMax);
+  const lt1_bsln = findSpeedAtLactateOrNull(coeffs, baselineLac + 0.5, xMin, xMax);
   const lt1_loglog = computeLogLog(speeds, lactates);
   const lt1_best = lt1_bsln ?? lt1_loglog ?? lt1_obla ?? xMin;
   const lt1_method =
@@ -508,6 +519,18 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt1_watt = interpolateAt(lt1_best, speeds, watts, true);
   const lt2_hr = interpolateAt(lt2_best, speeds, hrs, true);
   const lt2_watt = interpolateAt(lt2_best, speeds, watts, true);
+
+  // Cross-check pace-verschil LT1 ↔ LT2 (typisch 30-45 s/km; > 60 s/km = red flag)
+  if (lt1_best > 0 && lt2_best > 0 && lt2_best > lt1_best) {
+    const deltaSecPerKm = ((60 / lt1_best) - (60 / lt2_best)) * 60;
+    if (deltaSecPerKm > 60) {
+      warnings.push({
+        severity: 'warning',
+        code: 'LT_GAP_LARGE',
+        message: `Ongewoon groot verschil tussen drempels (Δ ≈ ${Math.round(deltaSecPerKm)} s/km). Controleer of de Aerobic Threshold niet kunstmatig laag is door een uitschieter in de beginpunten.`,
+      });
+    }
+  }
 
   return {
     coeffs, r2, speeds, lactates, hrs, watts, restLac, minActiveLac, modStartIdx,
