@@ -290,15 +290,21 @@ function computeDmax(
   if (v2 <= v1) return null;
   const slope = (L2 - L1) / (v2 - v1);
   const intercept = L1 - slope * v1;
+  // Classic Dmax (Cheng 1992): max PERPENDICULAR distance van curve naar chord.
+  // Voor argmax is dit equivalent met max |vertical distance| (verschilt enkel
+  // door constante factor 1/√(1+slope²)). Lactaatcurves zijn convex-up en
+  // liggen onder het koord; we nemen daarom de absolute waarde.
   const N = 500;
   const step = (v2 - v1) / N;
   let bestV = v1, bestDist = -Infinity;
   for (let i = 1; i < N; i++) {
     const v = v1 + i * step;
-    const dist = evalNorm(coeffsAsc, xs, v) - (slope * v + intercept);
+    const dist = Math.abs(evalNorm(coeffsAsc, xs, v) - (slope * v + intercept));
     if (dist > bestDist) { bestDist = dist; bestV = v; }
   }
-  return bestDist > 0 ? bestV : null;
+  // Vereis significante afstand én niet op de rand (geen numeriek artefact)
+  const onBoundary = (bestV - v1) < step * 1.5 || (v2 - bestV) < step * 1.5;
+  return bestDist > 0.05 && !onBoundary ? bestV : null;
 }
 
 // ModDmax startpunt (Bishop): eerste trede waar ΔL ≥ 0.4 mmol/L → startIdx = i-1
