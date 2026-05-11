@@ -168,14 +168,14 @@ const DataInputTab = ({
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const imported = mapAiSteps(data);
-      if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de afbeelding.', variant: 'destructive' }); return; }
+      if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen trappen gevonden in de afbeelding.', variant: 'destructive' }); return; }
       const rl = data?.resting_lactate;
       if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
       setTestData(imported);
       setNeedsValidation(true);
-      setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} tredes** ingelezen uit je afbeelding. **Controleer elke trede** (tijd, lactaat, HR, snelheid) en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan met de berekening.` }]);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} trappen** ingelezen uit je afbeelding. **Controleer elke trap** (tijd, lactaat, HR, snelheid) en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan met de berekening.` }]);
       setPastedImage(null); setPastedFileName(null); setPasteText(''); setShowPaste(false);
-      toast({ title: 'Afbeelding ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
+      toast({ title: 'Afbeelding ingelezen', description: `${imported.length} trappen herkend — controleer en pas aan waar nodig.` });
     } catch (err) {
       toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
     } finally { setParsing(false); }
@@ -235,14 +235,14 @@ const DataInputTab = ({
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
         const imported = mapAiSteps(data);
-        if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' }); return; }
+        if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen trappen gevonden in de tekst.', variant: 'destructive' }); return; }
         const rl = data?.resting_lactate;
         if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
         setTestData(imported);
         setNeedsValidation(true);
-        setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} tredes** ingelezen uit je tekst. **Controleer elke trede** en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan.` }]);
+        setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} trappen** ingelezen uit je tekst. **Controleer elke trap** en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan.` }]);
         setPasteText('');
-        toast({ title: 'Tekst ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
+        toast({ title: 'Tekst ingelezen', description: `${imported.length} trappen herkend — controleer en pas aan waar nodig.` });
       } catch (err) {
         toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
       } finally { setParsing(false); }
@@ -288,7 +288,7 @@ const DataInputTab = ({
     outline: 'none',
   };
 
-  // Globale afstand wijzigt alle (niet-all-out) tredes mee
+  // Globale afstand wijzigt alle (niet-all-out) trappen mee
   const handleGlobalDistanceChange = (val: string) => {
     setStepDistance(val);
     const newDist = parseFloat(val) || 0;
@@ -305,7 +305,7 @@ const DataInputTab = ({
     }
   };
 
-  // All-out afstand wijzigt alleen de laatste trede
+  // All-out afstand wijzigt alleen de laatste trap
   const handleAllOutDistanceChange = (val: string) => {
     const newDist = parseFloat(val) || 0;
     if (setProtocol && protocol) setProtocol({ ...protocol, allOutDistance: newDist });
@@ -556,7 +556,7 @@ const DataInputTab = ({
                               updateTime(i, parseInt(v) || 0, secVal);
                             }}
                             placeholder="mm"
-                            aria-label={`Trede ${i + 1} minuten`}
+                            aria-label={`Trap ${i + 1} minuten`}
                             className="wb-cell no-spin"
                             style={{ ...bigInput, textAlign: 'center', padding: '0 6px', flex: 1, minWidth: 0 }}
                           />
@@ -570,7 +570,7 @@ const DataInputTab = ({
                               updateTime(i, minVal, s);
                             }}
                             placeholder="ss"
-                            aria-label={`Trede ${i + 1} seconden`}
+                            aria-label={`Trap ${i + 1} seconden`}
                             className="wb-cell no-spin"
                             style={{ ...bigInput, textAlign: 'center', padding: '0 6px', flex: 1, minWidth: 0 }}
                           />
@@ -584,7 +584,7 @@ const DataInputTab = ({
                           value={row.lactate || ''}
                           onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
                           placeholder="—"
-                          aria-label={`Trede ${i + 1} lactaat`}
+                          aria-label={`Trap ${i + 1} lactaat`}
                           className="wb-cell no-spin"
                           style={{ ...bigInput, textAlign: 'center' }}
                         />
@@ -597,7 +597,7 @@ const DataInputTab = ({
                           value={row.hr || ''}
                           onChange={(e) => updateRow(i, { hr: parseInt(e.target.value) || 0 })}
                           placeholder="—"
-                          aria-label={`Trede ${i + 1} hartslag`}
+                          aria-label={`Trap ${i + 1} hartslag`}
                           className="wb-cell no-spin"
                           style={{ ...bigInput, textAlign: 'center' }}
                           onKeyDown={(e) => {
@@ -627,7 +627,7 @@ const DataInputTab = ({
                       <td style={{ padding: '6px 6px', textAlign: 'center', width: '34px' }}>
                         <button
                           onClick={() => removeRow(i)}
-                          aria-label={`Verwijder trede ${i + 1}`}
+                          aria-label={`Verwijder trap ${i + 1}`}
                           className="wb-focus wb-transition"
                           style={{
                             background: 'transparent', border: 'none', cursor: 'pointer',
@@ -654,7 +654,7 @@ const DataInputTab = ({
               background: 'transparent', border: '1px solid var(--wb-border-2)',
               color: 'var(--wb-text-dim)', fontSize: '12.5px', fontWeight: 500, cursor: 'pointer',
             }}>
-              <Plus size={13} /> Trede toevoegen
+              <Plus size={13} /> Trap toevoegen
             </button>
           </div>
         </div>
@@ -708,7 +708,7 @@ const DataInputTab = ({
               }}>
                 <AlertTriangle size={18} style={{ color: 'var(--wb-amber)', flexShrink: 0 }} />
                 <div style={{ flex: 1, fontSize: '12.5px', color: 'var(--wb-text)', lineHeight: 1.45 }}>
-                  <strong style={{ color: 'var(--wb-amber)' }}>Controle vereist.</strong> Loop alle tredes na en klik dan op de knop hiernaast.
+                  <strong style={{ color: 'var(--wb-amber)' }}>Controle vereist.</strong> Loop alle trappen na en klik dan op de knop hiernaast.
                 </div>
                 <button onClick={() => setNeedsValidation(false)} className="wb-focus wb-transition wb-pulse-cta"
                   style={{

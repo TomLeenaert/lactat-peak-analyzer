@@ -307,12 +307,12 @@ function computeDmax(
   return bestDist > 0.05 && !onBoundary ? bestV : null;
 }
 
-// ModDmax startpunt (Bishop): eerste trede waar ΔL ≥ 0.4 mmol/L → startIdx = i-1
+// ModDmax startpunt (Bishop): eerste trap waar ΔL ≥ 0.4 mmol/L → startIdx = i-1
 function findModDmaxStart(lactates: number[], restLac: number): number {
   for (let i = 1; i < lactates.length; i++) {
     if (lactates[i] - lactates[i - 1] >= 0.4) return Math.max(0, i - 1);
   }
-  // Fallback: laatste trede onder restLac+0.5
+  // Fallback: laatste trap onder restLac+0.5
   let last = 0;
   for (let i = 0; i < lactates.length; i++) {
     if (lactates[i] < restLac + 0.5) last = i;
@@ -360,7 +360,7 @@ function detectOutliers(speeds: number[], lactates: number[], coeffsAsc: number[
     if (Math.abs((r - mean) / sd) > 2.5) {
       warnings.push({
         severity: 'warning', code: 'OUTLIER', affectedStep: i,
-        message: `Trede ${i + 1} (${speeds[i]} km/h, ${lactates[i]} mmol/L) wijkt sterk af van de curve.`,
+        message: `Trap ${i + 1} (${speeds[i]} km/h, ${lactates[i]} mmol/L) wijkt sterk af van de curve.`,
       });
     }
   });
@@ -381,11 +381,11 @@ function checkMonotonicity(coeffsAsc: number[], xs: XScale, xMin: number, xMax: 
 }
 
 /**
- * Detecteer een submaximale all-out trede.
- * Heuristiek: de laatste trede is een "all-out" als haar snelheidssprong t.o.v.
- * de vorige trede duidelijk groter is dan de mediaan van de eerdere sprongen
+ * Detecteer een submaximale all-out trap.
+ * Heuristiek: de laatste trap is een "all-out" als haar snelheidssprong t.o.v.
+ * de vorige trap duidelijk groter is dan de mediaan van de eerdere sprongen
  * (>= 1.6x). Een echte maximale inspanning verwachten we lactaat-stijging van
- * minstens ~3 mmol/L boven de voorlaatste trede. Anders waarschuwing.
+ * minstens ~3 mmol/L boven de voorlaatste trap. Anders waarschuwing.
  */
 function checkAllOutSubmaximal(speeds: number[], lactates: number[], warnings: CalcWarning[]) {
   if (speeds.length < 4) return;
@@ -402,7 +402,7 @@ function checkAllOutSubmaximal(speeds: number[], lactates: number[], warnings: C
     warnings.push({
       severity: 'warning',
       code: 'SUBMAXIMAL_ALLOUT',
-      message: `All-out bij ${speeds[n - 1].toFixed(1)} km/h lijkt submaximaal (lactaat slechts +${lactateRise.toFixed(1)} mmol/L boven vorige trede). Overweeg deze trede uit te sluiten — een echte maximale inspanning geeft meestal ≥ 3 mmol/L extra stijging.`,
+      message: `All-out bij ${speeds[n - 1].toFixed(1)} km/h lijkt submaximaal (lactaat slechts +${lactateRise.toFixed(1)} mmol/L boven vorige trap). Overweeg deze trap uit te sluiten — een echte maximale inspanning geeft meestal ≥ 3 mmol/L extra stijging.`,
       affectedStep: n - 1,
     });
   }
@@ -424,7 +424,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     if (dedup.length === 0 || r.speed !== dedup[dedup.length - 1].speed) dedup.push(r);
   }
   if (dedup.length < 4) {
-    return 'Dubbele snelheden — elke trede moet een unieke snelheid hebben.';
+    return 'Dubbele snelheden — elke trap moet een unieke snelheid hebben.';
   }
 
   const speeds = dedup.map(r => r.speed);
@@ -446,13 +446,13 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     degree = 1; curveType = 'linear';
     warnings.push({
       severity: 'warning', code: 'LOW_DATA_LINEAR',
-      message: '4 datapunten — lineaire fit. Voeg tredes toe voor een betrouwbaarder resultaat.',
+      message: '4 datapunten — lineaire fit. Voeg trappen toe voor een betrouwbaarder resultaat.',
     });
   } else if (speeds.length <= 6) {
     degree = 2; curveType = 'quadratic';
     warnings.push({
       severity: 'info', code: 'MEDIUM_DATA_QUADRATIC',
-      message: `${speeds.length} datapunten — quadratische fit. 7+ tredes geven nog stabielere resultaten.`,
+      message: `${speeds.length} datapunten — quadratische fit. 7+ trappen geven nog stabielere resultaten.`,
     });
   } else {
     degree = 3; curveType = 'cubic';
@@ -491,7 +491,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     warnings.push({
       severity: 'info',
       code: 'BASELINE_FLOORED',
-      message: `Gedetecteerde baseline (${restLac.toFixed(1)} mmol/L) lag onder ${BASELINE_FLOOR.toFixed(1)} — een ondergrens van ${BASELINE_FLOOR.toFixed(1)} mmol/L is gebruikt voor de Aerobic Threshold om vertekening door een te lage eerste trede te vermijden.`,
+      message: `Gedetecteerde baseline (${restLac.toFixed(1)} mmol/L) lag onder ${BASELINE_FLOOR.toFixed(1)} — een ondergrens van ${BASELINE_FLOOR.toFixed(1)} mmol/L is gebruikt voor de Aerobic Threshold om vertekening door een te lage eerste trap te vermijden.`,
     });
   }
   const lt1_obla = findSpeedAtLactateOrNull(coeffs, 2.0, xMin, xMax);
