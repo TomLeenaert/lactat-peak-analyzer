@@ -285,17 +285,37 @@ const DataInputTab = ({
     outline: 'none',
   };
 
-  // Globale afstand wijzigt alle tredes mee
+  // Globale afstand wijzigt alle (niet-all-out) tredes mee
   const handleGlobalDistanceChange = (val: string) => {
     setStepDistance(val);
     const newDist = parseFloat(val) || 0;
     if (newDist > 0) {
-      setTestData(testData.map(r => ({
+      const lastIdx = testData.length - 1;
+      setTestData(testData.map((r, idx) => {
+        if (protocol?.allOutEnabled && idx === lastIdx) return r;
+        return {
+          ...r,
+          distance: newDist,
+          speed: r.time && r.time > 0 ? calcSpeed(newDist, r.time) : r.speed,
+        };
+      }));
+    }
+  };
+
+  // All-out afstand wijzigt alleen de laatste trede
+  const handleAllOutDistanceChange = (val: string) => {
+    const newDist = parseFloat(val) || 0;
+    if (setProtocol && protocol) setProtocol({ ...protocol, allOutDistance: newDist });
+    const lastIdx = testData.length - 1;
+    if (lastIdx < 0) return;
+    setTestData(testData.map((r, idx) => {
+      if (idx !== lastIdx) return r;
+      return {
         ...r,
         distance: newDist,
         speed: r.time && r.time > 0 ? calcSpeed(newDist, r.time) : r.speed,
-      })));
-    }
+      };
+    }));
   };
 
   return (
