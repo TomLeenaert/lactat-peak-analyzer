@@ -696,6 +696,25 @@ const DataInputTab = ({
               </button>
             </div>
 
+            {needsValidation && (
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', gap: '10px',
+                padding: '10px 12px',
+                background: 'rgba(245,158,11,0.06)',
+                border: '1px solid rgba(245,158,11,0.35)',
+                borderRadius: '10px',
+              }}>
+                <AlertTriangle size={15} style={{ color: 'var(--wb-amber)', flexShrink: 0, marginTop: '2px' }} />
+                <div style={{ flex: 1, fontSize: '12.5px', color: 'var(--wb-text)', lineHeight: 1.45 }}>
+                  <strong style={{ color: 'var(--wb-amber)' }}>Controle vereist.</strong> Loop alle tredes na en pas aan waar nodig vóór de berekening.
+                </div>
+                <button onClick={() => setNeedsValidation(false)} className="wb-focus wb-transition"
+                  style={{ ...secondaryBtn, color: 'var(--wb-amber)', borderColor: 'rgba(245,158,11,0.4)', padding: '5px 10px', fontSize: '12px', whiteSpace: 'nowrap' }}>
+                  <Check className="h-3.5 w-3.5" /> Gecontroleerd
+                </button>
+              </div>
+            )}
+
             {/* Conversatie-historiek */}
             <div style={{
               flex: 1, minHeight: '280px', overflowY: 'auto',
