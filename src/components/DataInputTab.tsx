@@ -766,9 +766,7 @@ const DataInputTab = ({
                   }}>
                   <Paperclip size={15} />
                 </button>
-                <div style={{ flex: 1, fontSize: '10.5px', color: 'var(--wb-text-mute)' }}>
-                  <kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>V</kbd> plak · <kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>⏎</kbd> versturen
-                </div>
+                <div style={{ flex: 1 }} />
                 <button
                   onClick={handleComposerSubmit}
                   disabled={parsing || chatBusy || (!pasteText.trim() && !pastedImage)}
