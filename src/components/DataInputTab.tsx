@@ -513,8 +513,18 @@ const DataInputTab = ({
           <Button variant="secondary" size="sm" onClick={addRow} className="w-full">
             <Plus className="h-4 w-4 mr-1" /> {t('data.addStep')}
           </Button>
-          <Button className="w-full" onClick={onCalculate} style={{ background: 'linear-gradient(135deg, #6644ff, #8866ff)', border: 'none' }}>
-            {t('data.calculate')}
+          <Button
+            className="w-full"
+            onClick={onCalculate}
+            disabled={needsValidation}
+            style={{
+              background: needsValidation
+                ? 'rgba(255,255,255,0.08)'
+                : 'linear-gradient(135deg, #6644ff, #8866ff)',
+              border: 'none',
+            }}
+          >
+            {needsValidation ? 'Bevestig eerst de ingelezen waarden' : t('data.calculate')}
           </Button>
         </CardContent>
       </Card>
