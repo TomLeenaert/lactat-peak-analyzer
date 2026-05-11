@@ -479,6 +479,7 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
   detectOutliers(speeds, lactates, coeffsAsc, xScale, warnings);
   checkMonotonicity(coeffsAsc, xScale, xMin, xMax, warnings);
+  checkAllOutSubmaximal(speeds, lactates, warnings);
 
   // --- LT1 ---
   const minActiveLac = Math.min(...lactates.slice(0, 3));
