@@ -1,14 +1,11 @@
 import { useRef, useState, useMemo } from 'react';
 import {
   Trash2, Plus, Image as ImageIcon, AlertTriangle, Check, Loader2,
-  ClipboardPaste, Zap, ChevronDown, Settings2, FileJson, Keyboard,
+  Zap, Settings2, FileJson, Keyboard, X, ArrowUp, Paperclip, MessageSquarePlus,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { calculate, formatPace, polyEval, type StepData } from '@/lib/lactate-math';
 import LactateChart from '@/components/LactateChart';
@@ -66,6 +63,8 @@ const DataInputTab = ({
   const [needsValidation, setNeedsValidation] = useState(false);
   const [pasteText, setPasteText] = useState('');
   const [showPaste, setShowPaste] = useState(false);
+  const [pastedImage, setPastedImage] = useState<string | null>(null);
+  const [pastedFileName, setPastedFileName] = useState<string | null>(null);
   const [protocolOpen, setProtocolOpen] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
@@ -156,10 +155,7 @@ const DataInputTab = ({
       return { speed, lactate: typeof row.lactate === 'number' ? row.lactate : 0, hr: typeof row.hr === 'number' ? row.hr : 0, watt: 0, distance, time };
     });
   };
-  const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
+  const parseImageFile = async (file: File) => {
     if (file.size > 8 * 1024 * 1024) { toast({ title: 'Bestand te groot', description: 'Maximaal 8 MB.', variant: 'destructive' }); return; }
     setParsing(true);
     try {
@@ -173,14 +169,45 @@ const DataInputTab = ({
       if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
       setTestData(imported);
       setNeedsValidation(true);
+      setPastedImage(null); setPastedFileName(null); setPasteText(''); setShowPaste(false);
       toast({ title: 'Afbeelding ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
     } catch (err) {
       toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
     } finally { setParsing(false); }
   };
-  const handlePasteImport = async () => {
+  const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    await parseImageFile(file);
+  };
+  const handleComposerPaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      if (it.kind === 'file' && it.type.startsWith('image/')) {
+        const file = it.getAsFile();
+        if (file) {
+          e.preventDefault();
+          const dataUrl = await fileToDataUrl(file);
+          setPastedImage(dataUrl);
+          setPastedFileName(file.name || 'screenshot.png');
+          return;
+        }
+      }
+    }
+  };
+  const handleComposerSubmit = async () => {
+    if (pastedImage) {
+      const res = await fetch(pastedImage);
+      const blob = await res.blob();
+      const file = new File([blob], pastedFileName || 'pasted.png', { type: blob.type || 'image/png' });
+      await parseImageFile(file);
+      return;
+    }
     const txt = pasteText.trim();
-    if (!txt) { toast({ title: 'Geen tekst', description: 'Plak eerst je testgegevens.', variant: 'destructive' }); return; }
+    if (!txt) { toast({ title: 'Niets om in te lezen', description: 'Plak een screenshot of tekst, of voeg een bestand toe.', variant: 'destructive' }); return; }
     setParsing(true);
     try {
       const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
@@ -240,31 +267,34 @@ const DataInputTab = ({
         display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
         marginBottom: '14px',
       }}>
-        {/* Import dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="wb-focus wb-transition" style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              padding: '8px 14px', borderRadius: '8px',
-              background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-              color: 'var(--wb-text)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
-            }}>
-              Importeren <ChevronDown size={14} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => imageInputRef.current?.click()} disabled={parsing}>
-              {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ImageIcon className="h-4 w-4 mr-2" />}
-              Foto / screenshot
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowPaste(true)} disabled={parsing}>
-              <ClipboardPaste className="h-4 w-4 mr-2" /> Plakken uit chat / tabel
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-              <FileJson className="h-4 w-4 mr-2" /> JSON-bestand
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Import toggle */}
+        <button
+          onClick={() => setShowPaste(v => !v)}
+          className="wb-focus wb-transition"
+          aria-expanded={showPaste}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '8px 14px', borderRadius: '8px',
+            background: showPaste ? 'rgba(99,102,241,0.10)' : 'var(--wb-surface)',
+            border: `1px solid ${showPaste ? 'var(--wb-indigo)' : 'var(--wb-border)'}`,
+            color: 'var(--wb-text)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+          }}
+        >
+          <MessageSquarePlus size={14} /> Importeren via chat
+        </button>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="wb-focus wb-transition"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '8px 12px', borderRadius: '8px',
+            background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+            color: 'var(--wb-text-dim)', fontSize: '12.5px', cursor: 'pointer',
+          }}
+          title="JSON-bestand importeren"
+        >
+          <FileJson size={13} /> JSON
+        </button>
 
         {/* Protocol drawer */}
         {protocol && setProtocol && (
@@ -331,41 +361,120 @@ const DataInputTab = ({
         </div>
       </div>
 
-      {/* Paste panel */}
+      {/* Chat-style import composer */}
       {showPaste && (
         <div style={{
           marginBottom: '14px',
-          padding: '14px',
+          padding: '12px',
           background: 'var(--wb-surface)',
           border: '1px solid var(--wb-border)',
-          borderRadius: '12px',
+          borderRadius: '14px',
           display: 'flex', flexDirection: 'column', gap: '10px',
+          boxShadow: '0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px -16px rgba(0,0,0,0.6)',
         }}>
-          <div style={{ fontSize: '12.5px', color: 'var(--wb-text-dim)' }}>
-            Plak kolommen uit Excel, een chat, of vrij getypt. De AI haalt er automatisch de tredes uit.
+          <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <MessageSquarePlus size={13} />
+            Plak hier een screenshot van je papieren meting (Ctrl/Cmd+V), typ of plak tekst, of klik op <Paperclip size={11} style={{ display: 'inline', verticalAlign: 'middle' }} /> om een bestand toe te voegen.
           </div>
-          <textarea
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-            placeholder={'Bv.\nAfstand  Tijd     Snelheid  Lactaat  HR\n1,2      0:07:36  9,5       1,7      141\n1,2      0:07:13  10,0      1,1      149\n...'}
-            rows={7}
-            className="font-mono-num wb-focus"
-            style={{
-              width: '100%', fontSize: '13px', padding: '10px',
+
+          {/* Attached image preview */}
+          {pastedImage && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '10px',
+              padding: '8px', borderRadius: '10px',
               background: 'var(--wb-bg)', border: '1px solid var(--wb-border)',
-              borderRadius: '8px', color: 'var(--wb-text)', resize: 'vertical',
-            }}
-          />
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-            <button onClick={() => { setPasteText(''); setShowPaste(false); }} disabled={parsing}
-              className="wb-focus wb-transition"
-              style={{ ...secondaryBtn, padding: '7px 14px' }}>Annuleren</button>
-            <button onClick={handlePasteImport} disabled={parsing || !pasteText.trim()}
-              className="wb-focus wb-transition"
-              style={{ ...primaryBtn, padding: '7px 14px' }}>
-              {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-              {parsing ? 'Inlezen…' : 'Inlezen'}
-            </button>
+            }}>
+              <img src={pastedImage} alt="Bijlage"
+                style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--wb-border)' }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--wb-text)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {pastedFileName || 'screenshot.png'}
+                </div>
+                <div style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)' }}>Klaar om in te lezen</div>
+              </div>
+              <button onClick={() => { setPastedImage(null); setPastedFileName(null); }}
+                className="wb-focus wb-transition"
+                aria-label="Bijlage verwijderen"
+                style={{
+                  width: '28px', height: '28px', borderRadius: '6px',
+                  background: 'transparent', border: '1px solid var(--wb-border)',
+                  color: 'var(--wb-text-dim)', cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          {/* Composer textarea + actions row */}
+          <div style={{
+            display: 'flex', flexDirection: 'column', gap: '8px',
+            background: 'var(--wb-bg)', border: '1px solid var(--wb-border)',
+            borderRadius: '12px', padding: '10px',
+          }}>
+            <textarea
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              onPaste={handleComposerPaste}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                  e.preventDefault();
+                  handleComposerSubmit();
+                }
+              }}
+              placeholder={pastedImage
+                ? 'Optionele extra context bij je screenshot…'
+                : 'Plak hier een screenshot, of typ/plak je testgegevens…\nbv.  1,2 km   7:36   1,7 mmol   141 bpm'}
+              rows={5}
+              className="font-mono-num wb-focus"
+              style={{
+                width: '100%', fontSize: '13px', padding: '4px',
+                background: 'transparent', border: 'none', outline: 'none',
+                color: 'var(--wb-text)', resize: 'none',
+              }}
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => imageInputRef.current?.click()}
+                disabled={parsing}
+                className="wb-focus wb-transition"
+                aria-label="Bestand toevoegen"
+                title="Foto / screenshot toevoegen"
+                style={{
+                  width: '32px', height: '32px', borderRadius: '8px',
+                  background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+                  color: 'var(--wb-text-dim)', cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                <Paperclip size={15} />
+              </button>
+              <div style={{ flex: 1, fontSize: '11px', color: 'var(--wb-text-mute)' }}>
+                <kbd style={kbdStyle}>Ctrl</kbd>/<kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>V</kbd> om screenshot te plakken · <kbd style={kbdStyle}>Ctrl</kbd>+<kbd style={kbdStyle}>Enter</kbd> om te versturen
+              </div>
+              <button
+                onClick={() => { setPasteText(''); setPastedImage(null); setPastedFileName(null); setShowPaste(false); }}
+                disabled={parsing}
+                className="wb-focus wb-transition"
+                style={{ ...secondaryBtn, padding: '7px 12px' }}
+              >Annuleren</button>
+              <button
+                onClick={handleComposerSubmit}
+                disabled={parsing || (!pasteText.trim() && !pastedImage)}
+                className="wb-focus wb-transition"
+                aria-label="Versturen"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  height: '32px', padding: '0 12px', borderRadius: '8px',
+                  background: 'var(--wb-indigo)', color: '#fff',
+                  border: '1px solid var(--wb-indigo-dim)',
+                  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                  opacity: (parsing || (!pasteText.trim() && !pastedImage)) ? 0.5 : 1,
+                }}
+              >
+                {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp size={15} />}
+                {parsing ? 'Inlezen…' : 'Versturen'}
+              </button>
+            </div>
           </div>
         </div>
       )}
