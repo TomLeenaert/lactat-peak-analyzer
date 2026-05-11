@@ -76,10 +76,12 @@ Deno.serve(async (req) => {
           { role: 'system', content: SYSTEM_PROMPT },
           {
             role: 'user',
-            content: [
-              { type: 'text', text: 'Lees deze lactaattest in en geef het JSON terug volgens het schema.' },
-              { type: 'image_url', image_url: { url: dataUrl } },
-            ],
+            content: dataUrl
+              ? [
+                  { type: 'text', text: 'Lees deze lactaattest in en geef het JSON terug volgens het schema.' },
+                  { type: 'image_url', image_url: { url: dataUrl } },
+                ]
+              : `Lees deze lactaattest in en geef JSON volgens het schema:\n\n${text}`,
           },
         ],
         response_format: { type: 'json_object' },
