@@ -145,7 +145,7 @@ const AthleteTest = () => {
         rightContent={saveButton}
       />
 
-      <main className="max-w-[900px] mx-auto px-4 py-2 pb-6">
+      <main className="w-full px-2 py-2 pb-6">
         <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
         {(activeTab === 'data' || activeTab === 'protocol') && (
