@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus, Timer, Droplets, Heart, Image as ImageIcon, AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Timer, Droplets, Heart, Image as ImageIcon, AlertTriangle, Check, Loader2, ClipboardPaste } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
