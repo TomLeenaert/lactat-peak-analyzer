@@ -1,15 +1,12 @@
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState } from 'react';
 import {
-  Trash2, Plus, Image as ImageIcon, AlertTriangle, Check, Loader2,
-  Zap, Settings2, FileJson, Keyboard, X, ArrowUp, Paperclip, MessageSquarePlus,
+  Trash2, Plus, AlertTriangle, Check, Loader2,
+  Zap, X, ArrowUp, Paperclip, MessageSquarePlus,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { calculate, formatPace, polyEval, type StepData } from '@/lib/lactate-math';
-import LactateChart from '@/components/LactateChart';
-import ProtocolBar from '@/components/ProtocolBar';
+import { formatPace, type StepData } from '@/lib/lactate-math';
 import type { ProtocolSettings } from '@/lib/protocol-types';
 
 interface DataInputTabProps {
