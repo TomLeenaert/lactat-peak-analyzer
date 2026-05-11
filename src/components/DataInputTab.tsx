@@ -158,10 +158,7 @@ const DataInputTab = ({
       return { speed, lactate: typeof row.lactate === 'number' ? row.lactate : 0, hr: typeof row.hr === 'number' ? row.hr : 0, watt: 0, distance, time };
     });
   };
-  const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
+  const parseImageFile = async (file: File) => {
     if (file.size > 8 * 1024 * 1024) { toast({ title: 'Bestand te groot', description: 'Maximaal 8 MB.', variant: 'destructive' }); return; }
     setParsing(true);
     try {
@@ -175,14 +172,45 @@ const DataInputTab = ({
       if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
       setTestData(imported);
       setNeedsValidation(true);
+      setPastedImage(null); setPastedFileName(null); setPasteText(''); setShowPaste(false);
       toast({ title: 'Afbeelding ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
     } catch (err) {
       toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
     } finally { setParsing(false); }
   };
-  const handlePasteImport = async () => {
+  const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    await parseImageFile(file);
+  };
+  const handleComposerPaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      if (it.kind === 'file' && it.type.startsWith('image/')) {
+        const file = it.getAsFile();
+        if (file) {
+          e.preventDefault();
+          const dataUrl = await fileToDataUrl(file);
+          setPastedImage(dataUrl);
+          setPastedFileName(file.name || 'screenshot.png');
+          return;
+        }
+      }
+    }
+  };
+  const handleComposerSubmit = async () => {
+    if (pastedImage) {
+      const res = await fetch(pastedImage);
+      const blob = await res.blob();
+      const file = new File([blob], pastedFileName || 'pasted.png', { type: blob.type || 'image/png' });
+      await parseImageFile(file);
+      return;
+    }
     const txt = pasteText.trim();
-    if (!txt) { toast({ title: 'Geen tekst', description: 'Plak eerst je testgegevens.', variant: 'destructive' }); return; }
+    if (!txt) { toast({ title: 'Niets om in te lezen', description: 'Plak een screenshot of tekst, of voeg een bestand toe.', variant: 'destructive' }); return; }
     setParsing(true);
     try {
       const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
