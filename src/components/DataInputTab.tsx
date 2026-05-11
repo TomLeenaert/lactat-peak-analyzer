@@ -1,12 +1,11 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus, Upload, Check, Timer, Droplets, Heart } from 'lucide-react';
+import { Trash2, Plus, Timer, Droplets, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import NumPad from '@/components/NumPad';
 import { useLang } from '@/contexts/LanguageContext';
 import ProtocolBar from '@/components/ProtocolBar';
 import type { ProtocolSettings } from '@/lib/protocol-types';
@@ -28,9 +27,6 @@ interface DataInputTabProps {
   protocol?: ProtocolSettings;
   setProtocol?: (p: ProtocolSettings) => void;
 }
-
-type EditingField = 'time' | 'lactate' | 'hr';
-type TimeSubField = 'min' | 'sec';
 
 type ImportRow = Record<string, unknown>;
 
@@ -73,11 +69,10 @@ const secsToDisplay = (secs: number): string => {
 
 const DataInputTab = ({
   testData, setTestData,
-  athleteName, setAthleteName,
-  testDate, setTestDate,
   restingLactate, setRestingLactate,
   stepDistance, setStepDistance,
-  stepIncrement, setStepIncrement,
+  setStepIncrement,
+  setAthleteName, setTestDate,
   onCalculate,
   protocol, setProtocol,
 }: DataInputTabProps) => {
@@ -87,62 +82,30 @@ const DataInputTab = ({
   const { t } = useLang();
   const [isDragging, setIsDragging] = useState(false);
 
-  // Sheet state: which step & which field are we editing?
-  const [editStep, setEditStep] = useState<number | null>(null);
-  const [editField, setEditField] = useState<EditingField | null>(null);
+  // ── Update helpers ─────────────────────────────────────────────────────
+  const updateRow = (idx: number, patch: Partial<StepData>) => {
+    const next = [...testData];
+    next[idx] = { ...next[idx], ...patch };
+    setTestData(next);
+  };
 
-  // For time editing: two values (min + sec)
-  const [timeMin, setTimeMin] = useState('');
-  const [timeSec, setTimeSec] = useState('');
-  const [timeSubField, setTimeSubField] = useState<TimeSubField>('min');
+  const updateTime = (idx: number, min: number, sec: number) => {
+    const totalSecs = (min || 0) * 60 + (sec || 0);
+    const row = testData[idx];
+    updateRow(idx, {
+      time: totalSecs,
+      speed: calcSpeed(row.distance || dist, totalSecs),
+    });
+  };
 
-  // For single-value fields
-  const [numPadValue, setNumPadValue] = useState('');
-
-  // ── Open field editor ──────────────────────────────────────────────────
-  const openField = useCallback((stepIdx: number, field: EditingField) => {
-    const row = testData[stepIdx];
-    setEditStep(stepIdx);
-    setEditField(field);
-
-    if (field === 'time') {
-      const secs = row.time || 0;
-      setTimeMin(secs > 0 ? String(Math.floor(secs / 60)) : '');
-      setTimeSec(secs > 0 ? String(Math.round(secs % 60)) : '');
-      setTimeSubField('min');
-    } else if (field === 'lactate') {
-      setNumPadValue(row.lactate > 0 ? String(row.lactate) : '');
-    } else if (field === 'hr') {
-      setNumPadValue(row.hr > 0 ? String(row.hr) : '');
-    }
-  }, [testData]);
-
-  // ── Confirm & close ────────────────────────────────────────────────────
-  const confirmField = useCallback(() => {
-    if (editStep === null || !editField) return;
-    const newData = [...testData];
-    const row = { ...newData[editStep] };
-
-    if (editField === 'time') {
-      const totalSecs = (parseInt(timeMin) || 0) * 60 + (parseInt(timeSec) || 0);
-      row.time = totalSecs;
-      row.speed = calcSpeed(row.distance || dist, totalSecs);
-    } else if (editField === 'lactate') {
-      row.lactate = parseFloat(numPadValue) || 0;
-    } else if (editField === 'hr') {
-      row.hr = parseInt(numPadValue) || 0;
-    }
-
-    newData[editStep] = row;
-    setTestData(newData);
-    setEditStep(null);
-    setEditField(null);
-  }, [editStep, editField, timeMin, timeSec, numPadValue, testData, dist, setTestData]);
-
-  const dismiss = useCallback(() => {
-    setEditStep(null);
-    setEditField(null);
-  }, []);
+  const updateStepDistanceFor = (idx: number, val: string) => {
+    const newDist = parseFloat(val) || 0;
+    const row = testData[idx];
+    updateRow(idx, {
+      distance: newDist,
+      speed: row.time && row.time > 0 ? calcSpeed(newDist, row.time) : row.speed,
+    });
+  };
 
   // ── JSON import ──────────────────────────────────────────────────────────
   const processJsonFile = (file: File) => {
@@ -188,13 +151,6 @@ const DataInputTab = ({
     reader.readAsText(file);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault(); setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.name.endsWith('.json')) processJsonFile(file);
-    else toast({ title: t('common.error'), description: t('data.onlyJson'), variant: 'destructive' });
-  };
-
   const handleJsonImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -202,120 +158,35 @@ const DataInputTab = ({
     e.target.value = '';
   };
 
-  const clearData = () => {
-    setAthleteName(''); setTestDate(new Date().toISOString().split('T')[0]);
-    setRestingLactate(''); setStepDistance('1600'); setStepIncrement('1');
-    setTestData(Array.from({ length: 6 }, () => ({ speed: 0, lactate: 0, hr: 0, watt: 0, distance: 1600, time: 0 })));
-  };
-
   const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
   const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
 
   const filledCount = testData.filter(r => r.lactate > 0).length;
 
-  // ── Field button component ─────────────────────────────────────────────
-  const FieldButton = ({ stepIdx, field, icon, label, value, color, filled }: {
-    stepIdx: number; field: EditingField; icon: React.ReactNode; label: string; value: string; color: string; filled: boolean;
-  }) => (
-    <button
-      onClick={(e) => { e.stopPropagation(); openField(stepIdx, field); }}
-      style={{
-        flex: 1,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
-        padding: '10px 6px',
-        borderRadius: '12px',
-        background: filled ? `${color}12` : 'rgba(255,255,255,0.02)',
-        border: filled ? `1.5px solid ${color}40` : '1px solid rgba(255,255,255,0.08)',
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-        transition: 'all 0.15s',
-      }}
-    >
-      <div style={{ color: filled ? color : 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-        {icon}
-        <span style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
-      </div>
-      <span style={{
-        fontSize: '16px', fontWeight: 700, fontFamily: 'monospace',
-        color: filled ? '#fff' : 'rgba(255,255,255,0.15)',
-      }}>
-        {filled ? value : '—'}
-      </span>
-    </button>
-  );
-
-  // ── Sheet content by field type ────────────────────────────────────────
-  const renderSheetContent = () => {
-    if (editStep === null || !editField) return null;
-
-    if (editField === 'time') {
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {/* Toggle min/sec */}
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-            {(['min', 'sec'] as TimeSubField[]).map(sf => (
-              <button
-                key={sf}
-                onClick={() => setTimeSubField(sf)}
-                style={{
-                  padding: '8px 24px', borderRadius: '999px', fontSize: '13px', fontWeight: 700,
-                  background: timeSubField === sf ? '#00fdc120' : 'rgba(255,255,255,0.03)',
-                  border: timeSubField === sf ? '1.5px solid #00fdc160' : '1px solid rgba(255,255,255,0.06)',
-                  color: timeSubField === sf ? '#00fdc1' : 'rgba(255,255,255,0.3)',
-                  cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-                }}
-              >
-                {sf === 'min' ? 'MIN' : 'SEC'}
-              </button>
-            ))}
-          </div>
-
-          {/* Show both values above numpad */}
-          <div style={{
-            display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: '6px',
-            padding: '12px', fontSize: '13px', color: 'rgba(255,255,255,0.5)',
-          }}>
-            <span style={{ color: timeSubField === 'min' ? '#00fdc1' : 'rgba(255,255,255,0.3)', fontWeight: 700, fontSize: '18px', fontFamily: 'monospace' }}>
-              {timeMin || '0'}
-            </span>
-            <span>min</span>
-            <span style={{ color: timeSubField === 'sec' ? '#00fdc1' : 'rgba(255,255,255,0.3)', fontWeight: 700, fontSize: '18px', fontFamily: 'monospace' }}>
-              {timeSec || '0'}
-            </span>
-            <span>sec</span>
-          </div>
-
-          <NumPad
-            value={timeSubField === 'min' ? timeMin : timeSec}
-            onChange={timeSubField === 'min' ? setTimeMin : setTimeSec}
-            label={timeSubField === 'min' ? t('data.minutes') : t('data.seconds')}
-            unit={timeSubField === 'min' ? 'min' : 'sec'}
-            color="#00fdc1"
-            maxValue={59}
-            decimalPlaces={0}
-            hideDisplay
-          />
-        </div>
-      );
-    }
-
-    if (editField === 'lactate') {
-      return (
-        <NumPad value={numPadValue} onChange={setNumPadValue} label={t('data.lactate')} unit="mmol/L" color="#6644ff" maxValue={25} decimalPlaces={1} />
-      );
-    }
-
-    if (editField === 'hr') {
-      return (
-        <NumPad value={numPadValue} onChange={setNumPadValue} label={t('data.hr')} unit="bpm" color="#ff6b2b" maxValue={220} decimalPlaces={0} />
-      );
-    }
-
-    return null;
+  // ── Inline cell input (desktop friendly) ──────────────────────────────
+  const cellStyle: React.CSSProperties = {
+    height: '38px',
+    fontSize: '15px',
+    fontFamily: 'monospace',
+    fontWeight: 700,
+    textAlign: 'center',
+    padding: '0 6px',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    color: '#fff',
+    width: '100%',
   };
-
-  const fieldColor = editField === 'time' ? '#00fdc1' : editField === 'lactate' ? '#6644ff' : '#ff6b2b';
-  const fieldTextDark = editField === 'time';
+  const labelStyle: React.CSSProperties = {
+    fontSize: '10px',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    marginBottom: '4px',
+  };
 
   return (
     <>
@@ -335,6 +206,24 @@ const DataInputTab = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
+
+          {/* Rustlactaat */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <Label style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+              Rustlactaat
+            </Label>
+            <Input
+              type="number"
+              inputMode="decimal"
+              step="0.1"
+              min="0"
+              value={restingLactate}
+              onChange={(e) => setRestingLactate(e.target.value)}
+              placeholder="optioneel"
+              style={{ width: '110px', height: '32px', fontFamily: 'monospace', fontWeight: 600 }}
+            />
+            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>mmol/L</span>
+          </div>
 
           {/* Progress */}
           {filledCount > 0 && (
@@ -361,16 +250,8 @@ const DataInputTab = ({
               const hasTime = (row.time || 0) > 0;
               const allFilled = hasLactate && hasHR && hasTime;
               const isFinal = i === testData.length - 1 && testData.length > 1;
-              const rowDist = row.distance || dist;
-
-              const updateStepDistance = (val: string) => {
-                const newDist = parseFloat(val) || 0;
-                const newData = [...testData];
-                const r = { ...newData[i], distance: newDist };
-                if (r.time && r.time > 0) r.speed = calcSpeed(newDist, r.time);
-                newData[i] = r;
-                setTestData(newData);
-              };
+              const minVal = row.time ? Math.floor(row.time / 60) : 0;
+              const secVal = row.time ? Math.round(row.time % 60) : 0;
 
               return (
                 <div key={i} style={{
@@ -378,56 +259,16 @@ const DataInputTab = ({
                     ? '2px solid rgba(255,107,43,0.55)'
                     : allFilled ? '1px solid rgba(0,253,193,0.3)' : '1px solid rgba(255,255,255,0.06)',
                   borderRadius: '16px',
-                  padding: '14px 16px',
+                  padding: '12px 14px',
                   background: isFinal
                     ? 'rgba(255,107,43,0.06)'
                     : allFilled ? 'rgba(0,253,193,0.03)' : 'rgba(255,255,255,0.02)',
-                  boxShadow: isFinal ? '0 0 0 4px rgba(255,107,43,0.08)' : undefined,
                 }}>
-                  {isFinal && (
-                    <div style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      gap: '10px', flexWrap: 'wrap',
-                      marginBottom: '12px', paddingBottom: '10px',
-                      borderBottom: '1px dashed rgba(255,107,43,0.3)',
-                    }}>
-                      <span style={{
-                        fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px',
-                        color: '#ff6b2b', textTransform: 'uppercase',
-                        background: 'rgba(255,107,43,0.15)',
-                        border: '1px solid rgba(255,107,43,0.4)',
-                        borderRadius: '6px', padding: '4px 10px',
-                      }}>
-                        ⚡ FINAL STAGE — ALL OUT
-                      </span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                          Afstand
-                        </Label>
-                        <Input
-                          type="number"
-                          inputMode="numeric"
-                          value={row.distance || ''}
-                          onChange={(e) => updateStepDistance(e.target.value)}
-                          placeholder={String(dist)}
-                          style={{
-                            width: '90px', height: '32px', fontSize: '14px',
-                            fontFamily: 'monospace', fontWeight: 700,
-                            textAlign: 'right', padding: '0 8px',
-                            background: 'rgba(255,107,43,0.08)',
-                            borderColor: 'rgba(255,107,43,0.4)',
-                            color: '#fff',
-                          }}
-                        />
-                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>m</span>
-                      </div>
-                    </div>
-                  )}
-                  {/* Step header */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  {/* Header */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                       <div style={{
-                        width: '30px', height: '30px', borderRadius: '50%',
+                        width: '28px', height: '28px', borderRadius: '50%',
                         background: allFilled ? 'rgba(0,253,193,0.2)' : 'rgba(255,255,255,0.06)',
                         border: allFilled ? '1px solid rgba(0,253,193,0.5)' : '1px solid rgba(255,255,255,0.1)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -436,52 +277,44 @@ const DataInputTab = ({
                       }}>
                         {allFilled ? '✓' : i + 1}
                       </div>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#fff' }}>
-                        {t('data.step')} {i + 1}
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>
+                        {isFinal ? '⚡ All-out' : `${t('data.step')} ${i + 1}`}
                       </span>
-                      {!isFinal && (
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: '4px',
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                          borderRadius: '6px', padding: '2px 6px',
-                        }}>
-                          <Input
-                            type="number"
-                            inputMode="numeric"
-                            value={row.distance ?? ''}
-                            onChange={(e) => updateStepDistance(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                            placeholder={String(dist)}
-                            style={{
-                              width: '58px', height: '22px', fontSize: '11px',
-                              fontFamily: 'monospace', fontWeight: 700,
-                              textAlign: 'right', padding: '0 4px',
-                              background: 'transparent', border: 'none',
-                              color: 'rgba(255,255,255,0.85)',
-                            }}
-                          />
-                          <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>m</span>
-                        </div>
-                      )}
+
+                      {/* afstand */}
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '6px', padding: '2px 6px',
+                      }}>
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          value={row.distance ?? ''}
+                          onChange={(e) => updateStepDistanceFor(i, e.target.value)}
+                          placeholder={String(dist)}
+                          style={{
+                            width: '62px', height: '24px', fontSize: '12px',
+                            fontFamily: 'monospace', fontWeight: 700,
+                            textAlign: 'right', padding: '0 4px',
+                            background: 'transparent', border: 'none',
+                            color: 'rgba(255,255,255,0.85)',
+                          }}
+                        />
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>m</span>
+                      </div>
+
                       {row.speed > 0 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{
-                            fontSize: '13px', fontWeight: 700, fontFamily: 'monospace',
-                            color: '#00fdc1',
-                            background: 'rgba(0,253,193,0.1)',
-                            border: '1px solid rgba(0,253,193,0.25)',
-                            borderRadius: '8px', padding: '2px 8px',
-                          }}>
-                            {formatPace(row.speed)}/km
-                          </span>
-                          <span style={{
-                            fontSize: '12px', fontWeight: 500, fontFamily: 'monospace',
-                            color: 'rgba(255,255,255,0.35)',
-                          }}>
-                            ({secsToDisplay(Math.round(1440 / row.speed))} /400m)
-                          </span>
-                        </div>
+                        <span style={{
+                          fontSize: '12px', fontWeight: 700, fontFamily: 'monospace',
+                          color: '#00fdc1',
+                          background: 'rgba(0,253,193,0.1)',
+                          border: '1px solid rgba(0,253,193,0.25)',
+                          borderRadius: '8px', padding: '2px 8px',
+                        }}>
+                          {formatPace(row.speed)}/km · {row.speed.toFixed(1)} km/h
+                        </span>
                       )}
                     </div>
                     <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive shrink-0" onClick={() => removeRow(i)}>
@@ -489,26 +322,72 @@ const DataInputTab = ({
                     </Button>
                   </div>
 
-                  {/* 3 field buttons */}
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <FieldButton
-                      stepIdx={i} field="time"
-                      icon={<Timer size={14} />} label={t('data.time')}
-                      value={secsToDisplay(row.time || 0)}
-                      color="#00fdc1" filled={hasTime}
-                    />
-                    <FieldButton
-                      stepIdx={i} field="lactate"
-                      icon={<Droplets size={14} />} label={t('data.lactate')}
-                      value={String(row.lactate)}
-                      color="#6644ff" filled={hasLactate}
-                    />
-                    <FieldButton
-                      stepIdx={i} field="hr"
-                      icon={<Heart size={14} />} label="HR"
-                      value={String(row.hr)}
-                      color="#ff6b2b" filled={hasHR}
-                    />
+                  {/* Inline grid: tijd | lactaat | HR */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '8px' }}>
+                    {/* Tijd */}
+                    <div>
+                      <div style={{ ...labelStyle, color: hasTime ? '#00fdc1' : 'rgba(255,255,255,0.4)' }}>
+                        <Timer size={12} /> {t('data.time')}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          min="0"
+                          max="99"
+                          value={minVal || ''}
+                          onChange={(e) => updateTime(i, parseInt(e.target.value) || 0, secVal)}
+                          placeholder="mm"
+                          style={cellStyle}
+                        />
+                        <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>:</span>
+                        <Input
+                          type="number"
+                          inputMode="numeric"
+                          min="0"
+                          max="59"
+                          value={secVal || ''}
+                          onChange={(e) => updateTime(i, minVal, parseInt(e.target.value) || 0)}
+                          placeholder="ss"
+                          style={cellStyle}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Lactaat */}
+                    <div>
+                      <div style={{ ...labelStyle, color: hasLactate ? '#6644ff' : 'rgba(255,255,255,0.4)' }}>
+                        <Droplets size={12} /> {t('data.lactate')}
+                      </div>
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        step="0.1"
+                        min="0"
+                        max="25"
+                        value={row.lactate || ''}
+                        onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
+                        placeholder="mmol/L"
+                        style={cellStyle}
+                      />
+                    </div>
+
+                    {/* HR */}
+                    <div>
+                      <div style={{ ...labelStyle, color: hasHR ? '#ff6b2b' : 'rgba(255,255,255,0.4)' }}>
+                        <Heart size={12} /> HR
+                      </div>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        max="220"
+                        value={row.hr || ''}
+                        onChange={(e) => updateRow(i, { hr: parseInt(e.target.value) || 0 })}
+                        placeholder="bpm"
+                        style={cellStyle}
+                      />
+                    </div>
                   </div>
                 </div>
               );
@@ -523,45 +402,6 @@ const DataInputTab = ({
           </Button>
         </CardContent>
       </Card>
-
-      {/* ── Field editor sheet ──────────────────────────────────────────────── */}
-      {editStep !== null && editField && (
-        <>
-          <div onClick={dismiss} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 100, backdropFilter: 'blur(4px)' }} />
-          <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 101,
-            background: '#0e0f15', borderTop: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '24px 24px 0 0', padding: '16px 20px 40px',
-            maxHeight: '90vh', overflowY: 'auto',
-          }}>
-            <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.15)', margin: '0 auto 16px' }} />
-
-            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: '#fff' }}>
-                {t('data.step')} {editStep + 1}
-                <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}> / {testData.length}</span>
-              </span>
-            </div>
-
-            {renderSheetContent()}
-
-            <button
-              onClick={confirmField}
-              style={{
-                marginTop: '12px', width: '100%', height: '60px', borderRadius: '16px',
-                background: `linear-gradient(135deg, ${fieldColor}, ${fieldColor}cc)`,
-                border: 'none', color: fieldTextDark ? '#000' : '#fff',
-                fontSize: '17px', fontWeight: 700, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <Check size={20} />
-              {t('common.confirm')}
-            </button>
-          </div>
-        </>
-      )}
     </>
   );
 };
