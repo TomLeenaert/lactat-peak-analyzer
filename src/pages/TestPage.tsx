@@ -89,7 +89,7 @@ const TestPage = () => {
         background: 'var(--wb-surface)',
         borderBottom: '1px solid var(--wb-border)',
       }}>
-        <div className="max-w-[1440px] mx-auto" style={{
+        <div className="w-full" style={{
           display: 'flex', alignItems: 'center', gap: '12px',
           padding: '10px 20px',
         }}>
@@ -132,7 +132,7 @@ const TestPage = () => {
         </div>
       </header>
 
-      <main className="max-w-[1440px] mx-auto" style={{ padding: '16px 20px' }}>
+      <main className="w-full" style={{ padding: '16px 20px' }}>
         {(activeTab === 'data' || activeTab === 'protocol') && (
           <DataInputTab
             testData={testData} setTestData={setTestData}
