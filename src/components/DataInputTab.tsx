@@ -793,6 +793,25 @@ const DataInputTab = ({
 
         </div>
       </div>
+
+      {/* Footer logo */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        gap: '8px', padding: '32px 0 16px', marginTop: '24px',
+        opacity: 0.85,
+      }}>
+        <img src={logoSrc} alt="MyLactest" style={{
+          width: '40px', height: '40px', objectFit: 'contain',
+          mixBlendMode: 'lighten',
+          filter: 'drop-shadow(0 2px 8px rgba(139,74,255,0.25))',
+        }} />
+        <span style={{
+          fontSize: '13px', fontWeight: 700, letterSpacing: '0.04em',
+          color: 'var(--wb-text-dim)',
+        }}>
+          MyLactest
+        </span>
+      </div>
     </>
   );
 };
