@@ -406,6 +406,9 @@ function checkAllOutSubmaximal(speeds: number[], lactates: number[], warnings: C
       affectedStep: n - 1,
     });
   }
+}
+
+// ============ HOOFDFUNCTIE ============
 
 export function calculate(testData: StepData[], restingLactate: number): CalculationResults | string {
   const valid = testData
