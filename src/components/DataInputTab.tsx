@@ -355,7 +355,7 @@ const DataInputTab = ({
 
       {/* ── Workbench: two-column layout ───────────────────── */}
       <div
-        className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_440px]"
+        className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_480px] xl:grid-cols-[minmax(0,1fr)_560px]"
       >
 
         {/* LEFT — spreadsheet */}
