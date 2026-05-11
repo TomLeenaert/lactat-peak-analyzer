@@ -1,13 +1,17 @@
-import { useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus, Timer, Droplets, Heart, Image as ImageIcon, AlertTriangle, Check, Loader2, ClipboardPaste } from 'lucide-react';
+import { useRef, useState, useMemo } from 'react';
+import {
+  Trash2, Plus, Image as ImageIcon, AlertTriangle, Check, Loader2,
+  ClipboardPaste, Zap, ChevronDown, Settings2, FileJson, Keyboard,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { calculate, formatPace, polyEval, type StepData } from '@/lib/lactate-math';
+import LactateChart from '@/components/LactateChart';
 import ProtocolBar from '@/components/ProtocolBar';
 import type { ProtocolSettings } from '@/lib/protocol-types';
 
@@ -29,44 +33,21 @@ interface DataInputTabProps {
   setProtocol?: (p: ProtocolSettings) => void;
 }
 
-type ImportRow = Record<string, unknown>;
-
-const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
-
-const getNumber = (row: ImportRow, ...keys: string[]): number => {
-  for (const key of keys) {
-    const value = row[key];
-    if (typeof value === 'number') return value;
-  }
+// ── small helpers ────────────────────────────────────────────
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+const getNumber = (row: Record<string, unknown>, ...keys: string[]) => {
+  for (const k of keys) { const v = row[k]; if (typeof v === 'number') return v; }
   return 0;
 };
-
-const getString = (row: Record<string, unknown>, ...keys: string[]): string | undefined => {
-  for (const key of keys) {
-    const value = row[key];
-    if (typeof value === 'string' && value) return value;
-  }
+const getString = (row: Record<string, unknown>, ...keys: string[]) => {
+  for (const k of keys) { const v = row[k]; if (typeof v === 'string' && v) return v; }
   return undefined;
 };
-
 const findFirstArray = (row: Record<string, unknown>): unknown[] => {
-  for (const value of Object.values(row)) {
-    if (Array.isArray(value)) return value;
-  }
+  for (const v of Object.values(row)) if (Array.isArray(v)) return v;
   return [];
 };
-
-const calcSpeed = (distanceM: number, timeSec: number): number => {
-  if (!distanceM || !timeSec || timeSec <= 0) return 0;
-  return (distanceM / 1000) / (timeSec / 3600);
-};
-
-const secsToDisplay = (secs: number): string => {
-  if (!secs || secs <= 0) return '—';
-  const m = Math.floor(secs / 60);
-  const s = Math.round(secs % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-};
+const calcSpeed = (dM: number, tS: number) => (!dM || !tS || tS <= 0 ? 0 : (dM / 1000) / (tS / 3600));
 
 const DataInputTab = ({
   testData, setTestData,
@@ -80,39 +61,43 @@ const DataInputTab = ({
   const dist = parseFloat(stepDistance) || 1600;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
   const [parsing, setParsing] = useState(false);
   const [needsValidation, setNeedsValidation] = useState(false);
   const [pasteText, setPasteText] = useState('');
   const [showPaste, setShowPaste] = useState(false);
+  const [protocolOpen, setProtocolOpen] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
 
-  // ── Update helpers ─────────────────────────────────────────────────────
+  // ── live preview calculation ──────────────────────────────
+  const livePreview = useMemo(() => {
+    const filled = testData.filter(r => r.lactate > 0 && r.speed > 0);
+    if (filled.length < 3) return null;
+    const result = calculate(filled, parseFloat(restingLactate) || 0);
+    return typeof result === 'string' ? null : result;
+  }, [testData, restingLactate]);
+
+  // ── row helpers ───────────────────────────────────────────
   const updateRow = (idx: number, patch: Partial<StepData>) => {
     const next = [...testData];
     next[idx] = { ...next[idx], ...patch };
     setTestData(next);
   };
-
   const updateTime = (idx: number, min: number, sec: number) => {
     const totalSecs = (min || 0) * 60 + (sec || 0);
     const row = testData[idx];
-    updateRow(idx, {
-      time: totalSecs,
-      speed: calcSpeed(row.distance || dist, totalSecs),
-    });
+    updateRow(idx, { time: totalSecs, speed: calcSpeed(row.distance || dist, totalSecs) });
   };
-
   const updateStepDistanceFor = (idx: number, val: string) => {
     const newDist = parseFloat(val) || 0;
     const row = testData[idx];
-    updateRow(idx, {
-      distance: newDist,
-      speed: row.time && row.time > 0 ? calcSpeed(newDist, row.time) : row.speed,
-    });
+    updateRow(idx, { distance: newDist, speed: row.time && row.time > 0 ? calcSpeed(newDist, row.time) : row.speed });
   };
+  const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
+  const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
 
-  // ── JSON import ──────────────────────────────────────────────────────────
+  // ── JSON ─────────────────────────────────────────────────
   const processJsonFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -121,24 +106,17 @@ const DataInputTab = ({
         const json = isRecord(parsedJson) ? parsedJson : {};
         const rawSteps = Array.isArray(parsedJson)
           ? parsedJson
-          : (json.steps || json.data || json.stappen || json.testen || json.results || json.resultaten || json.inspanningstesten || json.rows || json.metingen ||
-             findFirstArray(json));
+          : (json.steps || json.data || json.stappen || json.testen || json.results || json.resultaten || json.inspanningstesten || json.rows || json.metingen || findFirstArray(json));
         const steps = Array.isArray(rawSteps) ? rawSteps : [];
-        if (!steps.length) {
-          toast({ title: t('common.error'), description: t('data.noStepsFound'), variant: 'destructive' });
-          return;
-        }
-        const normalizedRows = steps.filter(isRecord);
-        const importedSteps: StepData[] = normalizedRows.map((row) => {
+        if (!steps.length) { toast({ title: t('common.error'), description: t('data.noStepsFound'), variant: 'destructive' }); return; }
+        const rows = steps.filter(isRecord);
+        const imported: StepData[] = rows.map((row) => {
           const distance = getNumber(row, 'distance', 'afstand') || dist;
           const time = getNumber(row, 'time', 'tijd');
           const speed = getNumber(row, 'speed', 'snelheid') || (time > 0 ? (distance / 1000) / (time / 3600) : 0);
           return { speed, lactate: getNumber(row, 'lactate', 'lactaat'), hr: getNumber(row, 'hr', 'hartslag', 'heartrate'), watt: getNumber(row, 'watt', 'watts', 'power'), distance, time };
         });
-        if (importedSteps.length === 0) {
-          toast({ title: t('common.error'), description: t('data.noUsableSteps'), variant: 'destructive' });
-          return;
-        }
+        if (!imported.length) { toast({ title: t('common.error'), description: t('data.noUsableSteps'), variant: 'destructive' }); return; }
         const athlete = getString(json, 'athlete', 'atleet');
         const date = getString(json, 'date', 'datum');
         const resting = getString(json, 'restingLactate', 'rustlactaat') || String(getNumber(json, 'restingLactate', 'rustlactaat') || '');
@@ -147,15 +125,14 @@ const DataInputTab = ({
         if (date) setTestDate(date);
         if (resting) setRestingLactate(resting);
         if (distance) setStepDistance(distance);
-        setTestData(importedSteps);
-        toast({ title: t('data.imported'), description: `${importedSteps.length} ${t('data.stepsLoaded')}` });
+        setTestData(imported);
+        toast({ title: t('data.imported'), description: `${imported.length} ${t('data.stepsLoaded')}` });
       } catch {
         toast({ title: t('common.error'), description: t('data.invalidJson'), variant: 'destructive' });
       }
     };
     reader.readAsText(file);
   };
-
   const handleJsonImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -163,481 +140,596 @@ const DataInputTab = ({
     e.target.value = '';
   };
 
-  // ── Image / screenshot import via Lovable AI (vision) ─────────────────
+  // ── Image ────────────────────────────────────────────────
   const fileToDataUrl = (file: File): Promise<string> => new Promise((resolve, reject) => {
     const r = new FileReader();
     r.onload = () => resolve(r.result as string);
     r.onerror = () => reject(r.error);
     r.readAsDataURL(file);
   });
-
+  const mapAiSteps = (data: any): StepData[] => {
+    const rawSteps: Array<Record<string, unknown>> = Array.isArray(data?.steps) ? data.steps : [];
+    return rawSteps.map((row) => {
+      const distance = (typeof row.distance === 'number' && row.distance > 0) ? row.distance : dist;
+      const time = typeof row.time_sec === 'number' && row.time_sec > 0 ? row.time_sec : 0;
+      const speed = (typeof row.speed === 'number' && row.speed > 0) ? row.speed : (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+      return { speed, lactate: typeof row.lactate === 'number' ? row.lactate : 0, hr: typeof row.hr === 'number' ? row.hr : 0, watt: 0, distance, time };
+    });
+  };
   const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      toast({ title: 'Bestand te groot', description: 'Maximaal 8 MB.', variant: 'destructive' });
-      return;
-    }
+    if (file.size > 8 * 1024 * 1024) { toast({ title: 'Bestand te groot', description: 'Maximaal 8 MB.', variant: 'destructive' }); return; }
     setParsing(true);
     try {
       const dataUrl = await fileToDataUrl(file);
       const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { image: dataUrl } });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
-      const rawSteps: Array<Record<string, unknown>> = Array.isArray(data?.steps) ? data.steps : [];
-      if (!rawSteps.length) {
-        toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de afbeelding.', variant: 'destructive' });
-        return;
-      }
-
-      const importedSteps: StepData[] = rawSteps.map((row) => {
-        const distance = (typeof row.distance === 'number' && row.distance > 0) ? row.distance : dist;
-        const time = typeof row.time_sec === 'number' && row.time_sec > 0 ? row.time_sec : 0;
-        const speed = (typeof row.speed === 'number' && row.speed > 0)
-          ? row.speed
-          : (time > 0 ? (distance / 1000) / (time / 3600) : 0);
-        return {
-          speed,
-          lactate: typeof row.lactate === 'number' ? row.lactate : 0,
-          hr: typeof row.hr === 'number' ? row.hr : 0,
-          watt: 0,
-          distance,
-          time,
-        };
-      });
-
+      const imported = mapAiSteps(data);
+      if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de afbeelding.', variant: 'destructive' }); return; }
       const rl = data?.resting_lactate;
       if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
-
-      setTestData(importedSteps);
+      setTestData(imported);
       setNeedsValidation(true);
-      toast({
-        title: 'Afbeelding ingelezen',
-        description: `${importedSteps.length} tredes herkend — controleer en pas aan waar nodig.`,
-      });
+      toast({ title: 'Afbeelding ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
     } catch (err) {
-      toast({
-        title: 'Inlezen mislukt',
-        description: (err as Error).message || 'Onbekende fout',
-        variant: 'destructive',
-      });
-    } finally {
-      setParsing(false);
-    }
+      toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
+    } finally { setParsing(false); }
   };
-
   const handlePasteImport = async () => {
     const txt = pasteText.trim();
-    if (!txt) {
-      toast({ title: 'Geen tekst', description: 'Plak eerst je testgegevens.', variant: 'destructive' });
-      return;
-    }
+    if (!txt) { toast({ title: 'Geen tekst', description: 'Plak eerst je testgegevens.', variant: 'destructive' }); return; }
     setParsing(true);
     try {
       const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
-      const rawSteps: Array<Record<string, unknown>> = Array.isArray(data?.steps) ? data.steps : [];
-      if (!rawSteps.length) {
-        toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' });
-        return;
-      }
-
-      const importedSteps: StepData[] = rawSteps.map((row) => {
-        const distance = (typeof row.distance === 'number' && row.distance > 0) ? row.distance : dist;
-        const time = typeof row.time_sec === 'number' && row.time_sec > 0 ? row.time_sec : 0;
-        const speed = (typeof row.speed === 'number' && row.speed > 0)
-          ? row.speed
-          : (time > 0 ? (distance / 1000) / (time / 3600) : 0);
-        return {
-          speed,
-          lactate: typeof row.lactate === 'number' ? row.lactate : 0,
-          hr: typeof row.hr === 'number' ? row.hr : 0,
-          watt: 0,
-          distance,
-          time,
-        };
-      });
-
+      const imported = mapAiSteps(data);
+      if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' }); return; }
       const rl = data?.resting_lactate;
       if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
-
-      setTestData(importedSteps);
+      setTestData(imported);
       setNeedsValidation(true);
       setShowPaste(false);
       setPasteText('');
-      toast({
-        title: 'Tekst ingelezen',
-        description: `${importedSteps.length} tredes herkend — controleer en pas aan waar nodig.`,
-      });
+      toast({ title: 'Tekst ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
     } catch (err) {
-      toast({
-        title: 'Inlezen mislukt',
-        description: (err as Error).message || 'Onbekende fout',
-        variant: 'destructive',
-      });
-    } finally {
-      setParsing(false);
-    }
+      toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
+    } finally { setParsing(false); }
   };
 
-  const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
-  const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
-
+  // ── derived ──────────────────────────────────────────────
   const filledCount = testData.filter(r => r.lactate > 0).length;
+  const maxLactate = Math.max(0, ...testData.map(r => r.lactate || 0));
+  const peakHR = Math.max(0, ...testData.map(r => r.hr || 0));
 
-  // ── Inline cell input (desktop friendly) ──────────────────────────────
-  const cellStyle: React.CSSProperties = {
-    height: '38px',
-    fontSize: '15px',
-    fontFamily: 'monospace',
-    fontWeight: 700,
-    textAlign: 'center',
-    padding: '0 6px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '8px',
-    color: '#fff',
+  // ── styles ───────────────────────────────────────────────
+  const cellInput: React.CSSProperties = {
     width: '100%',
+    height: '34px',
+    background: 'transparent',
+    border: '1px solid transparent',
+    borderRadius: '6px',
+    padding: '0 8px',
+    color: 'var(--wb-text)',
+    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+    fontVariantNumeric: 'tabular-nums',
+    fontSize: '13.5px',
+    fontWeight: 500,
+    textAlign: 'right',
+    outline: 'none',
   };
-  const labelStyle: React.CSSProperties = {
-    fontSize: '10px',
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    marginBottom: '4px',
+  const cellInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.borderColor = 'var(--wb-indigo)';
+    e.currentTarget.style.background = 'rgba(99,102,241,0.06)';
+  };
+  const cellInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.borderColor = 'transparent';
+    e.currentTarget.style.background = 'transparent';
   };
 
   return (
     <>
-      {protocol && setProtocol && (
-        <ProtocolBar
-          protocol={protocol}
-          setProtocol={setProtocol}
-          testData={testData}
-          setTestData={setTestData}
-          setStepDistance={setStepDistance}
-          setStepIncrement={setStepIncrement}
-        />
-      )}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">{t('data.stepData')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
-          <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
+      <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
+      <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
 
-          {/* Import-knoppen */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => imageInputRef.current?.click()}
-              disabled={parsing}
-              style={{ flex: '1 1 220px' }}
-            >
+      {/* Action bar */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
+        marginBottom: '14px',
+      }}>
+        {/* Import dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="wb-focus wb-transition" style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: '8px 14px', borderRadius: '8px',
+              background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+              color: 'var(--wb-text)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+            }}>
+              Importeren <ChevronDown size={14} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => imageInputRef.current?.click()} disabled={parsing}>
               {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ImageIcon className="h-4 w-4 mr-2" />}
-              {parsing ? 'Beeld wordt gelezen…' : 'Foto / screenshot inlezen'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPaste((v) => !v)}
-              disabled={parsing}
-              style={{ flex: '1 1 220px' }}
-            >
-              <ClipboardPaste className="h-4 w-4 mr-2" />
-              {showPaste ? 'Plakvenster verbergen' : 'Plakken uit chat / tabel'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              style={{ flex: '1 1 160px' }}
-            >
-              JSON importeren
-            </Button>
-          </div>
+              Foto / screenshot
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowPaste(true)} disabled={parsing}>
+              <ClipboardPaste className="h-4 w-4 mr-2" /> Plakken uit chat / tabel
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+              <FileJson className="h-4 w-4 mr-2" /> JSON-bestand
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-          {showPaste && (
-            <div style={{
-              padding: '12px',
-              background: 'rgba(102,68,255,0.05)',
-              border: '1px solid rgba(102,68,255,0.25)',
-              borderRadius: '10px',
-              display: 'flex', flexDirection: 'column', gap: '8px',
-            }}>
-              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
-                Plak hier je testgegevens (kolommen uit Excel, een chat, of vrij getypt). De AI haalt er automatisch de tredes uit.
-              </div>
-              <textarea
-                value={pasteText}
-                onChange={(e) => setPasteText(e.target.value)}
-                placeholder={'Bv.\nAfstand  Tijd     Snelheid  Lactaat  HR\n1,2      0:07:36  9,5       1,7      141\n1,2      0:07:13  10,0      1,1      149\n...'}
-                rows={8}
-                style={{
-                  width: '100%',
-                  fontFamily: 'monospace',
-                  fontSize: '13px',
-                  padding: '10px',
-                  background: 'rgba(0,0,0,0.3)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  color: '#fff',
-                  resize: 'vertical',
-                }}
+        {/* Protocol drawer */}
+        {protocol && setProtocol && (
+          <Sheet open={protocolOpen} onOpenChange={setProtocolOpen}>
+            <SheetTrigger asChild>
+              <button className="wb-focus wb-transition" style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                padding: '8px 14px', borderRadius: '8px',
+                background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+                color: 'var(--wb-text-dim)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+              }}>
+                <Settings2 size={14} /> Protocol instellingen
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:max-w-[520px] overflow-y-auto">
+              <SheetHeader className="mb-4"><SheetTitle>Protocol instellingen</SheetTitle></SheetHeader>
+              <ProtocolBar
+                protocol={protocol}
+                setProtocol={setProtocol}
+                testData={testData}
+                setTestData={setTestData}
+                setStepDistance={setStepDistance}
+                setStepIncrement={setStepIncrement}
               />
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <Button variant="ghost" size="sm" onClick={() => { setPasteText(''); setShowPaste(false); }} disabled={parsing}>
-                  Annuleren
-                </Button>
-                <Button size="sm" onClick={handlePasteImport} disabled={parsing || !pasteText.trim()}>
-                  {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
-                  {parsing ? 'Inlezen…' : 'Inlezen'}
-                </Button>
-              </div>
-            </div>
-          )}
+            </SheetContent>
+          </Sheet>
+        )}
 
-          {/* Validatie-banner na AI-import */}
-          {needsValidation && (
-            <div style={{
-              display: 'flex', alignItems: 'flex-start', gap: '10px',
-              padding: '12px 14px',
-              background: 'rgba(255,180,0,0.08)',
-              border: '1px solid rgba(255,180,0,0.4)',
-              borderRadius: '10px',
-            }}>
-              <AlertTriangle size={18} style={{ color: '#ffb400', flexShrink: 0, marginTop: '2px' }} />
-              <div style={{ flex: 1, fontSize: '13px', color: 'rgba(255,255,255,0.85)' }}>
-                <strong style={{ color: '#ffb400' }}>Controle vereist.</strong> De waarden zijn automatisch ingelezen.
-                Loop alle tredes na (tijd, lactaat, hartslag, afstand) en pas aan waar nodig vóór de berekening.
-              </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setNeedsValidation(false)}
-                style={{ color: '#ffb400', height: '28px' }}
-              >
-                <Check className="h-4 w-4 mr-1" /> Gecontroleerd
-              </Button>
-            </div>
-          )}
+        {/* Resting lactate */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '8px',
+          padding: '6px 12px', borderRadius: '8px',
+          background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+        }}>
+          <label style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+            Rust
+          </label>
+          <input
+            type="number" inputMode="decimal" step="0.1" min="0"
+            value={restingLactate}
+            onChange={(e) => setRestingLactate(e.target.value)}
+            placeholder="—"
+            className="font-mono-num wb-focus"
+            style={{
+              width: '52px', height: '24px',
+              background: 'transparent', border: 'none', outline: 'none',
+              color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
+              textAlign: 'right',
+            }}
+          />
+          <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>mmol/L</span>
+        </div>
 
-          {/* Rustlactaat */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <Label style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-              Rustlactaat
-            </Label>
-            <Input
-              type="number"
-              inputMode="decimal"
-              step="0.1"
-              min="0"
-              value={restingLactate}
-              onChange={(e) => setRestingLactate(e.target.value)}
-              placeholder="optioneel"
-              style={{ width: '110px', height: '32px', fontFamily: 'monospace', fontWeight: 600 }}
-            />
-            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>mmol/L</span>
+        <div style={{ flex: 1 }} />
+
+        {/* Keyboard hint */}
+        <div className="hidden lg:flex" style={{
+          alignItems: 'center', gap: '6px',
+          fontSize: '11.5px', color: 'var(--wb-text-mute)',
+        }}>
+          <Keyboard size={12} />
+          <kbd style={kbdStyle}>Tab</kbd> volgende cel
+          <kbd style={kbdStyle}>Enter</kbd> nieuwe rij
+        </div>
+      </div>
+
+      {/* Paste panel */}
+      {showPaste && (
+        <div style={{
+          marginBottom: '14px',
+          padding: '14px',
+          background: 'var(--wb-surface)',
+          border: '1px solid var(--wb-border)',
+          borderRadius: '12px',
+          display: 'flex', flexDirection: 'column', gap: '10px',
+        }}>
+          <div style={{ fontSize: '12.5px', color: 'var(--wb-text-dim)' }}>
+            Plak kolommen uit Excel, een chat, of vrij getypt. De AI haalt er automatisch de tredes uit.
+          </div>
+          <textarea
+            value={pasteText}
+            onChange={(e) => setPasteText(e.target.value)}
+            placeholder={'Bv.\nAfstand  Tijd     Snelheid  Lactaat  HR\n1,2      0:07:36  9,5       1,7      141\n1,2      0:07:13  10,0      1,1      149\n...'}
+            rows={7}
+            className="font-mono-num wb-focus"
+            style={{
+              width: '100%', fontSize: '13px', padding: '10px',
+              background: 'var(--wb-bg)', border: '1px solid var(--wb-border)',
+              borderRadius: '8px', color: 'var(--wb-text)', resize: 'vertical',
+            }}
+          />
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <button onClick={() => { setPasteText(''); setShowPaste(false); }} disabled={parsing}
+              className="wb-focus wb-transition"
+              style={{ ...secondaryBtn, padding: '7px 14px' }}>Annuleren</button>
+            <button onClick={handlePasteImport} disabled={parsing || !pasteText.trim()}
+              className="wb-focus wb-transition"
+              style={{ ...primaryBtn, padding: '7px 14px' }}>
+              {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              {parsing ? 'Inlezen…' : 'Inlezen'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Validation banner */}
+      {needsValidation && (
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: '10px',
+          padding: '11px 14px', marginBottom: '14px',
+          background: 'rgba(245,158,11,0.06)',
+          border: '1px solid rgba(245,158,11,0.35)',
+          borderRadius: '12px',
+        }}>
+          <AlertTriangle size={16} style={{ color: 'var(--wb-amber)', flexShrink: 0, marginTop: '2px' }} />
+          <div style={{ flex: 1, fontSize: '13px', color: 'var(--wb-text)' }}>
+            <strong style={{ color: 'var(--wb-amber)' }}>Controle vereist.</strong> Loop alle tredes na en pas aan waar nodig vóór de berekening.
+          </div>
+          <button onClick={() => setNeedsValidation(false)} className="wb-focus wb-transition"
+            style={{ ...secondaryBtn, color: 'var(--wb-amber)', borderColor: 'rgba(245,158,11,0.4)', padding: '5px 10px', fontSize: '12px' }}>
+            <Check className="h-3.5 w-3.5" /> Gecontroleerd
+          </button>
+        </div>
+      )}
+
+      {/* ── Workbench: two-column layout ───────────────────── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr)',
+        gap: '16px',
+      }} className="lg:grid-cols-[55%_45%]">
+
+        {/* LEFT — spreadsheet */}
+        <div style={{
+          background: 'var(--wb-surface)',
+          border: '1px solid var(--wb-border)',
+          borderRadius: '12px',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 14px', borderBottom: '1px solid var(--wb-border)',
+          }}>
+            <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--wb-text-dim)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Stappen — {testData.length}
+            </span>
+            <span style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)' }}>
+              {filledCount}/{testData.length} ingevuld
+            </span>
           </div>
 
-          {/* Progress */}
-          {filledCount > 0 && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              padding: '10px 14px', background: 'rgba(102,68,255,0.08)',
-              border: '1px solid rgba(102,68,255,0.2)', borderRadius: '10px',
+          <div style={{ overflowX: 'auto' }}>
+            <table ref={tableRef} style={{
+              width: '100%', borderCollapse: 'collapse', fontSize: '13px',
             }}>
-              <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px' }}>
-                <div style={{ height: '100%', width: `${(filledCount / testData.length) * 100}%`, background: '#6644ff', borderRadius: '2px', transition: 'width 0.3s ease' }} />
-              </div>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#a090ff', whiteSpace: 'nowrap' }}>
-                {filledCount}/{testData.length} {t('data.steps')}
-              </span>
-            </div>
-          )}
+              <thead>
+                <tr style={{ background: 'var(--wb-bg)' }}>
+                  {['#', 'Afstand', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
+                    <th key={i} style={{
+                      padding: '9px 8px', textAlign: i === 0 ? 'center' : 'right',
+                      fontSize: '10.5px', fontWeight: 700,
+                      color: 'var(--wb-text-mute)', textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      borderBottom: '1px solid var(--wb-border)',
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {testData.map((row, i) => {
+                  const hasLactate = row.lactate > 0;
+                  const hasHR = row.hr > 0;
+                  const hasTime = (row.time || 0) > 0;
+                  const allFilled = hasLactate && hasHR && hasTime;
+                  const isFinal = i === testData.length - 1 && testData.length > 1 && protocol?.allOutEnabled;
+                  const minVal = row.time ? Math.floor(row.time / 60) : 0;
+                  const secVal = row.time ? Math.round(row.time % 60) : 0;
 
-          {/* Step cards */}
-          <h4 className="text-base font-semibold pt-2">{t('data.stepData')}</h4>
-          <div className="space-y-3">
-            {testData.map((row, i) => {
-              const hasLactate = row.lactate > 0;
-              const hasHR = row.hr > 0;
-              const hasTime = (row.time || 0) > 0;
-              const allFilled = hasLactate && hasHR && hasTime;
-              const isFinal = i === testData.length - 1 && testData.length > 1;
-              const minVal = row.time ? Math.floor(row.time / 60) : 0;
-              const secVal = row.time ? Math.round(row.time % 60) : 0;
+                  return (
+                    <tr key={i}
+                      className="wb-transition"
+                      style={{
+                        borderBottom: '1px solid var(--wb-border)',
+                        borderLeft: isFinal ? '2px solid var(--wb-amber)' : '2px solid transparent',
+                        background: isFinal ? 'rgba(245,158,11,0.03)' : 'transparent',
+                      }}
+                      onMouseEnter={(e) => { if (!isFinal) e.currentTarget.style.background = 'rgba(255,255,255,0.015)'; }}
+                      onMouseLeave={(e) => { if (!isFinal) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      {/* # */}
+                      <td style={{ padding: '6px 8px', textAlign: 'center', width: '36px' }}>
+                        <div style={{
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          width: '22px', height: '22px', borderRadius: '6px',
+                          background: allFilled ? 'rgba(52,211,153,0.12)' : 'var(--wb-bg)',
+                          border: `1px solid ${allFilled ? 'rgba(52,211,153,0.35)' : 'var(--wb-border-2)'}`,
+                          color: allFilled ? 'var(--wb-emerald)' : 'var(--wb-text-mute)',
+                          fontSize: '11px', fontWeight: 700,
+                          fontFamily: "'JetBrains Mono', monospace",
+                        }}>
+                          {isFinal ? <Zap size={11} color="var(--wb-amber)" /> : allFilled ? <Check size={12} /> : i + 1}
+                        </div>
+                      </td>
 
-              return (
-                <div key={i} style={{
-                  border: isFinal
-                    ? '2px solid rgba(255,107,43,0.55)'
-                    : allFilled ? '1px solid rgba(0,253,193,0.3)' : '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: '16px',
-                  padding: '12px 14px',
-                  background: isFinal
-                    ? 'rgba(255,107,43,0.06)'
-                    : allFilled ? 'rgba(0,253,193,0.03)' : 'rgba(255,255,255,0.02)',
-                }}>
-                  {/* Header */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', gap: '10px', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <div style={{
-                        width: '28px', height: '28px', borderRadius: '50%',
-                        background: allFilled ? 'rgba(0,253,193,0.2)' : 'rgba(255,255,255,0.06)',
-                        border: allFilled ? '1px solid rgba(0,253,193,0.5)' : '1px solid rgba(255,255,255,0.1)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '12px', fontWeight: 700,
-                        color: allFilled ? '#00fdc1' : 'rgba(255,255,255,0.4)',
-                      }}>
-                        {allFilled ? '✓' : i + 1}
-                      </div>
-                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>
-                        {isFinal ? '⚡ All-out' : `${t('data.step')} ${i + 1}`}
-                      </span>
+                      {/* Distance */}
+                      <td style={{ padding: '4px 4px', width: '90px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <input
+                            type="number" inputMode="numeric"
+                            value={row.distance ?? ''}
+                            onChange={(e) => updateStepDistanceFor(i, e.target.value)}
+                            placeholder={String(dist)}
+                            aria-label={`Trede ${i + 1} afstand`}
+                            style={cellInput}
+                            onFocus={cellInputFocus} onBlur={cellInputBlur}
+                          />
+                          <span style={unitStyle}>m</span>
+                        </div>
+                      </td>
 
-                      {/* afstand */}
-                      <div style={{
-                        display: 'flex', alignItems: 'center', gap: '4px',
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '6px', padding: '2px 6px',
-                      }}>
-                        <Input
-                          type="number"
-                          inputMode="numeric"
-                          value={row.distance ?? ''}
-                          onChange={(e) => updateStepDistanceFor(i, e.target.value)}
-                          placeholder={String(dist)}
-                          style={{
-                            width: '62px', height: '24px', fontSize: '12px',
-                            fontFamily: 'monospace', fontWeight: 700,
-                            textAlign: 'right', padding: '0 4px',
-                            background: 'transparent', border: 'none',
-                            color: 'rgba(255,255,255,0.85)',
+                      {/* Time mm:ss */}
+                      <td style={{ padding: '4px 4px', width: '110px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                          <input
+                            type="number" inputMode="numeric" min="0" max="99"
+                            value={minVal || ''}
+                            onChange={(e) => updateTime(i, parseInt(e.target.value) || 0, secVal)}
+                            placeholder="mm"
+                            aria-label={`Trede ${i + 1} minuten`}
+                            style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
+                            onFocus={cellInputFocus} onBlur={cellInputBlur}
+                          />
+                          <span style={{ color: 'var(--wb-text-mute)', fontWeight: 700 }}>:</span>
+                          <input
+                            type="number" inputMode="numeric" min="0" max="59"
+                            value={secVal || ''}
+                            onChange={(e) => updateTime(i, minVal, parseInt(e.target.value) || 0)}
+                            placeholder="ss"
+                            aria-label={`Trede ${i + 1} seconden`}
+                            style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
+                            onFocus={cellInputFocus} onBlur={cellInputBlur}
+                          />
+                        </div>
+                      </td>
+
+                      {/* Lactate */}
+                      <td style={{ padding: '4px 4px', width: '88px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <input
+                            type="number" inputMode="decimal" step="0.1" min="0" max="25"
+                            value={row.lactate || ''}
+                            onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
+                            placeholder="—"
+                            aria-label={`Trede ${i + 1} lactaat`}
+                            style={cellInput}
+                            onFocus={cellInputFocus} onBlur={cellInputBlur}
+                          />
+                        </div>
+                      </td>
+
+                      {/* HR */}
+                      <td style={{ padding: '4px 4px', width: '72px' }}>
+                        <input
+                          type="number" inputMode="numeric" min="0" max="220"
+                          value={row.hr || ''}
+                          onChange={(e) => updateRow(i, { hr: parseInt(e.target.value) || 0 })}
+                          placeholder="—"
+                          aria-label={`Trede ${i + 1} hartslag`}
+                          style={cellInput}
+                          onFocus={cellInputFocus} onBlur={cellInputBlur}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && i === testData.length - 1) {
+                              e.preventDefault();
+                              addRow();
+                            }
                           }}
                         />
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>m</span>
-                      </div>
+                      </td>
 
-                      {row.speed > 0 && (
-                        <span style={{
-                          fontSize: '12px', fontWeight: 700, fontFamily: 'monospace',
-                          color: '#00fdc1',
-                          background: 'rgba(0,253,193,0.1)',
-                          border: '1px solid rgba(0,253,193,0.25)',
-                          borderRadius: '8px', padding: '2px 8px',
-                        }}>
-                          {formatPace(row.speed)}/km · {row.speed.toFixed(1)} km/h
+                      {/* Pace (auto) */}
+                      <td style={{ padding: '6px 8px', textAlign: 'right' }}>
+                        <span className="font-mono-num" style={autoCellStyle(row.speed > 0)}>
+                          {row.speed > 0 ? formatPace(row.speed) : '—'}
                         </span>
-                      )}
-                    </div>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive shrink-0" onClick={() => removeRow(i)}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
+                      </td>
 
-                  {/* Inline grid: tijd | lactaat | HR */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '8px' }}>
-                    {/* Tijd */}
-                    <div>
-                      <div style={{ ...labelStyle, color: hasTime ? '#00fdc1' : 'rgba(255,255,255,0.4)' }}>
-                        <Timer size={12} /> {t('data.time')}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Input
-                          type="number"
-                          inputMode="numeric"
-                          min="0"
-                          max="99"
-                          value={minVal || ''}
-                          onChange={(e) => updateTime(i, parseInt(e.target.value) || 0, secVal)}
-                          placeholder="mm"
-                          style={cellStyle}
-                        />
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>:</span>
-                        <Input
-                          type="number"
-                          inputMode="numeric"
-                          min="0"
-                          max="59"
-                          value={secVal || ''}
-                          onChange={(e) => updateTime(i, minVal, parseInt(e.target.value) || 0)}
-                          placeholder="ss"
-                          style={cellStyle}
-                        />
-                      </div>
-                    </div>
+                      {/* Speed (auto) */}
+                      <td style={{ padding: '6px 8px', textAlign: 'right' }}>
+                        <span className="font-mono-num" style={autoCellStyle(row.speed > 0)}>
+                          {row.speed > 0 ? row.speed.toFixed(1) : '—'}
+                        </span>
+                      </td>
 
-                    {/* Lactaat */}
-                    <div>
-                      <div style={{ ...labelStyle, color: hasLactate ? '#6644ff' : 'rgba(255,255,255,0.4)' }}>
-                        <Droplets size={12} /> {t('data.lactate')}
-                      </div>
-                      <Input
-                        type="number"
-                        inputMode="decimal"
-                        step="0.1"
-                        min="0"
-                        max="25"
-                        value={row.lactate || ''}
-                        onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
-                        placeholder="mmol/L"
-                        style={cellStyle}
-                      />
-                    </div>
-
-                    {/* HR */}
-                    <div>
-                      <div style={{ ...labelStyle, color: hasHR ? '#ff6b2b' : 'rgba(255,255,255,0.4)' }}>
-                        <Heart size={12} /> HR
-                      </div>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        min="0"
-                        max="220"
-                        value={row.hr || ''}
-                        onChange={(e) => updateRow(i, { hr: parseInt(e.target.value) || 0 })}
-                        placeholder="bpm"
-                        style={cellStyle}
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                      {/* Actions */}
+                      <td style={{ padding: '6px 6px', textAlign: 'center', width: '34px' }}>
+                        <button
+                          onClick={() => removeRow(i)}
+                          aria-label={`Verwijder trede ${i + 1}`}
+                          className="wb-focus wb-transition"
+                          style={{
+                            background: 'transparent', border: 'none', cursor: 'pointer',
+                            padding: '6px', borderRadius: '6px',
+                            color: 'var(--wb-text-mute)',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = 'rgb(248,113,113)'; e.currentTarget.style.background = 'rgba(248,113,113,0.08)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--wb-text-mute)'; e.currentTarget.style.background = 'transparent'; }}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
-          <Button variant="secondary" size="sm" onClick={addRow} className="w-full">
-            <Plus className="h-4 w-4 mr-1" /> {t('data.addStep')}
-          </Button>
-          <Button
-            className="w-full"
-            onClick={onCalculate}
-            disabled={needsValidation}
-            style={{
-              background: needsValidation
-                ? 'rgba(255,255,255,0.08)'
-                : 'linear-gradient(135deg, #6644ff, #8866ff)',
-              border: 'none',
-            }}
-          >
-            {needsValidation ? 'Bevestig eerst de ingelezen waarden' : t('data.calculate')}
-          </Button>
-        </CardContent>
-      </Card>
+          <div style={{ padding: '10px 14px', borderTop: '1px solid var(--wb-border)' }}>
+            <button onClick={addRow} className="wb-focus wb-transition" style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: '6px 12px', borderRadius: '7px',
+              background: 'transparent', border: '1px solid var(--wb-border-2)',
+              color: 'var(--wb-text-dim)', fontSize: '12.5px', fontWeight: 500, cursor: 'pointer',
+            }}>
+              <Plus size={13} /> Trede toevoegen
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT — sticky live preview */}
+        <div style={{ position: 'sticky', top: '16px', alignSelf: 'start' }}>
+          <div style={{
+            background: 'var(--wb-surface)',
+            border: '1px solid var(--wb-border)',
+            borderRadius: '12px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '12px 14px', borderBottom: '1px solid var(--wb-border)',
+            }}>
+              <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--wb-text-dim)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Live voorbeeld
+              </span>
+              <button
+                onClick={onCalculate}
+                disabled={needsValidation || filledCount < 3}
+                className="wb-focus wb-transition"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '7px 14px', borderRadius: '8px',
+                  background: (needsValidation || filledCount < 3) ? 'var(--wb-surface-2)' : 'var(--wb-indigo)',
+                  border: '1px solid ' + ((needsValidation || filledCount < 3) ? 'var(--wb-border-2)' : 'var(--wb-indigo-dim)'),
+                  color: (needsValidation || filledCount < 3) ? 'var(--wb-text-mute)' : '#fff',
+                  fontSize: '12.5px', fontWeight: 600,
+                  cursor: (needsValidation || filledCount < 3) ? 'not-allowed' : 'pointer',
+                  boxShadow: (needsValidation || filledCount < 3) ? 'none' : 'inset 0 1px 0 rgba(255,255,255,0.15)',
+                }}
+                aria-label="Genereer rapport"
+              >
+                Genereer rapport
+              </button>
+            </div>
+
+            {/* Metric tiles */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '1px', background: 'var(--wb-border)',
+              borderBottom: '1px solid var(--wb-border)',
+            }}>
+              <Tile label="LT1" value={livePreview ? formatPace(livePreview.lt1.best) : '—'} sub={livePreview ? '/km' : ''} color="var(--wb-emerald)" />
+              <Tile label="LT2" value={livePreview ? formatPace(livePreview.lt2.best) : '—'} sub={livePreview ? '/km' : ''} color="var(--wb-amber)" />
+              <Tile label="Max Lac" value={maxLactate > 0 ? maxLactate.toFixed(1) : '—'} sub={maxLactate > 0 ? 'mmol/L' : ''} color="var(--wb-text)" />
+            </div>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '1px', background: 'var(--wb-border)',
+              borderBottom: '1px solid var(--wb-border)',
+            }}>
+              <Tile label="Piek HR" value={peakHR > 0 ? String(peakHR) : '—'} sub={peakHR > 0 ? 'bpm' : ''} color="var(--wb-text)" />
+              <Tile
+                label="Drempel lac."
+                value={livePreview && livePreview.coeffs ? polyEval(livePreview.coeffs, livePreview.lt2.best).toFixed(1) : '—'}
+                sub={livePreview ? 'mmol/L' : ''}
+                color="var(--wb-text)"
+              />
+            </div>
+
+            {/* Chart */}
+            <div style={{ padding: '10px 8px 4px' }}>
+              {livePreview ? (
+                <div className="wb-tick"><LactateChart results={livePreview} /></div>
+              ) : (
+                <div style={{
+                  height: '280px', display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center', gap: '6px',
+                  color: 'var(--wb-text-mute)', fontSize: '12.5px',
+                }}>
+                  <div style={{ fontWeight: 600, color: 'var(--wb-text-dim)' }}>Curve verschijnt hier</div>
+                  <div>Minstens 3 tredes met snelheid + lactaat nodig</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
+
+// ── small visual helpers ──────────────────────────────────
+const kbdStyle: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '1px 6px',
+  background: 'var(--wb-surface)',
+  border: '1px solid var(--wb-border-2)',
+  borderRadius: '4px',
+  fontFamily: "'JetBrains Mono', monospace",
+  fontSize: '10.5px',
+  color: 'var(--wb-text-dim)',
+  margin: '0 2px',
+};
+const primaryBtn: React.CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', gap: '6px',
+  background: 'var(--wb-indigo)', color: '#fff',
+  border: '1px solid var(--wb-indigo-dim)',
+  borderRadius: '8px',
+  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15)',
+};
+const secondaryBtn: React.CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', gap: '6px',
+  background: 'transparent', color: 'var(--wb-text-dim)',
+  border: '1px solid var(--wb-border-2)',
+  borderRadius: '8px',
+  fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+};
+const unitStyle: React.CSSProperties = {
+  fontSize: '10.5px', color: 'var(--wb-text-mute)',
+  paddingRight: '6px', fontWeight: 600,
+};
+const autoCellStyle = (active: boolean): React.CSSProperties => ({
+  fontSize: '12.5px',
+  fontWeight: 500,
+  color: active ? 'var(--wb-text)' : 'var(--wb-text-mute)',
+  opacity: active ? 1 : 0.4,
+});
+
+const Tile = ({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) => (
+  <div style={{
+    background: 'var(--wb-surface)',
+    padding: '10px 12px',
+  }}>
+    <div style={{
+      fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
+      textTransform: 'uppercase', color: 'var(--wb-text-mute)',
+      marginBottom: '4px',
+    }}>{label}</div>
+    <div className="font-mono-num" style={{
+      fontSize: '20px', fontWeight: 600, color, lineHeight: 1.1,
+    }}>{value}</div>
+    {sub && (
+      <div style={{ fontSize: '10.5px', color: 'var(--wb-text-mute)', marginTop: '2px' }}>{sub}</div>
+    )}
+  </div>
+);
 
 export default DataInputTab;

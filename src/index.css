@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -142,3 +142,41 @@
   0%, 100% { opacity: 0.6; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.05); }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Workbench design tokens (2026 redesign — scoped to test page)
+   Warm-neutral dark, indigo accent, emerald/amber semantics
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --wb-bg:        #0E0E11;
+  --wb-surface:   #16161A;
+  --wb-surface-2: #1B1B20;
+  --wb-border:    #24242B;
+  --wb-border-2:  #2E2E36;
+  --wb-text:      #F5F5F7;
+  --wb-text-dim:  #A1A1AA;
+  --wb-text-mute: #71717A;
+  --wb-indigo:    #6366F1;
+  --wb-indigo-dim:#4F46E5;
+  --wb-emerald:   #34D399;
+  --wb-amber:     #F59E0B;
+}
+
+.font-mono-num {
+  font-family: 'JetBrains Mono', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.wb-focus:focus-visible {
+  outline: 2px solid var(--wb-indigo);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+@keyframes wb-tick-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.wb-tick { animation: wb-tick-up 150ms ease-out; }
+.wb-transition { transition: all 150ms ease-out; }

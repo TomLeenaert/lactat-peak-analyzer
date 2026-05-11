@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -72,22 +72,67 @@ const TestPage = () => {
     toast({ title: t('test.calculationDone') });
   }, [testData, restingLactate, toast, t]);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        if (testData.some(r => r.lactate > 0)) onCalculate();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onCalculate, testData]);
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="max-w-[900px] mx-auto px-3 sm:px-4 py-3 flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate('/')}>
+    <div className="min-h-screen" style={{ background: 'var(--wb-bg)' }}>
+      <header style={{
+        background: 'var(--wb-surface)',
+        borderBottom: '1px solid var(--wb-border)',
+      }}>
+        <div className="max-w-[1440px] mx-auto" style={{
+          display: 'flex', alignItems: 'center', gap: '12px',
+          padding: '10px 20px',
+        }}>
+          <Button variant="ghost" size="icon" className="shrink-0 wb-focus" onClick={() => navigate('/')} aria-label="Terug">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-base sm:text-lg font-semibold truncate">
-            {isQuick ? t('test.fieldTest') : t('test.labTest')}
-          </h1>
+          <nav aria-label="Breadcrumb" style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            fontSize: '13px', color: 'var(--wb-text-dim)', minWidth: 0,
+          }}>
+            <span style={{ color: 'var(--wb-text-mute)' }}>Alle atleten</span>
+            <span style={{ color: 'var(--wb-text-mute)' }}>/</span>
+            <span style={{ color: 'var(--wb-text)', fontWeight: 600 }}>{athleteName || 'Nieuwe atleet'}</span>
+            <span style={{ color: 'var(--wb-text-mute)' }}>/</span>
+            <span style={{ color: 'var(--wb-text)', fontWeight: 600 }}>{isQuick ? t('test.fieldTest') : t('test.labTest')}</span>
+          </nav>
+
+          <div style={{ flex: 1 }} />
+
+          <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
+
+          <button
+            onClick={onCalculate}
+            disabled={!testData.some(r => r.lactate > 0)}
+            className="wb-focus wb-transition"
+            aria-label="Opslaan en analyseren"
+            title="Opslaan (Cmd+S)"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px', borderRadius: '8px',
+              background: 'var(--wb-indigo)', color: '#fff',
+              border: '1px solid var(--wb-indigo-dim)',
+              fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15)',
+              opacity: testData.some(r => r.lactate > 0) ? 1 : 0.5,
+            }}
+          >
+            Opslaan
+          </button>
         </div>
       </header>
 
-      <main className="max-w-[900px] mx-auto px-3 sm:px-4 py-2 sm:py-4">
-        <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
-
+      <main className="max-w-[1440px] mx-auto" style={{ padding: '16px 20px' }}>
         {(activeTab === 'data' || activeTab === 'protocol') && (
           <DataInputTab
             testData={testData} setTestData={setTestData}

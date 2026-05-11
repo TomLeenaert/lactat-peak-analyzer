@@ -10,55 +10,48 @@ const StepNav = ({ activeTab, onTabChange, hasResults }: StepNavProps) => {
   const { t } = useLang();
 
   const STEPS = [
-    { key: 'data',     label: t('step.test') },
-    { key: 'analyze',  label: t('step.analyze') },
+    { key: 'data', label: t('step.test') },
+    { key: 'analyze', label: t('step.analyze') },
   ];
 
   return (
-    <div style={{
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '16px 0',
-      width: '100%',
-    }}>
-      {/* Connecting line */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '10%',
-        right: '10%',
-        height: '2px',
-        background: 'linear-gradient(90deg, #00fdc1, #6644ff)',
-        transform: 'translateY(-50%)',
-        zIndex: 0,
-      }} />
-
+    <div
+      role="tablist"
+      aria-label="Test sections"
+      style={{
+        display: 'inline-flex',
+        background: 'var(--wb-surface)',
+        border: '1px solid var(--wb-border)',
+        borderRadius: '10px',
+        padding: '3px',
+        gap: '2px',
+      }}
+    >
       {STEPS.map(({ key, label }) => {
         const isActive = activeTab === key;
         const isDisabled = key === 'analyze' && !hasResults;
         return (
           <button
             key={key}
+            role="tab"
+            aria-selected={isActive}
+            aria-disabled={isDisabled}
             onClick={() => !isDisabled && onTabChange(key)}
+            className="wb-focus wb-transition"
             style={{
-              position: 'relative',
-              zIndex: 1,
-              padding: '10px 24px',
-              borderRadius: '999px',
-              border: isActive ? '2px solid #6644ff' : '2px solid rgba(102,68,255,0.3)',
-              background: isActive ? '#6644ff' : '#1a1a2e',
-              color: isActive ? '#fff' : 'rgba(255,255,255,0.5)',
+              padding: '7px 18px',
+              borderRadius: '7px',
+              border: 'none',
+              background: isActive ? 'var(--wb-surface-2)' : 'transparent',
+              boxShadow: isActive ? 'inset 0 0 0 1px var(--wb-border-2)' : 'none',
+              color: isActive ? 'var(--wb-text)' : 'var(--wb-text-dim)',
               fontFamily: 'Inter, sans-serif',
-              fontWeight: 800,
-              fontSize: '12px',
-              letterSpacing: '0.08em',
+              fontWeight: 600,
+              fontSize: '12.5px',
+              letterSpacing: '0.04em',
               textTransform: 'uppercase',
-              cursor: isDisabled ? 'default' : 'pointer',
-              opacity: isDisabled ? 0.3 : 1,
-              transition: 'all 0.2s ease',
-              boxShadow: isActive ? '0 0 20px rgba(102,68,255,0.5)' : 'none',
+              cursor: isDisabled ? 'not-allowed' : 'pointer',
+              opacity: isDisabled ? 0.4 : 1,
               WebkitTapHighlightColor: 'transparent',
               whiteSpace: 'nowrap',
             }}
