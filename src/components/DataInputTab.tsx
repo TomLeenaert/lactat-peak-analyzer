@@ -79,13 +79,7 @@ const DataInputTab = ({
   const { toast } = useToast();
   const { t } = useLang();
 
-  // ── live preview calculation ──────────────────────────────
-  const livePreview = useMemo(() => {
-    const filled = testData.filter(r => r.lactate > 0 && r.speed > 0);
-    if (filled.length < 3) return null;
-    const result = calculate(filled, parseFloat(restingLactate) || 0);
-    return typeof result === 'string' ? null : result;
-  }, [testData, restingLactate]);
+
 
   // ── row helpers ───────────────────────────────────────────
   const updateRow = (idx: number, patch: Partial<StepData>) => {
