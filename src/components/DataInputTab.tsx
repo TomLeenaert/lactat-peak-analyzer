@@ -417,25 +417,7 @@ const DataInputTab = ({
 
       {/* Composer moved to right column — always visible */}
 
-      {/* Validation banner */}
-      {needsValidation && (
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: '10px',
-          padding: '11px 14px', marginBottom: '14px',
-          background: 'rgba(245,158,11,0.06)',
-          border: '1px solid rgba(245,158,11,0.35)',
-          borderRadius: '12px',
-        }}>
-          <AlertTriangle size={16} style={{ color: 'var(--wb-amber)', flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ flex: 1, fontSize: '13px', color: 'var(--wb-text)' }}>
-            <strong style={{ color: 'var(--wb-amber)' }}>Controle vereist.</strong> Loop alle tredes na en pas aan waar nodig vóór de berekening.
-          </div>
-          <button onClick={() => setNeedsValidation(false)} className="wb-focus wb-transition"
-            style={{ ...secondaryBtn, color: 'var(--wb-amber)', borderColor: 'rgba(245,158,11,0.4)', padding: '5px 10px', fontSize: '12px' }}>
-            <Check className="h-3.5 w-3.5" /> Gecontroleerd
-          </button>
-        </div>
-      )}
+      {/* Validation banner moved into the chat panel for consistency */}
 
       {/* ── Workbench: two-column layout ───────────────────── */}
       <div
