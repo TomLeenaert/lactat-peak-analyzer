@@ -235,7 +235,7 @@ const DataInputTab = ({
   // ── styles ───────────────────────────────────────────────
   const cellInput: React.CSSProperties = {
     width: '100%',
-    height: '34px',
+    height: '38px',
     background: 'transparent',
     border: '1px solid transparent',
     borderRadius: '6px',
@@ -243,18 +243,23 @@ const DataInputTab = ({
     color: 'var(--wb-text)',
     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
     fontVariantNumeric: 'tabular-nums',
-    fontSize: '13.5px',
+    fontSize: '14px',
     fontWeight: 500,
     textAlign: 'right',
     outline: 'none',
   };
-  const cellInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'var(--wb-indigo)';
-    e.currentTarget.style.background = 'rgba(99,102,241,0.06)';
-  };
-  const cellInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'transparent';
-    e.currentTarget.style.background = 'transparent';
+
+  // Globale afstand wijzigt alle tredes mee
+  const handleGlobalDistanceChange = (val: string) => {
+    setStepDistance(val);
+    const newDist = parseFloat(val) || 0;
+    if (newDist > 0) {
+      setTestData(testData.map(r => ({
+        ...r,
+        distance: newDist,
+        speed: r.time && r.time > 0 ? calcSpeed(newDist, r.time) : r.speed,
+      })));
+    }
   };
 
   return (
@@ -267,35 +272,6 @@ const DataInputTab = ({
         display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
         marginBottom: '14px',
       }}>
-        {/* Import toggle */}
-        <button
-          onClick={() => setShowPaste(v => !v)}
-          className="wb-focus wb-transition"
-          aria-expanded={showPaste}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '8px 14px', borderRadius: '8px',
-            background: showPaste ? 'rgba(99,102,241,0.10)' : 'var(--wb-surface)',
-            border: `1px solid ${showPaste ? 'var(--wb-indigo)' : 'var(--wb-border)'}`,
-            color: 'var(--wb-text)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
-          }}
-        >
-          <MessageSquarePlus size={14} /> Importeren via chat
-        </button>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="wb-focus wb-transition"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '8px 12px', borderRadius: '8px',
-            background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-            color: 'var(--wb-text-dim)', fontSize: '12.5px', cursor: 'pointer',
-          }}
-          title="JSON-bestand importeren"
-        >
-          <FileJson size={13} /> JSON
-        </button>
-
         {/* Protocol drawer */}
         {protocol && setProtocol && (
           <Sheet open={protocolOpen} onOpenChange={setProtocolOpen}>
@@ -323,6 +299,45 @@ const DataInputTab = ({
           </Sheet>
         )}
 
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="wb-focus wb-transition"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '8px 12px', borderRadius: '8px',
+            background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+            color: 'var(--wb-text-dim)', fontSize: '12.5px', cursor: 'pointer',
+          }}
+          title="JSON-bestand importeren"
+        >
+          <FileJson size={13} /> JSON
+        </button>
+
+        {/* Globale afstand per trede */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '8px',
+          padding: '6px 12px', borderRadius: '8px',
+          background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+        }}>
+          <label style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+            Afstand
+          </label>
+          <input
+            type="number" inputMode="numeric" min="0"
+            value={stepDistance}
+            onChange={(e) => handleGlobalDistanceChange(e.target.value)}
+            placeholder="1600"
+            className="font-mono-num no-spin wb-focus"
+            style={{
+              width: '70px', height: '24px',
+              background: 'transparent', border: 'none', outline: 'none',
+              color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
+              textAlign: 'right',
+            }}
+          />
+          <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+        </div>
+
         {/* Resting lactate */}
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px',
@@ -337,7 +352,7 @@ const DataInputTab = ({
             value={restingLactate}
             onChange={(e) => setRestingLactate(e.target.value)}
             placeholder="—"
-            className="font-mono-num wb-focus"
+            className="font-mono-num no-spin wb-focus"
             style={{
               width: '52px', height: '24px',
               background: 'transparent', border: 'none', outline: 'none',
@@ -361,123 +376,7 @@ const DataInputTab = ({
         </div>
       </div>
 
-      {/* Chat-style import composer */}
-      {showPaste && (
-        <div style={{
-          marginBottom: '14px',
-          padding: '12px',
-          background: 'var(--wb-surface)',
-          border: '1px solid var(--wb-border)',
-          borderRadius: '14px',
-          display: 'flex', flexDirection: 'column', gap: '10px',
-          boxShadow: '0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px -16px rgba(0,0,0,0.6)',
-        }}>
-          <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <MessageSquarePlus size={13} />
-            Plak hier een screenshot van je papieren meting (Ctrl/Cmd+V), typ of plak tekst, of klik op <Paperclip size={11} style={{ display: 'inline', verticalAlign: 'middle' }} /> om een bestand toe te voegen.
-          </div>
-
-          {/* Attached image preview */}
-          {pastedImage && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              padding: '8px', borderRadius: '10px',
-              background: 'var(--wb-bg)', border: '1px solid var(--wb-border)',
-            }}>
-              <img src={pastedImage} alt="Bijlage"
-                style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--wb-border)' }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '12.5px', color: 'var(--wb-text)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {pastedFileName || 'screenshot.png'}
-                </div>
-                <div style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)' }}>Klaar om in te lezen</div>
-              </div>
-              <button onClick={() => { setPastedImage(null); setPastedFileName(null); }}
-                className="wb-focus wb-transition"
-                aria-label="Bijlage verwijderen"
-                style={{
-                  width: '28px', height: '28px', borderRadius: '6px',
-                  background: 'transparent', border: '1px solid var(--wb-border)',
-                  color: 'var(--wb-text-dim)', cursor: 'pointer',
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                <X size={14} />
-              </button>
-            </div>
-          )}
-
-          {/* Composer textarea + actions row */}
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: '8px',
-            background: 'var(--wb-bg)', border: '1px solid var(--wb-border)',
-            borderRadius: '12px', padding: '10px',
-          }}>
-            <textarea
-              value={pasteText}
-              onChange={(e) => setPasteText(e.target.value)}
-              onPaste={handleComposerPaste}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                  e.preventDefault();
-                  handleComposerSubmit();
-                }
-              }}
-              placeholder={pastedImage
-                ? 'Optionele extra context bij je screenshot…'
-                : 'Plak hier een screenshot, of typ/plak je testgegevens…\nbv.  1,2 km   7:36   1,7 mmol   141 bpm'}
-              rows={5}
-              className="font-mono-num wb-focus"
-              style={{
-                width: '100%', fontSize: '13px', padding: '4px',
-                background: 'transparent', border: 'none', outline: 'none',
-                color: 'var(--wb-text)', resize: 'none',
-              }}
-            />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button
-                onClick={() => imageInputRef.current?.click()}
-                disabled={parsing}
-                className="wb-focus wb-transition"
-                aria-label="Bestand toevoegen"
-                title="Foto / screenshot toevoegen"
-                style={{
-                  width: '32px', height: '32px', borderRadius: '8px',
-                  background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-                  color: 'var(--wb-text-dim)', cursor: 'pointer',
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                <Paperclip size={15} />
-              </button>
-              <div style={{ flex: 1, fontSize: '11px', color: 'var(--wb-text-mute)' }}>
-                <kbd style={kbdStyle}>Ctrl</kbd>/<kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>V</kbd> om screenshot te plakken · <kbd style={kbdStyle}>Ctrl</kbd>+<kbd style={kbdStyle}>Enter</kbd> om te versturen
-              </div>
-              <button
-                onClick={() => { setPasteText(''); setPastedImage(null); setPastedFileName(null); setShowPaste(false); }}
-                disabled={parsing}
-                className="wb-focus wb-transition"
-                style={{ ...secondaryBtn, padding: '7px 12px' }}
-              >Annuleren</button>
-              <button
-                onClick={handleComposerSubmit}
-                disabled={parsing || (!pasteText.trim() && !pastedImage)}
-                className="wb-focus wb-transition"
-                aria-label="Versturen"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  height: '32px', padding: '0 12px', borderRadius: '8px',
-                  background: 'var(--wb-indigo)', color: '#fff',
-                  border: '1px solid var(--wb-indigo-dim)',
-                  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
-                  opacity: (parsing || (!pasteText.trim() && !pastedImage)) ? 0.5 : 1,
-                }}
-              >
-                {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp size={15} />}
-                {parsing ? 'Inlezen…' : 'Versturen'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Composer moved to right column — always visible */}
 
       {/* Validation banner */}
       {needsValidation && (
@@ -531,7 +430,7 @@ const DataInputTab = ({
             }}>
               <thead>
                 <tr style={{ background: 'var(--wb-bg)' }}>
-                  {['#', 'Afstand', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
+                  {['#', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
                     <th key={i} style={{
                       padding: '9px 8px', textAlign: i === 0 ? 'center' : 'right',
                       fontSize: '10.5px', fontWeight: 700,
@@ -560,14 +459,12 @@ const DataInputTab = ({
                         borderLeft: isFinal ? '2px solid var(--wb-amber)' : '2px solid transparent',
                         background: isFinal ? 'rgba(245,158,11,0.03)' : 'transparent',
                       }}
-                      onMouseEnter={(e) => { if (!isFinal) e.currentTarget.style.background = 'rgba(255,255,255,0.015)'; }}
-                      onMouseLeave={(e) => { if (!isFinal) e.currentTarget.style.background = 'transparent'; }}
                     >
                       {/* # */}
-                      <td style={{ padding: '6px 8px', textAlign: 'center', width: '36px' }}>
+                      <td style={{ padding: '8px', textAlign: 'center', width: '40px' }}>
                         <div style={{
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                          width: '22px', height: '22px', borderRadius: '6px',
+                          width: '24px', height: '24px', borderRadius: '6px',
                           background: allFilled ? 'rgba(52,211,153,0.12)' : 'var(--wb-bg)',
                           border: `1px solid ${allFilled ? 'rgba(52,211,153,0.35)' : 'var(--wb-border-2)'}`,
                           color: allFilled ? 'var(--wb-emerald)' : 'var(--wb-text-mute)',
@@ -578,72 +475,54 @@ const DataInputTab = ({
                         </div>
                       </td>
 
-                      {/* Distance */}
-                      <td style={{ padding: '4px 4px', width: '90px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="number" inputMode="numeric"
-                            value={row.distance ?? ''}
-                            onChange={(e) => updateStepDistanceFor(i, e.target.value)}
-                            placeholder={String(dist)}
-                            aria-label={`Trede ${i + 1} afstand`}
-                            style={cellInput}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
-                          />
-                          <span style={unitStyle}>m</span>
-                        </div>
-                      </td>
-
                       {/* Time mm:ss */}
-                      <td style={{ padding: '4px 4px', width: '110px' }}>
+                      <td style={{ padding: '8px 6px', width: '130px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                           <input
-                            type="number" inputMode="numeric" min="0" max="99"
+                            type="number" min="0" max="99"
                             value={minVal || ''}
                             onChange={(e) => updateTime(i, parseInt(e.target.value) || 0, secVal)}
                             placeholder="mm"
                             aria-label={`Trede ${i + 1} minuten`}
+                            className="wb-cell no-spin"
                             style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
                           />
                           <span style={{ color: 'var(--wb-text-mute)', fontWeight: 700 }}>:</span>
                           <input
-                            type="number" inputMode="numeric" min="0" max="59"
+                            type="number" min="0" max="59"
                             value={secVal || ''}
                             onChange={(e) => updateTime(i, minVal, parseInt(e.target.value) || 0)}
                             placeholder="ss"
                             aria-label={`Trede ${i + 1} seconden`}
+                            className="wb-cell no-spin"
                             style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
                           />
                         </div>
                       </td>
 
                       {/* Lactate */}
-                      <td style={{ padding: '4px 4px', width: '88px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <input
-                            type="number" inputMode="decimal" step="0.1" min="0" max="25"
-                            value={row.lactate || ''}
-                            onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
-                            placeholder="—"
-                            aria-label={`Trede ${i + 1} lactaat`}
-                            style={cellInput}
-                            onFocus={cellInputFocus} onBlur={cellInputBlur}
-                          />
-                        </div>
+                      <td style={{ padding: '8px 6px', width: '100px' }}>
+                        <input
+                          type="number" step="0.1" min="0" max="25"
+                          value={row.lactate || ''}
+                          onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
+                          placeholder="—"
+                          aria-label={`Trede ${i + 1} lactaat`}
+                          className="wb-cell no-spin"
+                          style={cellInput}
+                        />
                       </td>
 
                       {/* HR */}
-                      <td style={{ padding: '4px 4px', width: '72px' }}>
+                      <td style={{ padding: '8px 6px', width: '90px' }}>
                         <input
-                          type="number" inputMode="numeric" min="0" max="220"
+                          type="number" min="0" max="220"
                           value={row.hr || ''}
                           onChange={(e) => updateRow(i, { hr: parseInt(e.target.value) || 0 })}
                           placeholder="—"
                           aria-label={`Trede ${i + 1} hartslag`}
+                          className="wb-cell no-spin"
                           style={cellInput}
-                          onFocus={cellInputFocus} onBlur={cellInputBlur}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && i === testData.length - 1) {
                               e.preventDefault();
@@ -703,8 +582,116 @@ const DataInputTab = ({
           </div>
         </div>
 
-        {/* RIGHT — sticky live preview */}
-        <div style={{ position: 'sticky', top: '16px', alignSelf: 'start' }}>
+        {/* RIGHT — chat (always open) + sticky live preview */}
+        <div style={{ position: 'sticky', top: '16px', alignSelf: 'start', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+          {/* Permanent chat composer */}
+          <div style={{
+            padding: '12px',
+            background: 'var(--wb-surface)',
+            border: '1px solid var(--wb-border)',
+            borderRadius: '14px',
+            display: 'flex', flexDirection: 'column', gap: '10px',
+            boxShadow: '0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px -16px rgba(0,0,0,0.6)',
+          }}>
+            <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <MessageSquarePlus size={13} />
+              Plak een screenshot of typ je testgegevens — of klik op <Paperclip size={11} style={{ display: 'inline', verticalAlign: 'middle' }} /> voor een bestand.
+            </div>
+
+            {pastedImage && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '8px', borderRadius: '10px',
+                background: 'var(--wb-bg)', border: '1px solid var(--wb-border)',
+              }}>
+                <img src={pastedImage} alt="Bijlage"
+                  style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--wb-border)' }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--wb-text)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {pastedFileName || 'screenshot.png'}
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)' }}>Klaar om in te lezen</div>
+                </div>
+                <button onClick={() => { setPastedImage(null); setPastedFileName(null); }}
+                  className="wb-focus wb-transition"
+                  aria-label="Bijlage verwijderen"
+                  style={{
+                    width: '28px', height: '28px', borderRadius: '6px',
+                    background: 'transparent', border: '1px solid var(--wb-border)',
+                    color: 'var(--wb-text-dim)', cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: '8px',
+              background: 'var(--wb-bg)', border: '1px solid var(--wb-border)',
+              borderRadius: '12px', padding: '10px',
+            }}>
+              <textarea
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+                onPaste={handleComposerPaste}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    handleComposerSubmit();
+                  }
+                }}
+                placeholder={pastedImage
+                  ? 'Optionele extra context bij je screenshot…'
+                  : 'Plak hier een screenshot of typ je testgegevens…\nbv.  1,2 km   7:36   1,7 mmol   141 bpm'}
+                rows={4}
+                className="font-mono-num wb-focus"
+                style={{
+                  width: '100%', fontSize: '13px', padding: '4px',
+                  background: 'transparent', border: 'none', outline: 'none',
+                  color: 'var(--wb-text)', resize: 'none',
+                }}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={parsing}
+                  className="wb-focus wb-transition"
+                  aria-label="Bestand toevoegen"
+                  title="Foto / screenshot toevoegen"
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '8px',
+                    background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+                    color: 'var(--wb-text-dim)', cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <Paperclip size={15} />
+                </button>
+                <div style={{ flex: 1, fontSize: '10.5px', color: 'var(--wb-text-mute)' }}>
+                  <kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>V</kbd> plak · <kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>⏎</kbd> versturen
+                </div>
+                <button
+                  onClick={handleComposerSubmit}
+                  disabled={parsing || (!pasteText.trim() && !pastedImage)}
+                  className="wb-focus wb-transition"
+                  aria-label="Versturen"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    height: '32px', padding: '0 12px', borderRadius: '8px',
+                    background: 'var(--wb-indigo)', color: '#fff',
+                    border: '1px solid var(--wb-indigo-dim)',
+                    fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                    opacity: (parsing || (!pasteText.trim() && !pastedImage)) ? 0.5 : 1,
+                  }}
+                >
+                  {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp size={15} />}
+                  {parsing ? 'Inlezen…' : 'Versturen'}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div style={{
             background: 'var(--wb-surface)',
             border: '1px solid var(--wb-border)',
