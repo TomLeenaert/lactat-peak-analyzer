@@ -79,6 +79,9 @@ const DataInputTab = ({
 }: DataInputTabProps) => {
   const dist = parseFloat(stepDistance) || 1600;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [parsing, setParsing] = useState(false);
+  const [needsValidation, setNeedsValidation] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
 
