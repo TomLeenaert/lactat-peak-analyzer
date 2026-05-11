@@ -91,7 +91,7 @@ const TestPage = () => {
           }}>
             <span style={{ color: 'var(--wb-text-mute)' }}>Alle atleten</span>
             <span style={{ color: 'var(--wb-text-mute)' }}>/</span>
-            <span style={{ color: 'var(--wb-text), fontWeight: 600' }}>{athleteName || 'Nieuwe atleet'}</span>
+            <span style={{ color: 'var(--wb-text)', fontWeight: 600 }}>{athleteName || 'Nieuwe atleet'}</span>
             <span style={{ color: 'var(--wb-text-mute)' }}>/</span>
             <span style={{ color: 'var(--wb-text)', fontWeight: 600 }}>{isQuick ? t('test.fieldTest') : t('test.labTest')}</span>
           </nav>
