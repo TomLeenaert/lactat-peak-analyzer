@@ -322,7 +322,7 @@ const DataInputTab = ({
     <>
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
 
-      {/* Action bar — alleen afstand */}
+      {/* Action bar — afstand + all-out afstand */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
         marginBottom: '14px',
@@ -333,7 +333,7 @@ const DataInputTab = ({
           background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
         }}>
           <label style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
-            Afstand
+            Afstand / trap
           </label>
           <input
             type="number" inputMode="numeric" min="0"
@@ -350,6 +350,34 @@ const DataInputTab = ({
           />
           <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
         </div>
+
+        {protocol?.allOutEnabled && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '6px 12px', borderRadius: '8px',
+            background: 'rgba(245,158,11,0.06)',
+            border: '1px solid rgba(245,158,11,0.35)',
+          }}>
+            <Zap size={13} style={{ color: 'var(--wb-amber)' }} />
+            <label style={{ fontSize: '11.5px', color: 'var(--wb-amber)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+              All-Out afstand
+            </label>
+            <input
+              type="number" inputMode="numeric" min="0"
+              value={protocol.allOutDistance || ''}
+              onChange={(e) => handleAllOutDistanceChange(e.target.value)}
+              placeholder="800"
+              className="font-mono-num no-spin wb-focus"
+              style={{
+                width: '70px', height: '24px',
+                background: 'transparent', border: 'none', outline: 'none',
+                color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
+                textAlign: 'right',
+              }}
+            />
+            <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+          </div>
+        )}
       </div>
 
       {/* Composer moved to right column — always visible */}
