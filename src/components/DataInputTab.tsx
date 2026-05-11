@@ -664,7 +664,7 @@ const DataInputTab = ({
 
             {/* Conversatie-historiek */}
             <div style={{
-              maxHeight: '340px', overflowY: 'auto',
+              flex: 1, minHeight: '280px', overflowY: 'auto',
               display: 'flex', flexDirection: 'column', gap: '8px',
               padding: '4px 2px',
             }}>
