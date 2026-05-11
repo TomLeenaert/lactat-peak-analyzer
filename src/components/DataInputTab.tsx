@@ -68,11 +68,9 @@ const DataInputTab = ({
       role: 'assistant',
       content:
         'Hi 👋 Ik help je met deze test.\n\n' +
-        '• Vul **tijd, lactaat en HR** per trede in (Tab/Enter om snel te navigeren).\n' +
-        '• Stel **afstand per trede** bovenaan in (standaard 1600 m).\n' +
-        '• **Plak een screenshot** of klik op 📎 — ik lees je papieren testblad automatisch in.\n' +
-        '• Vanaf 3 ingevulde tredes klik je op **Genereer rapport**.\n\n' +
-        'Vraag me gerust om uitleg.',
+        '• Vul **tijd, lactaat en HR** per trap in (Tab/Enter om snel te navigeren).\n\n' +
+        '• Stel **afstand per trap** bovenaan in (standaard 1600 m).\n\n' +
+        '• OF **Plak een screenshot** of klik op 📎 — ik lees je papieren testblad automatisch in.',
     },
   ]);
   const [chatBusy, setChatBusy] = useState(false);
