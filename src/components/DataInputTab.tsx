@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus, Timer, Droplets, Heart, Image as ImageIcon, AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { Trash2, Plus, Timer, Droplets, Heart, Image as ImageIcon, AlertTriangle, Check, Loader2, ClipboardPaste } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -82,6 +82,8 @@ const DataInputTab = ({
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [parsing, setParsing] = useState(false);
   const [needsValidation, setNeedsValidation] = useState(false);
+  const [pasteText, setPasteText] = useState('');
+  const [showPaste, setShowPaste] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
 
@@ -226,6 +228,62 @@ const DataInputTab = ({
     }
   };
 
+  const handlePasteImport = async () => {
+    const txt = pasteText.trim();
+    if (!txt) {
+      toast({ title: 'Geen tekst', description: 'Plak eerst je testgegevens.', variant: 'destructive' });
+      return;
+    }
+    setParsing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const rawSteps: Array<Record<string, unknown>> = Array.isArray(data?.steps) ? data.steps : [];
+      if (!rawSteps.length) {
+        toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' });
+        return;
+      }
+
+      const importedSteps: StepData[] = rawSteps.map((row) => {
+        const distance = (typeof row.distance === 'number' && row.distance > 0) ? row.distance : dist;
+        const time = typeof row.time_sec === 'number' && row.time_sec > 0 ? row.time_sec : 0;
+        const speed = (typeof row.speed === 'number' && row.speed > 0)
+          ? row.speed
+          : (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+        return {
+          speed,
+          lactate: typeof row.lactate === 'number' ? row.lactate : 0,
+          hr: typeof row.hr === 'number' ? row.hr : 0,
+          watt: 0,
+          distance,
+          time,
+        };
+      });
+
+      const rl = data?.resting_lactate;
+      if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
+
+      setTestData(importedSteps);
+      setNeedsValidation(true);
+      setShowPaste(false);
+      setPasteText('');
+      toast({
+        title: 'Tekst ingelezen',
+        description: `${importedSteps.length} tredes herkend — controleer en pas aan waar nodig.`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Inlezen mislukt',
+        description: (err as Error).message || 'Onbekende fout',
+        variant: 'destructive',
+      });
+    } finally {
+      setParsing(false);
+    }
+  };
+
   const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
   const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
 
@@ -291,12 +349,62 @@ const DataInputTab = ({
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setShowPaste((v) => !v)}
+              disabled={parsing}
+              style={{ flex: '1 1 220px' }}
+            >
+              <ClipboardPaste className="h-4 w-4 mr-2" />
+              {showPaste ? 'Plakvenster verbergen' : 'Plakken uit chat / tabel'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               style={{ flex: '1 1 160px' }}
             >
               JSON importeren
             </Button>
           </div>
+
+          {showPaste && (
+            <div style={{
+              padding: '12px',
+              background: 'rgba(102,68,255,0.05)',
+              border: '1px solid rgba(102,68,255,0.25)',
+              borderRadius: '10px',
+              display: 'flex', flexDirection: 'column', gap: '8px',
+            }}>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                Plak hier je testgegevens (kolommen uit Excel, een chat, of vrij getypt). De AI haalt er automatisch de tredes uit.
+              </div>
+              <textarea
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+                placeholder={'Bv.\nAfstand  Tijd     Snelheid  Lactaat  HR\n1,2      0:07:36  9,5       1,7      141\n1,2      0:07:13  10,0      1,1      149\n...'}
+                rows={8}
+                style={{
+                  width: '100%',
+                  fontFamily: 'monospace',
+                  fontSize: '13px',
+                  padding: '10px',
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  color: '#fff',
+                  resize: 'vertical',
+                }}
+              />
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <Button variant="ghost" size="sm" onClick={() => { setPasteText(''); setShowPaste(false); }} disabled={parsing}>
+                  Annuleren
+                </Button>
+                <Button size="sm" onClick={handlePasteImport} disabled={parsing || !pasteText.trim()}>
+                  {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+                  {parsing ? 'Inlezen…' : 'Inlezen'}
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Validatie-banner na AI-import */}
           {needsValidation && (

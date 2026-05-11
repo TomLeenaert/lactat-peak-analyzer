@@ -51,14 +51,14 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { image } = await req.json();
-    if (!image || typeof image !== 'string') {
-      return new Response(JSON.stringify({ error: 'Missing image (data URL or base64)' }), {
+    const { image, text } = await req.json();
+    if ((!image || typeof image !== 'string') && (!text || typeof text !== 'string')) {
+      return new Response(JSON.stringify({ error: 'Missing image or text' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const dataUrl = image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`;
+    const dataUrl = image ? (image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`) : null;
 
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
@@ -76,10 +76,12 @@ Deno.serve(async (req) => {
           { role: 'system', content: SYSTEM_PROMPT },
           {
             role: 'user',
-            content: [
-              { type: 'text', text: 'Lees deze lactaattest in en geef het JSON terug volgens het schema.' },
-              { type: 'image_url', image_url: { url: dataUrl } },
-            ],
+            content: dataUrl
+              ? [
+                  { type: 'text', text: 'Lees deze lactaattest in en geef het JSON terug volgens het schema.' },
+                  { type: 'image_url', image_url: { url: dataUrl } },
+                ]
+              : `Lees deze lactaattest in en geef JSON volgens het schema:\n\n${text}`,
           },
         ],
         response_format: { type: 'json_object' },
