@@ -173,6 +173,7 @@ const DataInputTab = ({
       if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
       setTestData(imported);
       setNeedsValidation(true);
+      setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} tredes** ingelezen uit je afbeelding. **Controleer elke trede** (tijd, lactaat, HR, snelheid) en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan met de berekening.` }]);
       setPastedImage(null); setPastedFileName(null); setPasteText(''); setShowPaste(false);
       toast({ title: 'Afbeelding ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
     } catch (err) {
