@@ -520,6 +520,18 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt2_hr = interpolateAt(lt2_best, speeds, hrs, true);
   const lt2_watt = interpolateAt(lt2_best, speeds, watts, true);
 
+  // Cross-check pace-verschil LT1 ↔ LT2 (typisch 30-45 s/km; > 60 s/km = red flag)
+  if (lt1_best > 0 && lt2_best > 0 && lt2_best > lt1_best) {
+    const deltaSecPerKm = ((60 / lt1_best) - (60 / lt2_best)) * 60;
+    if (deltaSecPerKm > 60) {
+      warnings.push({
+        severity: 'warning',
+        code: 'LT_GAP_LARGE',
+        message: `Ongewoon groot verschil tussen drempels (Δ ≈ ${Math.round(deltaSecPerKm)} s/km). Controleer of de Aerobic Threshold niet kunstmatig laag is door een uitschieter in de beginpunten.`,
+      });
+    }
+  }
+
   return {
     coeffs, r2, speeds, lactates, hrs, watts, restLac, minActiveLac, modStartIdx,
     lt1: { obla: lt1_obla, bsln: lt1_bsln, loglog: lt1_loglog, best: lt1_best, method: lt1_method, hr: lt1_hr, watt: lt1_watt },
