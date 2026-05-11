@@ -657,13 +657,15 @@ const DataInputTab = ({
               {chatMessages.map((m, idx) => (
                 <div key={idx} style={{
                   alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '92%',
-                  padding: m.role === 'user' ? '8px 12px' : '4px 2px',
-                  borderRadius: m.role === 'user' ? '12px' : '0',
-                  background: m.role === 'user' ? 'var(--wb-indigo)' : 'transparent',
+                  maxWidth: '90%',
+                  padding: '9px 13px',
+                  borderRadius: m.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                  background: m.role === 'user' ? 'var(--wb-indigo)' : 'var(--wb-surface-2)',
                   color: m.role === 'user' ? '#fff' : 'var(--wb-text)',
-                  fontSize: '13px', lineHeight: 1.5,
+                  border: m.role === 'user' ? '1px solid var(--wb-indigo-dim)' : '1px solid var(--wb-border)',
+                  fontSize: '13px', lineHeight: 1.55,
                   whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                  boxShadow: m.role === 'user' ? 'inset 0 1px 0 rgba(255,255,255,0.12)' : 'none',
                 }}>
                   {m.role === 'assistant'
                     ? m.content.split('\n').map((line, j) => (
