@@ -161,7 +161,71 @@ const DataInputTab = ({
     e.target.value = '';
   };
 
-  const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
+  // ── Image / screenshot import via Lovable AI (vision) ─────────────────
+  const fileToDataUrl = (file: File): Promise<string> => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(file);
+  });
+
+  const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      toast({ title: 'Bestand te groot', description: 'Maximaal 8 MB.', variant: 'destructive' });
+      return;
+    }
+    setParsing(true);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { image: dataUrl } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const rawSteps: Array<Record<string, unknown>> = Array.isArray(data?.steps) ? data.steps : [];
+      if (!rawSteps.length) {
+        toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de afbeelding.', variant: 'destructive' });
+        return;
+      }
+
+      const importedSteps: StepData[] = rawSteps.map((row) => {
+        const distance = (typeof row.distance === 'number' && row.distance > 0) ? row.distance : dist;
+        const time = typeof row.time_sec === 'number' && row.time_sec > 0 ? row.time_sec : 0;
+        const speed = (typeof row.speed === 'number' && row.speed > 0)
+          ? row.speed
+          : (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+        return {
+          speed,
+          lactate: typeof row.lactate === 'number' ? row.lactate : 0,
+          hr: typeof row.hr === 'number' ? row.hr : 0,
+          watt: 0,
+          distance,
+          time,
+        };
+      });
+
+      const rl = data?.resting_lactate;
+      if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
+
+      setTestData(importedSteps);
+      setNeedsValidation(true);
+      toast({
+        title: 'Afbeelding ingelezen',
+        description: `${importedSteps.length} tredes herkend — controleer en pas aan waar nodig.`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Inlezen mislukt',
+        description: (err as Error).message || 'Onbekende fout',
+        variant: 'destructive',
+      });
+    } finally {
+      setParsing(false);
+    }
+  };
+
   const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
 
   const filledCount = testData.filter(r => r.lactate > 0).length;
