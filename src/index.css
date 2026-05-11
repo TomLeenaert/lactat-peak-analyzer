@@ -201,3 +201,15 @@
   font-size: 16px !important;
   font-weight: 700 !important;
 }
+
+@keyframes wb-pulse-cta {
+  0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0.6); }
+  70%  { box-shadow: 0 0 0 12px rgba(245,158,11,0); }
+  100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+}
+.wb-pulse-cta {
+  animation: wb-pulse-cta 1.8s ease-out infinite;
+}
+.wb-pulse-cta:hover {
+  filter: brightness(1.08);
+}
