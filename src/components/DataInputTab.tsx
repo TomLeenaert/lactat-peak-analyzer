@@ -274,6 +274,54 @@ const DataInputTab = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
+          <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
+
+          {/* Import-knoppen */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={parsing}
+              style={{ flex: '1 1 220px' }}
+            >
+              {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ImageIcon className="h-4 w-4 mr-2" />}
+              {parsing ? 'Beeld wordt gelezen…' : 'Foto / screenshot inlezen'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              style={{ flex: '1 1 160px' }}
+            >
+              JSON importeren
+            </Button>
+          </div>
+
+          {/* Validatie-banner na AI-import */}
+          {needsValidation && (
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: '10px',
+              padding: '12px 14px',
+              background: 'rgba(255,180,0,0.08)',
+              border: '1px solid rgba(255,180,0,0.4)',
+              borderRadius: '10px',
+            }}>
+              <AlertTriangle size={18} style={{ color: '#ffb400', flexShrink: 0, marginTop: '2px' }} />
+              <div style={{ flex: 1, fontSize: '13px', color: 'rgba(255,255,255,0.85)' }}>
+                <strong style={{ color: '#ffb400' }}>Controle vereist.</strong> De waarden zijn automatisch ingelezen.
+                Loop alle tredes na (tijd, lactaat, hartslag, afstand) en pas aan waar nodig vóór de berekening.
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setNeedsValidation(false)}
+                style={{ color: '#ffb400', height: '28px' }}
+              >
+                <Check className="h-4 w-4 mr-1" /> Gecontroleerd
+              </Button>
+            </div>
+          )}
 
           {/* Rustlactaat */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
