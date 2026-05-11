@@ -349,12 +349,62 @@ const DataInputTab = ({
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setShowPaste((v) => !v)}
+              disabled={parsing}
+              style={{ flex: '1 1 220px' }}
+            >
+              <ClipboardPaste className="h-4 w-4 mr-2" />
+              {showPaste ? 'Plakvenster verbergen' : 'Plakken uit chat / tabel'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               style={{ flex: '1 1 160px' }}
             >
               JSON importeren
             </Button>
           </div>
+
+          {showPaste && (
+            <div style={{
+              padding: '12px',
+              background: 'rgba(102,68,255,0.05)',
+              border: '1px solid rgba(102,68,255,0.25)',
+              borderRadius: '10px',
+              display: 'flex', flexDirection: 'column', gap: '8px',
+            }}>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                Plak hier je testgegevens (kolommen uit Excel, een chat, of vrij getypt). De AI haalt er automatisch de tredes uit.
+              </div>
+              <textarea
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+                placeholder={'Bv.\nAfstand  Tijd     Snelheid  Lactaat  HR\n1,2      0:07:36  9,5       1,7      141\n1,2      0:07:13  10,0      1,1      149\n...'}
+                rows={8}
+                style={{
+                  width: '100%',
+                  fontFamily: 'monospace',
+                  fontSize: '13px',
+                  padding: '10px',
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  color: '#fff',
+                  resize: 'vertical',
+                }}
+              />
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <Button variant="ghost" size="sm" onClick={() => { setPasteText(''); setShowPaste(false); }} disabled={parsing}>
+                  Annuleren
+                </Button>
+                <Button size="sm" onClick={handlePasteImport} disabled={parsing || !pasteText.trim()}>
+                  {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+                  {parsing ? 'Inlezen…' : 'Inlezen'}
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Validatie-banner na AI-import */}
           {needsValidation && (
