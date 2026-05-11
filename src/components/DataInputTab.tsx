@@ -312,56 +312,13 @@ const DataInputTab = ({
 
   return (
     <>
-      <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
 
-      {/* Action bar */}
+      {/* Action bar — alleen afstand */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
         marginBottom: '14px',
       }}>
-        {/* Protocol drawer */}
-        {protocol && setProtocol && (
-          <Sheet open={protocolOpen} onOpenChange={setProtocolOpen}>
-            <SheetTrigger asChild>
-              <button className="wb-focus wb-transition" style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                padding: '8px 14px', borderRadius: '8px',
-                background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-                color: 'var(--wb-text-dim)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
-              }}>
-                <Settings2 size={14} /> Protocol instellingen
-              </button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-[520px] overflow-y-auto">
-              <SheetHeader className="mb-4"><SheetTitle>Protocol instellingen</SheetTitle></SheetHeader>
-              <ProtocolBar
-                protocol={protocol}
-                setProtocol={setProtocol}
-                testData={testData}
-                setTestData={setTestData}
-                setStepDistance={setStepDistance}
-                setStepIncrement={setStepIncrement}
-              />
-            </SheetContent>
-          </Sheet>
-        )}
-
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="wb-focus wb-transition"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '8px 12px', borderRadius: '8px',
-            background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-            color: 'var(--wb-text-dim)', fontSize: '12.5px', cursor: 'pointer',
-          }}
-          title="JSON-bestand importeren"
-        >
-          <FileJson size={13} /> JSON
-        </button>
-
-        {/* Globale afstand per trede */}
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px',
           padding: '6px 12px', borderRadius: '8px',
@@ -384,43 +341,6 @@ const DataInputTab = ({
             }}
           />
           <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
-        </div>
-
-        {/* Resting lactate */}
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '8px',
-          padding: '6px 12px', borderRadius: '8px',
-          background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-        }}>
-          <label style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
-            Rust
-          </label>
-          <input
-            type="number" inputMode="decimal" step="0.1" min="0"
-            value={restingLactate}
-            onChange={(e) => setRestingLactate(e.target.value)}
-            placeholder="—"
-            className="font-mono-num no-spin wb-focus"
-            style={{
-              width: '52px', height: '24px',
-              background: 'transparent', border: 'none', outline: 'none',
-              color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
-              textAlign: 'right',
-            }}
-          />
-          <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>mmol/L</span>
-        </div>
-
-        <div style={{ flex: 1 }} />
-
-        {/* Keyboard hint */}
-        <div className="hidden lg:flex" style={{
-          alignItems: 'center', gap: '6px',
-          fontSize: '11.5px', color: 'var(--wb-text-mute)',
-        }}>
-          <Keyboard size={12} />
-          <kbd style={kbdStyle}>Tab</kbd> volgende cel
-          <kbd style={kbdStyle}>Enter</kbd> nieuwe rij
         </div>
       </div>
 
