@@ -565,7 +565,24 @@ const DataInputTab = ({
                 <MessageSquarePlus size={13} />
                 <span style={{ color: 'var(--wb-text-dim)', fontWeight: 600 }}>Assistent</span>
               </div>
-              <span style={{ fontSize: '10.5px', color: 'var(--wb-emerald)' }}>● Online</span>
+              <button
+                onClick={onCalculate}
+                disabled={needsValidation || filledCount < 3}
+                className="wb-focus wb-transition"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 12px', borderRadius: '8px',
+                  background: (needsValidation || filledCount < 3) ? 'var(--wb-surface-2)' : 'var(--wb-indigo)',
+                  border: '1px solid ' + ((needsValidation || filledCount < 3) ? 'var(--wb-border-2)' : 'var(--wb-indigo-dim)'),
+                  color: (needsValidation || filledCount < 3) ? 'var(--wb-text-mute)' : '#fff',
+                  fontSize: '12px', fontWeight: 600,
+                  cursor: (needsValidation || filledCount < 3) ? 'not-allowed' : 'pointer',
+                  boxShadow: (needsValidation || filledCount < 3) ? 'none' : 'inset 0 1px 0 rgba(255,255,255,0.15)',
+                }}
+                aria-label="Genereer rapport"
+              >
+                Genereer rapport
+              </button>
             </div>
 
             {/* Conversatie-historiek */}
