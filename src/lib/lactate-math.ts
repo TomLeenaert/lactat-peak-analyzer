@@ -483,8 +483,19 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
   // --- LT1 ---
   const minActiveLac = Math.min(...lactates.slice(0, 3));
+  // Sanity-floor: baseline onder 1.5 mmol/L is fysiologisch onwaarschijnlijk bij
+  // een actieve atleet → ondergrens van 1.5 gebruiken voor Baseline+0.5.
+  const BASELINE_FLOOR = 1.5;
+  const baselineLac = Math.max(restLac, BASELINE_FLOOR);
+  if (restLac < BASELINE_FLOOR) {
+    warnings.push({
+      severity: 'info',
+      code: 'BASELINE_FLOORED',
+      message: `Gedetecteerde baseline (${restLac.toFixed(1)} mmol/L) lag onder ${BASELINE_FLOOR.toFixed(1)} — een ondergrens van ${BASELINE_FLOOR.toFixed(1)} mmol/L is gebruikt voor de Aerobic Threshold om vertekening door een te lage eerste trede te vermijden.`,
+    });
+  }
   const lt1_obla = findSpeedAtLactateOrNull(coeffs, 2.0, xMin, xMax);
-  const lt1_bsln = findSpeedAtLactateOrNull(coeffs, restLac + 0.5, xMin, xMax);
+  const lt1_bsln = findSpeedAtLactateOrNull(coeffs, baselineLac + 0.5, xMin, xMax);
   const lt1_loglog = computeLogLog(speeds, lactates);
   const lt1_best = lt1_bsln ?? lt1_loglog ?? lt1_obla ?? xMin;
   const lt1_method =
