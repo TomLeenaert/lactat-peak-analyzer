@@ -270,31 +270,34 @@ const DataInputTab = ({
         display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
         marginBottom: '14px',
       }}>
-        {/* Import dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="wb-focus wb-transition" style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              padding: '8px 14px', borderRadius: '8px',
-              background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-              color: 'var(--wb-text)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
-            }}>
-              Importeren <ChevronDown size={14} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => imageInputRef.current?.click()} disabled={parsing}>
-              {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ImageIcon className="h-4 w-4 mr-2" />}
-              Foto / screenshot
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowPaste(true)} disabled={parsing}>
-              <ClipboardPaste className="h-4 w-4 mr-2" /> Plakken uit chat / tabel
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-              <FileJson className="h-4 w-4 mr-2" /> JSON-bestand
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Import toggle */}
+        <button
+          onClick={() => setShowPaste(v => !v)}
+          className="wb-focus wb-transition"
+          aria-expanded={showPaste}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '8px 14px', borderRadius: '8px',
+            background: showPaste ? 'rgba(99,102,241,0.10)' : 'var(--wb-surface)',
+            border: `1px solid ${showPaste ? 'var(--wb-indigo)' : 'var(--wb-border)'}`,
+            color: 'var(--wb-text)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+          }}
+        >
+          <MessageSquarePlus size={14} /> Importeren via chat
+        </button>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="wb-focus wb-transition"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '8px 12px', borderRadius: '8px',
+            background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+            color: 'var(--wb-text-dim)', fontSize: '12.5px', cursor: 'pointer',
+          }}
+          title="JSON-bestand importeren"
+        >
+          <FileJson size={13} /> JSON
+        </button>
 
         {/* Protocol drawer */}
         {protocol && setProtocol && (
