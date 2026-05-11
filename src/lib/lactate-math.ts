@@ -55,7 +55,7 @@ export interface FitQuality {
 export type WarningSeverity = 'info' | 'warning';
 export interface CalcWarning {
   severity: WarningSeverity;
-  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC';
+  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT';
   message: string;
   affectedStep?: number;
 }
