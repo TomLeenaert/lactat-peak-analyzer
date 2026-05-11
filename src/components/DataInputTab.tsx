@@ -272,35 +272,6 @@ const DataInputTab = ({
         display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
         marginBottom: '14px',
       }}>
-        {/* Import toggle */}
-        <button
-          onClick={() => setShowPaste(v => !v)}
-          className="wb-focus wb-transition"
-          aria-expanded={showPaste}
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '8px 14px', borderRadius: '8px',
-            background: showPaste ? 'rgba(99,102,241,0.10)' : 'var(--wb-surface)',
-            border: `1px solid ${showPaste ? 'var(--wb-indigo)' : 'var(--wb-border)'}`,
-            color: 'var(--wb-text)', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
-          }}
-        >
-          <MessageSquarePlus size={14} /> Importeren via chat
-        </button>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="wb-focus wb-transition"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '8px 12px', borderRadius: '8px',
-            background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
-            color: 'var(--wb-text-dim)', fontSize: '12.5px', cursor: 'pointer',
-          }}
-          title="JSON-bestand importeren"
-        >
-          <FileJson size={13} /> JSON
-        </button>
-
         {/* Protocol drawer */}
         {protocol && setProtocol && (
           <Sheet open={protocolOpen} onOpenChange={setProtocolOpen}>
@@ -328,6 +299,45 @@ const DataInputTab = ({
           </Sheet>
         )}
 
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="wb-focus wb-transition"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '8px 12px', borderRadius: '8px',
+            background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+            color: 'var(--wb-text-dim)', fontSize: '12.5px', cursor: 'pointer',
+          }}
+          title="JSON-bestand importeren"
+        >
+          <FileJson size={13} /> JSON
+        </button>
+
+        {/* Globale afstand per trede */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '8px',
+          padding: '6px 12px', borderRadius: '8px',
+          background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+        }}>
+          <label style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+            Afstand
+          </label>
+          <input
+            type="number" inputMode="numeric" min="0"
+            value={stepDistance}
+            onChange={(e) => handleGlobalDistanceChange(e.target.value)}
+            placeholder="1600"
+            className="font-mono-num no-spin wb-focus"
+            style={{
+              width: '70px', height: '24px',
+              background: 'transparent', border: 'none', outline: 'none',
+              color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
+              textAlign: 'right',
+            }}
+          />
+          <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+        </div>
+
         {/* Resting lactate */}
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px',
@@ -342,7 +352,7 @@ const DataInputTab = ({
             value={restingLactate}
             onChange={(e) => setRestingLactate(e.target.value)}
             placeholder="—"
-            className="font-mono-num wb-focus"
+            className="font-mono-num no-spin wb-focus"
             style={{
               width: '52px', height: '24px',
               background: 'transparent', border: 'none', outline: 'none',
