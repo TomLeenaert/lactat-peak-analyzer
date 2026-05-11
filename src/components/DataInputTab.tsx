@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import {
   Trash2, Plus, AlertTriangle, Check, Loader2,
   Zap, X, ArrowUp, Paperclip, MessageSquarePlus,
+  Clock, Droplet, Heart,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
@@ -284,24 +285,44 @@ const DataInputTab = ({
     outline: 'none',
   };
 
-  // Globale afstand wijzigt alle tredes mee
+  // Globale afstand wijzigt alle (niet-all-out) tredes mee
   const handleGlobalDistanceChange = (val: string) => {
     setStepDistance(val);
     const newDist = parseFloat(val) || 0;
     if (newDist > 0) {
-      setTestData(testData.map(r => ({
+      const lastIdx = testData.length - 1;
+      setTestData(testData.map((r, idx) => {
+        if (protocol?.allOutEnabled && idx === lastIdx) return r;
+        return {
+          ...r,
+          distance: newDist,
+          speed: r.time && r.time > 0 ? calcSpeed(newDist, r.time) : r.speed,
+        };
+      }));
+    }
+  };
+
+  // All-out afstand wijzigt alleen de laatste trede
+  const handleAllOutDistanceChange = (val: string) => {
+    const newDist = parseFloat(val) || 0;
+    if (setProtocol && protocol) setProtocol({ ...protocol, allOutDistance: newDist });
+    const lastIdx = testData.length - 1;
+    if (lastIdx < 0) return;
+    setTestData(testData.map((r, idx) => {
+      if (idx !== lastIdx) return r;
+      return {
         ...r,
         distance: newDist,
         speed: r.time && r.time > 0 ? calcSpeed(newDist, r.time) : r.speed,
-      })));
-    }
+      };
+    }));
   };
 
   return (
     <>
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
 
-      {/* Action bar — alleen afstand */}
+      {/* Action bar — afstand + all-out afstand */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
         marginBottom: '14px',
@@ -312,7 +333,7 @@ const DataInputTab = ({
           background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
         }}>
           <label style={{ fontSize: '11.5px', color: 'var(--wb-text-mute)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
-            Afstand
+            Afstand / trap
           </label>
           <input
             type="number" inputMode="numeric" min="0"
@@ -329,6 +350,34 @@ const DataInputTab = ({
           />
           <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
         </div>
+
+        {protocol?.allOutEnabled && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '6px 12px', borderRadius: '8px',
+            background: 'rgba(245,158,11,0.06)',
+            border: '1px solid rgba(245,158,11,0.35)',
+          }}>
+            <Zap size={13} style={{ color: 'var(--wb-amber)' }} />
+            <label style={{ fontSize: '11.5px', color: 'var(--wb-amber)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+              All-Out afstand
+            </label>
+            <input
+              type="number" inputMode="numeric" min="0"
+              value={protocol.allOutDistance || ''}
+              onChange={(e) => handleAllOutDistanceChange(e.target.value)}
+              placeholder="800"
+              className="font-mono-num no-spin wb-focus"
+              style={{
+                width: '70px', height: '24px',
+                background: 'transparent', border: 'none', outline: 'none',
+                color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
+                textAlign: 'right',
+              }}
+            />
+            <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+          </div>
+        )}
       </div>
 
       {/* Composer moved to right column — always visible */}
@@ -380,18 +429,46 @@ const DataInputTab = ({
 
           <div style={{ overflowX: 'auto' }}>
             <table ref={tableRef} style={{
-              width: '100%', borderCollapse: 'collapse', fontSize: '15px',
+              width: '100%', borderCollapse: 'collapse', fontSize: '15px', tableLayout: 'fixed',
             }}>
+              <colgroup>
+                <col style={{ width: '52px' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '18%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '40px' }} />
+              </colgroup>
               <thead>
                 <tr style={{ background: 'var(--wb-bg)' }}>
-                  {['#', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
+                  {[
+                    { label: '#', icon: null, big: false },
+                    { label: 'Tijd', icon: <Clock size={13} />, big: true },
+                    { label: 'Lactaat', icon: <Droplet size={13} />, big: true },
+                    { label: 'HR', icon: <Heart size={13} />, big: true },
+                    { label: 'Tempo', icon: null, big: false },
+                    { label: 'Snelh.', icon: null, big: false },
+                    { label: '', icon: null, big: false },
+                  ].map((h, i) => (
                     <th key={i} style={{
-                      padding: '12px 10px', textAlign: i === 0 ? 'center' : 'right',
-                      fontSize: '12px', fontWeight: 700,
-                      color: 'var(--wb-text-dim)', textTransform: 'uppercase',
+                      padding: '12px 10px',
+                      textAlign: i === 0 ? 'center' : h.big ? 'left' : 'right',
+                      fontSize: h.big ? '12.5px' : '11px',
+                      fontWeight: 700,
+                      color: h.big ? 'var(--wb-text)' : 'var(--wb-text-mute)',
+                      textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       borderBottom: '1px solid var(--wb-border)',
-                    }}>{h}</th>
+                      opacity: h.big ? 1 : 0.7,
+                    }}>
+                      {h.icon ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ color: 'var(--wb-indigo)', opacity: 0.9 }}>{h.icon}</span>
+                          {h.label}
+                        </span>
+                      ) : h.label}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -405,6 +482,16 @@ const DataInputTab = ({
                   const minVal = row.time ? Math.floor(row.time / 60) : 0;
                   const secVal = row.time ? Math.round(row.time % 60) : 0;
 
+                  const bigInput: React.CSSProperties = {
+                    ...cellInput,
+                    height: '46px',
+                    fontSize: '19px',
+                    fontWeight: 600,
+                    background: 'var(--wb-bg)',
+                    border: '1px solid var(--wb-border-2)',
+                    borderRadius: '8px',
+                  };
+
                   return (
                     <tr key={i}
                       className="wb-transition"
@@ -415,23 +502,23 @@ const DataInputTab = ({
                       }}
                     >
                       {/* # */}
-                      <td style={{ padding: '12px 8px', textAlign: 'center', width: '48px' }}>
+                      <td style={{ padding: '10px 6px', textAlign: 'center' }}>
                         <div style={{
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                          width: '24px', height: '24px', borderRadius: '6px',
+                          width: '28px', height: '28px', borderRadius: '7px',
                           background: allFilled ? 'rgba(52,211,153,0.12)' : 'var(--wb-bg)',
                           border: `1px solid ${allFilled ? 'rgba(52,211,153,0.35)' : 'var(--wb-border-2)'}`,
                           color: allFilled ? 'var(--wb-emerald)' : 'var(--wb-text-mute)',
-                          fontSize: '11px', fontWeight: 700,
+                          fontSize: '12px', fontWeight: 700,
                           fontFamily: "'JetBrains Mono', monospace",
                         }}>
-                          {isFinal ? <Zap size={11} color="var(--wb-amber)" /> : allFilled ? <Check size={12} /> : i + 1}
+                          {isFinal ? <Zap size={12} color="var(--wb-amber)" /> : allFilled ? <Check size={13} /> : i + 1}
                         </div>
                       </td>
 
                       {/* Time mm:ss */}
-                      <td style={{ padding: '12px 8px', width: '130px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                      <td style={{ padding: '8px 8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <input
                             type="number" min="0" max="99"
                             value={minVal || ''}
@@ -439,9 +526,9 @@ const DataInputTab = ({
                             placeholder="mm"
                             aria-label={`Trede ${i + 1} minuten`}
                             className="wb-cell no-spin"
-                            style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
+                            style={{ ...bigInput, textAlign: 'center', padding: '0 6px', flex: 1, minWidth: 0 }}
                           />
-                          <span style={{ color: 'var(--wb-text-mute)', fontWeight: 700 }}>:</span>
+                          <span style={{ color: 'var(--wb-text-mute)', fontWeight: 700, fontSize: '18px' }}>:</span>
                           <input
                             type="number" min="0" max="59"
                             value={secVal || ''}
@@ -449,13 +536,13 @@ const DataInputTab = ({
                             placeholder="ss"
                             aria-label={`Trede ${i + 1} seconden`}
                             className="wb-cell no-spin"
-                            style={{ ...cellInput, textAlign: 'center', padding: '0 4px' }}
+                            style={{ ...bigInput, textAlign: 'center', padding: '0 6px', flex: 1, minWidth: 0 }}
                           />
                         </div>
                       </td>
 
                       {/* Lactate */}
-                      <td style={{ padding: '12px 8px', width: '100px' }}>
+                      <td style={{ padding: '8px 8px' }}>
                         <input
                           type="number" step="0.1" min="0" max="25"
                           value={row.lactate || ''}
@@ -463,12 +550,12 @@ const DataInputTab = ({
                           placeholder="—"
                           aria-label={`Trede ${i + 1} lactaat`}
                           className="wb-cell no-spin"
-                          style={cellInput}
+                          style={{ ...bigInput, textAlign: 'center' }}
                         />
                       </td>
 
                       {/* HR */}
-                      <td style={{ padding: '12px 8px', width: '90px' }}>
+                      <td style={{ padding: '8px 8px' }}>
                         <input
                           type="number" min="0" max="220"
                           value={row.hr || ''}
@@ -476,7 +563,7 @@ const DataInputTab = ({
                           placeholder="—"
                           aria-label={`Trede ${i + 1} hartslag`}
                           className="wb-cell no-spin"
-                          style={cellInput}
+                          style={{ ...bigInput, textAlign: 'center' }}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && i === testData.length - 1) {
                               e.preventDefault();
@@ -487,15 +574,15 @@ const DataInputTab = ({
                       </td>
 
                       {/* Pace (auto) */}
-                      <td style={{ padding: '6px 8px', textAlign: 'right' }}>
-                        <span className="font-mono-num" style={autoCellStyle(row.speed > 0)}>
+                      <td style={{ padding: '6px 6px', textAlign: 'right' }}>
+                        <span className="font-mono-num" style={{ ...autoCellStyle(row.speed > 0), fontSize: '13px', opacity: 0.75 }}>
                           {row.speed > 0 ? formatPace(row.speed) : '—'}
                         </span>
                       </td>
 
                       {/* Speed (auto) */}
-                      <td style={{ padding: '6px 8px', textAlign: 'right' }}>
-                        <span className="font-mono-num" style={autoCellStyle(row.speed > 0)}>
+                      <td style={{ padding: '6px 6px', textAlign: 'right' }}>
+                        <span className="font-mono-num" style={{ ...autoCellStyle(row.speed > 0), fontSize: '13px', opacity: 0.75 }}>
                           {row.speed > 0 ? row.speed.toFixed(1) : '—'}
                         </span>
                       </td>
