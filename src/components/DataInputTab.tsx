@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import {
   Trash2, Plus, AlertTriangle, Check, Loader2,
   Zap, X, ArrowUp, Paperclip, MessageSquarePlus,
+  Clock, Droplet, Heart,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
