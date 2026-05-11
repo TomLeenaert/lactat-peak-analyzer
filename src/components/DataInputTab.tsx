@@ -278,7 +278,7 @@ const DataInputTab = ({
     color: 'var(--wb-text)',
     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
     fontVariantNumeric: 'tabular-nums',
-    fontSize: '14px',
+    fontSize: '16px',
     fontWeight: 500,
     textAlign: 'right',
     outline: 'none',
@@ -379,15 +379,15 @@ const DataInputTab = ({
 
           <div style={{ overflowX: 'auto' }}>
             <table ref={tableRef} style={{
-              width: '100%', borderCollapse: 'collapse', fontSize: '13px',
+              width: '100%', borderCollapse: 'collapse', fontSize: '15px',
             }}>
               <thead>
                 <tr style={{ background: 'var(--wb-bg)' }}>
                   {['#', 'Tijd', 'Lactaat', 'HR', 'Tempo', 'Snelh.', ''].map((h, i) => (
                     <th key={i} style={{
-                      padding: '9px 8px', textAlign: i === 0 ? 'center' : 'right',
-                      fontSize: '10.5px', fontWeight: 700,
-                      color: 'var(--wb-text-mute)', textTransform: 'uppercase',
+                      padding: '12px 10px', textAlign: i === 0 ? 'center' : 'right',
+                      fontSize: '12px', fontWeight: 700,
+                      color: 'var(--wb-text-dim)', textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       borderBottom: '1px solid var(--wb-border)',
                     }}>{h}</th>
