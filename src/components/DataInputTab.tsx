@@ -642,9 +642,47 @@ const DataInputTab = ({
             display: 'flex', flexDirection: 'column', gap: '10px',
             boxShadow: '0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px -16px rgba(0,0,0,0.6)',
           }}>
-            <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MessageSquarePlus size={13} />
-              Plak een screenshot of typ je testgegevens — of klik op <Paperclip size={11} style={{ display: 'inline', verticalAlign: 'middle' }} /> voor een bestand.
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MessageSquarePlus size={13} />
+                <span style={{ color: 'var(--wb-text-dim)', fontWeight: 600 }}>Assistent</span>
+              </div>
+              <span style={{ fontSize: '10.5px', color: 'var(--wb-emerald)' }}>● Online</span>
+            </div>
+
+            {/* Conversatie-historiek */}
+            <div style={{
+              maxHeight: '340px', overflowY: 'auto',
+              display: 'flex', flexDirection: 'column', gap: '8px',
+              padding: '4px 2px',
+            }}>
+              {chatMessages.map((m, idx) => (
+                <div key={idx} style={{
+                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                  maxWidth: '92%',
+                  padding: m.role === 'user' ? '8px 12px' : '4px 2px',
+                  borderRadius: m.role === 'user' ? '12px' : '0',
+                  background: m.role === 'user' ? 'var(--wb-indigo)' : 'transparent',
+                  color: m.role === 'user' ? '#fff' : 'var(--wb-text)',
+                  fontSize: '13px', lineHeight: 1.5,
+                  whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                }}>
+                  {m.role === 'assistant'
+                    ? m.content.split('\n').map((line, j) => (
+                        <div key={j} dangerouslySetInnerHTML={{
+                          __html: line
+                            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'),
+                        }} />
+                      ))
+                    : m.content}
+                </div>
+              ))}
+              {chatBusy && (
+                <div style={{ alignSelf: 'flex-start', fontSize: '13px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> aan het typen…
+                </div>
+              )}
             </div>
 
             {pastedImage && (
