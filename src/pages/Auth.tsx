@@ -37,16 +37,48 @@ const Auth = () => {
         if (error) throw error;
         navigate('/dashboard');
       } else {
+        // Block disposable / throwaway email domains
+        if (isDisposableEmail(email)) {
+          toast({
+            title: lang === 'nl' ? 'Ongeldig e-mailadres' : 'Invalid email',
+            description: lang === 'nl'
+              ? 'Wegwerp-e-mailadressen zijn niet toegestaan. Gebruik een persoonlijk of werkadres.'
+              : 'Disposable email addresses are not allowed. Please use a personal or work address.',
+            variant: 'destructive',
+          });
+          setSubmitting(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email, password,
           options: { data: { full_name: `${firstName} ${lastName}`.trim(), first_name: firstName, last_name: lastName }, emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast({ title: lang === 'nl' ? 'Account aangemaakt' : 'Account created', description: lang === 'nl' ? 'Controleer je e-mail.' : 'Check your email.' });
+        toast({
+          title: lang === 'nl' ? 'Bevestig je e-mail' : 'Confirm your email',
+          description: lang === 'nl'
+            ? 'We stuurden een bevestigingslink naar je inbox. Klik erop om in te loggen.'
+            : 'We sent a confirmation link to your inbox. Click it to sign in.',
+        });
       }
     } catch (err: unknown) {
       toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
     } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    setSubmitting(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: `${window.location.origin}/dashboard`,
+      });
+      if (result.error) throw result.error;
+      // If redirected, browser navigates away. Otherwise session is set.
+      if (!result.redirected) navigate('/dashboard');
+    } catch (err: unknown) {
+      toast({ title: 'Error', description: getErrorMessage(err), variant: 'destructive' });
       setSubmitting(false);
     }
   };
