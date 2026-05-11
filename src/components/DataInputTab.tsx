@@ -352,31 +352,65 @@ const DataInputTab = ({
           <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
         </div>
 
-        {protocol?.allOutEnabled && (
+        {/* All-Out toggle + distance */}
+        {protocol && setProtocol && (
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
             padding: '6px 12px', borderRadius: '8px',
-            background: 'rgba(245,158,11,0.06)',
-            border: '1px solid rgba(245,158,11,0.35)',
+            background: protocol.allOutEnabled ? 'rgba(245,158,11,0.06)' : 'var(--wb-surface)',
+            border: protocol.allOutEnabled ? '1px solid rgba(245,158,11,0.35)' : '1px solid var(--wb-border)',
           }}>
-            <Zap size={13} style={{ color: 'var(--wb-amber)' }} />
-            <label style={{ fontSize: '11.5px', color: 'var(--wb-amber)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
-              All-Out afstand
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={!!protocol.allOutEnabled}
+                onChange={(e) => {
+                  const enabled = e.target.checked;
+                  setProtocol({ ...protocol, allOutEnabled: enabled });
+                  if (enabled) {
+                    // append all-out row if missing
+                    const lastIdx = testData.length - 1;
+                    const last = testData[lastIdx];
+                    const aoDist = protocol.allOutDistance || 600;
+                    if (!last || last.distance !== aoDist) {
+                      setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: aoDist, time: 0 }]);
+                    }
+                  } else {
+                    // remove last row if it's the all-out row
+                    if (testData.length > 0) {
+                      const lastIdx = testData.length - 1;
+                      const last = testData[lastIdx];
+                      if (last && last.distance !== (parseFloat(stepDistance) || 0)) {
+                        setTestData(testData.slice(0, -1));
+                      }
+                    }
+                  }
+                }}
+                style={{ accentColor: 'var(--wb-amber)' }}
+              />
+              <Zap size={13} style={{ color: protocol.allOutEnabled ? 'var(--wb-amber)' : 'var(--wb-text-mute)' }} />
+              <span style={{ fontSize: '11.5px', color: protocol.allOutEnabled ? 'var(--wb-amber)' : 'var(--wb-text-mute)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>
+                All-Out
+              </span>
             </label>
-            <input
-              type="number" inputMode="numeric" min="0"
-              value={protocol.allOutDistance || ''}
-              onChange={(e) => handleAllOutDistanceChange(e.target.value)}
-              placeholder="800"
-              className="font-mono-num no-spin wb-focus"
-              style={{
-                width: '70px', height: '24px',
-                background: 'transparent', border: 'none', outline: 'none',
-                color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
-                textAlign: 'right',
-              }}
-            />
-            <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+            {protocol.allOutEnabled && (
+              <>
+                <input
+                  type="number" inputMode="numeric" min="0"
+                  value={protocol.allOutDistance || ''}
+                  onChange={(e) => handleAllOutDistanceChange(e.target.value)}
+                  placeholder="800"
+                  className="font-mono-num no-spin wb-focus"
+                  style={{
+                    width: '70px', height: '24px',
+                    background: 'transparent', border: 'none', outline: 'none',
+                    color: 'var(--wb-text)', fontSize: '13px', fontWeight: 600,
+                    textAlign: 'right',
+                  }}
+                />
+                <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -504,16 +538,26 @@ const DataInputTab = ({
                     >
                       {/* # */}
                       <td style={{ padding: '10px 6px', textAlign: 'center' }}>
-                        <div style={{
-                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                          width: '28px', height: '28px', borderRadius: '7px',
-                          background: allFilled ? 'rgba(52,211,153,0.12)' : 'var(--wb-bg)',
-                          border: `1px solid ${allFilled ? 'rgba(52,211,153,0.35)' : 'var(--wb-border-2)'}`,
-                          color: allFilled ? 'var(--wb-emerald)' : 'var(--wb-text-mute)',
-                          fontSize: '12px', fontWeight: 700,
-                          fontFamily: "'JetBrains Mono', monospace",
-                        }}>
-                          {isFinal ? <Zap size={12} color="var(--wb-amber)" /> : allFilled ? <Check size={13} /> : i + 1}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                          <div style={{
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            width: '28px', height: '28px', borderRadius: '7px',
+                            background: allFilled ? 'rgba(52,211,153,0.12)' : 'var(--wb-bg)',
+                            border: `1px solid ${allFilled ? 'rgba(52,211,153,0.35)' : 'var(--wb-border-2)'}`,
+                            color: allFilled ? 'var(--wb-emerald)' : 'var(--wb-text-mute)',
+                            fontSize: '12px', fontWeight: 700,
+                            fontFamily: "'JetBrains Mono', monospace",
+                          }}>
+                            {isFinal ? <Zap size={12} color="var(--wb-amber)" /> : allFilled ? <Check size={13} /> : i + 1}
+                          </div>
+                          <span style={{
+                            fontSize: '10.5px', fontWeight: 700,
+                            color: isFinal ? 'var(--wb-amber)' : 'var(--wb-text-mute)',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {row.distance ? `${row.distance}m` : '—'}
+                          </span>
                         </div>
                       </td>
 
@@ -521,9 +565,12 @@ const DataInputTab = ({
                       <td style={{ padding: '8px 8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <input
-                            type="number" min="0" max="99"
-                            value={minVal || ''}
-                            onChange={(e) => updateTime(i, parseInt(e.target.value) || 0, secVal)}
+                            type="text" inputMode="numeric" pattern="[0-9]*" maxLength={2}
+                            value={(hasTime || minVal > 0) ? String(minVal) : ''}
+                            onChange={(e) => {
+                              const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+                              updateTime(i, parseInt(v) || 0, secVal);
+                            }}
                             placeholder="mm"
                             aria-label={`Trede ${i + 1} minuten`}
                             className="wb-cell no-spin"
@@ -531,9 +578,13 @@ const DataInputTab = ({
                           />
                           <span style={{ color: 'var(--wb-text-mute)', fontWeight: 700, fontSize: '18px' }}>:</span>
                           <input
-                            type="number" min="0" max="59"
-                            value={secVal || ''}
-                            onChange={(e) => updateTime(i, minVal, parseInt(e.target.value) || 0)}
+                            type="text" inputMode="numeric" pattern="[0-9]*" maxLength={2}
+                            value={hasTime ? String(secVal).padStart(2, '0') : ''}
+                            onChange={(e) => {
+                              const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+                              const s = Math.min(parseInt(v) || 0, 59);
+                              updateTime(i, minVal, s);
+                            }}
                             placeholder="ss"
                             aria-label={`Trede ${i + 1} seconden`}
                             className="wb-cell no-spin"
