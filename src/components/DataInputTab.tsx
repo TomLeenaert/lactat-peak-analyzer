@@ -268,8 +268,6 @@ const DataInputTab = ({
 
   // ── derived ──────────────────────────────────────────────
   const filledCount = testData.filter(r => r.lactate > 0).length;
-  const maxLactate = Math.max(0, ...testData.map(r => r.lactate || 0));
-  const peakHR = Math.max(0, ...testData.map(r => r.hr || 0));
 
   // ── styles ───────────────────────────────────────────────
   const cellInput: React.CSSProperties = {
