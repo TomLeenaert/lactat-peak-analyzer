@@ -9,6 +9,7 @@ import { useLang } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPace, type StepData } from '@/lib/lactate-math';
 import type { ProtocolSettings } from '@/lib/protocol-types';
+import logoSrc from '@/assets/screen.png';
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -623,17 +624,19 @@ const DataInputTab = ({
           </div>
         </div>
 
-        {/* RIGHT — chat (always open) + sticky live preview */}
-        <div style={{ position: 'sticky', top: '16px', alignSelf: 'start', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* RIGHT — chat (always open), aligned to data box height */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0 }}>
 
           {/* Permanent chat composer */}
           <div style={{
+            flex: 1,
             padding: '12px',
             background: 'var(--wb-surface)',
             border: '1px solid var(--wb-border)',
             borderRadius: '14px',
             display: 'flex', flexDirection: 'column', gap: '10px',
             boxShadow: '0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px -16px rgba(0,0,0,0.6)',
+            minHeight: 0,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
               <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -662,7 +665,7 @@ const DataInputTab = ({
 
             {/* Conversatie-historiek */}
             <div style={{
-              maxHeight: '340px', overflowY: 'auto',
+              flex: 1, minHeight: '280px', overflowY: 'auto',
               display: 'flex', flexDirection: 'column', gap: '8px',
               padding: '4px 2px',
             }}>
@@ -766,9 +769,7 @@ const DataInputTab = ({
                   }}>
                   <Paperclip size={15} />
                 </button>
-                <div style={{ flex: 1, fontSize: '10.5px', color: 'var(--wb-text-mute)' }}>
-                  <kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>V</kbd> plak · <kbd style={kbdStyle}>⌘</kbd>+<kbd style={kbdStyle}>⏎</kbd> versturen
-                </div>
+                <div style={{ flex: 1 }} />
                 <button
                   onClick={handleComposerSubmit}
                   disabled={parsing || chatBusy || (!pasteText.trim() && !pastedImage)}
@@ -791,6 +792,25 @@ const DataInputTab = ({
           </div>
 
         </div>
+      </div>
+
+      {/* Footer logo */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        gap: '8px', padding: '32px 0 16px', marginTop: '24px',
+        opacity: 0.85,
+      }}>
+        <img src={logoSrc} alt="MyLactest" style={{
+          width: '40px', height: '40px', objectFit: 'contain',
+          mixBlendMode: 'lighten',
+          filter: 'drop-shadow(0 2px 8px rgba(139,74,255,0.25))',
+        }} />
+        <span style={{
+          fontSize: '13px', fontWeight: 700, letterSpacing: '0.04em',
+          color: 'var(--wb-text-dim)',
+        }}>
+          MyLactest
+        </span>
       </div>
     </>
   );
