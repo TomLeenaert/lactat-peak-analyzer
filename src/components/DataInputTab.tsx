@@ -748,23 +748,5 @@ const autoCellStyle = (active: boolean): React.CSSProperties => ({
   opacity: active ? 1 : 0.4,
 });
 
-const Tile = ({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) => (
-  <div style={{
-    background: 'var(--wb-surface)',
-    padding: '10px 12px',
-  }}>
-    <div style={{
-      fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
-      textTransform: 'uppercase', color: 'var(--wb-text-mute)',
-      marginBottom: '4px',
-    }}>{label}</div>
-    <div className="font-mono-num" style={{
-      fontSize: '20px', fontWeight: 600, color, lineHeight: 1.1,
-    }}>{value}</div>
-    {sub && (
-      <div style={{ fontSize: '10.5px', color: 'var(--wb-text-mute)', marginTop: '2px' }}>{sub}</div>
-    )}
-  </div>
-);
 
 export default DataInputTab;
