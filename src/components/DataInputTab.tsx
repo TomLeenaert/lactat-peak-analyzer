@@ -240,6 +240,7 @@ const DataInputTab = ({
         if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
         setTestData(imported);
         setNeedsValidation(true);
+        setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} tredes** ingelezen uit je tekst. **Controleer elke trede** en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan.` }]);
         setPasteText('');
         toast({ title: 'Tekst ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
       } catch (err) {
