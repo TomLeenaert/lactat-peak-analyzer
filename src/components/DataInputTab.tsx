@@ -82,6 +82,8 @@ const DataInputTab = ({
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [parsing, setParsing] = useState(false);
   const [needsValidation, setNeedsValidation] = useState(false);
+  const [pasteText, setPasteText] = useState('');
+  const [showPaste, setShowPaste] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
 
