@@ -9,6 +9,7 @@ import { useLang } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPace, type StepData } from '@/lib/lactate-math';
 import type { ProtocolSettings } from '@/lib/protocol-types';
+import logoSrc from '@/assets/screen.png';
 
 interface DataInputTabProps {
   testData: StepData[];
