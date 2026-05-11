@@ -132,7 +132,7 @@ const TestPage = () => {
         </div>
       </header>
 
-      <main className="w-full" style={{ padding: '16px 20px' }}>
+      <main className="w-full" style={{ padding: '8px 8px 16px' }}>
         {(activeTab === 'data' || activeTab === 'protocol') && (
           <DataInputTab
             testData={testData} setTestData={setTestData}
