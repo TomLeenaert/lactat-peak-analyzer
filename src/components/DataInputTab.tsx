@@ -623,17 +623,19 @@ const DataInputTab = ({
           </div>
         </div>
 
-        {/* RIGHT — chat (always open) + sticky live preview */}
-        <div style={{ position: 'sticky', top: '16px', alignSelf: 'start', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* RIGHT — chat (always open), aligned to data box height */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0 }}>
 
           {/* Permanent chat composer */}
           <div style={{
+            flex: 1,
             padding: '12px',
             background: 'var(--wb-surface)',
             border: '1px solid var(--wb-border)',
             borderRadius: '14px',
             display: 'flex', flexDirection: 'column', gap: '10px',
             boxShadow: '0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px -16px rgba(0,0,0,0.6)',
+            minHeight: 0,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
               <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
