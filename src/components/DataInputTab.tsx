@@ -235,7 +235,7 @@ const DataInputTab = ({
   // ── styles ───────────────────────────────────────────────
   const cellInput: React.CSSProperties = {
     width: '100%',
-    height: '34px',
+    height: '38px',
     background: 'transparent',
     border: '1px solid transparent',
     borderRadius: '6px',
@@ -243,18 +243,23 @@ const DataInputTab = ({
     color: 'var(--wb-text)',
     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
     fontVariantNumeric: 'tabular-nums',
-    fontSize: '13.5px',
+    fontSize: '14px',
     fontWeight: 500,
     textAlign: 'right',
     outline: 'none',
   };
-  const cellInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'var(--wb-indigo)';
-    e.currentTarget.style.background = 'rgba(99,102,241,0.06)';
-  };
-  const cellInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.currentTarget.style.borderColor = 'transparent';
-    e.currentTarget.style.background = 'transparent';
+
+  // Globale afstand wijzigt alle tredes mee
+  const handleGlobalDistanceChange = (val: string) => {
+    setStepDistance(val);
+    const newDist = parseFloat(val) || 0;
+    if (newDist > 0) {
+      setTestData(testData.map(r => ({
+        ...r,
+        distance: newDist,
+        speed: r.time && r.time > 0 ? calcSpeed(newDist, r.time) : r.speed,
+      })));
+    }
   };
 
   return (
