@@ -228,6 +228,62 @@ const DataInputTab = ({
     }
   };
 
+  const handlePasteImport = async () => {
+    const txt = pasteText.trim();
+    if (!txt) {
+      toast({ title: 'Geen tekst', description: 'Plak eerst je testgegevens.', variant: 'destructive' });
+      return;
+    }
+    setParsing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const rawSteps: Array<Record<string, unknown>> = Array.isArray(data?.steps) ? data.steps : [];
+      if (!rawSteps.length) {
+        toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' });
+        return;
+      }
+
+      const importedSteps: StepData[] = rawSteps.map((row) => {
+        const distance = (typeof row.distance === 'number' && row.distance > 0) ? row.distance : dist;
+        const time = typeof row.time_sec === 'number' && row.time_sec > 0 ? row.time_sec : 0;
+        const speed = (typeof row.speed === 'number' && row.speed > 0)
+          ? row.speed
+          : (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+        return {
+          speed,
+          lactate: typeof row.lactate === 'number' ? row.lactate : 0,
+          hr: typeof row.hr === 'number' ? row.hr : 0,
+          watt: 0,
+          distance,
+          time,
+        };
+      });
+
+      const rl = data?.resting_lactate;
+      if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
+
+      setTestData(importedSteps);
+      setNeedsValidation(true);
+      setShowPaste(false);
+      setPasteText('');
+      toast({
+        title: 'Tekst ingelezen',
+        description: `${importedSteps.length} tredes herkend — controleer en pas aan waar nodig.`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Inlezen mislukt',
+        description: (err as Error).message || 'Onbekende fout',
+        variant: 'destructive',
+      });
+    } finally {
+      setParsing(false);
+    }
+  };
+
   const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
   const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
 
