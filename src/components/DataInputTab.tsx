@@ -730,7 +730,7 @@ const DataInputTab = ({
                 }}
                 placeholder={pastedImage
                   ? 'Optionele extra context bij je screenshot…'
-                  : 'Plak hier een screenshot of typ je testgegevens…\nbv.  1,2 km   7:36   1,7 mmol   141 bpm'}
+                  : 'Stel een vraag, plak een screenshot of typ je testdata…'}
                 rows={4}
                 className="font-mono-num wb-focus"
                 style={{
