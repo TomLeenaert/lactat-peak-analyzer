@@ -1,40 +1,24 @@
-## Doel
-Het data-invoer scherm strakker maken: alleen de tabel + chat rechts behouden. Alle randinfo en het Live-voorbeeld verdwijnen — die horen thuis op het volgende scherm (Analyse).
+## Probleem
 
-## Wijzigingen in `src/components/DataInputTab.tsx`
+De route `/athlete/:id/test` rendert `src/pages/AthleteTest.tsx`, niet `TestPage.tsx`. Mijn vorige edits zaten in `TestPage.tsx`, dus je zag nooit effect. In `AthleteTest.tsx` staat:
 
-### 1. Action bar boven de tabel — uitkleden
-Behouden:
-- **Alleen** het "AFSTAND … m" veld (globale afstand per trede).
+```tsx
+<main className="max-w-[900px] mx-auto px-4 py-2 pb-6">
+```
 
-Verwijderen:
-- "Protocol instellingen" knop + bijbehorende `<Sheet>` drawer.
-- "JSON" import-knop + verborgen `<input type="file">` voor JSON.
-- "RUST mmol/L" veld.
-- Keyboard-hint blok ("Tab volgende cel / Enter nieuwe rij").
-- De `flex: 1` spacer wordt overbodig — verwijderen.
+Die `max-w-[900px] mx-auto` capt het hele scherm op 900px en centreert het → vandaar de grote lege banden links en rechts.
 
-### 2. Rechterkolom — alleen chat
-Verwijderen:
-- Het volledige "Live voorbeeld" paneel (header, metric-tiles LT1/LT2/Max Lac/Piek HR/Drempel, en de mini-LactateChart).
-- De `livePreview` `useMemo` berekening + de import van `LactateChart` als die verder niet meer gebruikt wordt in dit bestand.
-- De `Genereer rapport` knop verhuist naar de chat-paneel-header (rechts bovenaan, op dezelfde plek waar nu "● Online" staat), zodat de gebruiker hem niet kwijt is. Disabled-logica blijft (`needsValidation || filledCount < 3`).
+## Fix
 
-De rechterkolom bevat dan enkel nog het chatpaneel (sticky), met de "Genereer rapport" knop in z'n header.
+**Bestand: `src/pages/AthleteTest.tsx`**
+- `<main>` wijzigen naar volledige breedte: vervang `max-w-[900px] mx-auto px-4 py-2 pb-6` door `w-full px-2 py-2 pb-6` (minimale horizontale padding zodat content niet aan de schermrand kleeft).
 
-### 3. Props / state opruimen
-- Props `protocol`, `setProtocol`, `setStepIncrement` worden niet meer gebruikt in deze component → uit de destructuring halen (interface mag blijven zodat `TestPage.tsx` ongewijzigd blijft).
-- State `protocolOpen` weg.
-- Lokale helpers/imports die enkel het verwijderde UI ondersteunden weg: `Settings2`, `FileJson`, `Keyboard`, `Sheet`/`SheetTrigger`/`SheetContent`/`SheetHeader`/`SheetTitle`, `ProtocolBar`, `polyEval`, eventueel `LactateChart` (afhankelijk van of die nog ergens in dit bestand wordt gebruikt — wordt geverifieerd vóór verwijdering).
-- `fileInputRef` voor JSON + `handleJsonImport`/`processJsonFile` blijven indien ze nergens anders nodig zijn — worden verwijderd samen met de UI.
+**Bestand: `src/components/DataInputTab.tsx`**
+- Verifiëren dat de grid `grid w-full grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_560px]` actief blijft. Geen wijziging nodig — de chat blijft 560 px vast, het data‑frame neemt alle resterende breedte (1fr).
 
-### 4. Niets aanpassen aan
-- `TestPage.tsx` — die geeft props mee maar als de interface ze nog accepteert (optioneel) is dat oké. Anders maken we `protocol`, `setProtocol`, `setStepIncrement` expliciet optioneel.
-- Berekenlogica, parse-test-image flow, chat-flow, of andere componenten.
-- `index.css` of tokens.
+**Optioneel (cleanup, geen functionele wijziging):**
+- De eerdere wijzigingen in `src/pages/TestPage.tsx` en `src/App.css` laten staan; ze doen geen kwaad, maar zijn niet de oplossing voor deze route.
 
 ## Resultaat
-- **Boven**: kleine balk met enkel "AFSTAND 1600 m".
-- **Links**: de stappen-tabel.
-- **Rechts**: het chatpaneel met "Genereer rapport" in z'n header.
-- Geen Live voorbeeld meer op dit scherm — dat blijft voor de Analyse-tab.
+
+Op desktop vult het data‑invulgedeelte de volledige breedte van het scherm op een paar pixels padding na, en de chat-kolom blijft 560 px aan de rechterkant. Geen centrering meer, geen witruimte links/rechts.
