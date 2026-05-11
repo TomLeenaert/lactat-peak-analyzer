@@ -66,6 +66,19 @@ const DataInputTab = ({
   const [pastedImage, setPastedImage] = useState<string | null>(null);
   const [pastedFileName, setPastedFileName] = useState<string | null>(null);
   const [protocolOpen, setProtocolOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'assistant' | 'user'; content: string }>>([
+    {
+      role: 'assistant',
+      content:
+        'Hi 👋 Ik help je met deze test.\n\n' +
+        '• Vul **tijd, lactaat en HR** per trede in (Tab/Enter om snel te navigeren).\n' +
+        '• Stel **afstand per trede** bovenaan in (standaard 1600 m).\n' +
+        '• **Plak een screenshot** of klik op 📎 — ik lees je papieren testblad automatisch in.\n' +
+        '• Vanaf 3 ingevulde tredes klik je op **Genereer rapport**.\n\n' +
+        'Vraag me gerust om uitleg.',
+    },
+  ]);
+  const [chatBusy, setChatBusy] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
 
@@ -198,7 +211,16 @@ const DataInputTab = ({
       }
     }
   };
+  // Heuristiek: lijkt deze tekst op testdata (cijfers/eenheden) of is het een vraag?
+  const looksLikeTestData = (txt: string) => {
+    const lower = txt.toLowerCase();
+    const hasUnit = /(mmol|bpm|km\/h|km|:\d{2})/.test(lower);
+    const digits = (txt.match(/\d/g) || []).length;
+    return hasUnit && digits >= 4;
+  };
+
   const handleComposerSubmit = async () => {
+    // 1) Afbeelding → altijd inlezen via parse-test-image
     if (pastedImage) {
       const res = await fetch(pastedImage);
       const blob = await res.blob();
@@ -206,25 +228,51 @@ const DataInputTab = ({
       await parseImageFile(file);
       return;
     }
+
     const txt = pasteText.trim();
-    if (!txt) { toast({ title: 'Niets om in te lezen', description: 'Plak een screenshot of tekst, of voeg een bestand toe.', variant: 'destructive' }); return; }
-    setParsing(true);
+    if (!txt) {
+      toast({ title: 'Niets te versturen', description: 'Plak een screenshot, typ je testdata of stel een vraag.', variant: 'destructive' });
+      return;
+    }
+
+    // 2) Lijkt op testdata? → inlezen
+    if (looksLikeTestData(txt)) {
+      setParsing(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        const imported = mapAiSteps(data);
+        if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' }); return; }
+        const rl = data?.resting_lactate;
+        if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
+        setTestData(imported);
+        setNeedsValidation(true);
+        setPasteText('');
+        toast({ title: 'Tekst ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
+      } catch (err) {
+        toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
+      } finally { setParsing(false); }
+      return;
+    }
+
+    // 3) Anders → gesprek met de assistent
+    const userMsg = { role: 'user' as const, content: txt };
+    const nextMessages = [...chatMessages, userMsg];
+    setChatMessages(nextMessages);
+    setPasteText('');
+    setChatBusy(true);
     try {
-      const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { text: txt } });
+      const { data, error } = await supabase.functions.invoke('lactate-chat', {
+        body: { messages: nextMessages.map(m => ({ role: m.role, content: m.content })) },
+      });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      const imported = mapAiSteps(data);
-      if (!imported.length) { toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de tekst.', variant: 'destructive' }); return; }
-      const rl = data?.resting_lactate;
-      if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
-      setTestData(imported);
-      setNeedsValidation(true);
-      setShowPaste(false);
-      setPasteText('');
-      toast({ title: 'Tekst ingelezen', description: `${imported.length} tredes herkend — controleer en pas aan waar nodig.` });
+      const reply: string = data?.reply || '…';
+      setChatMessages([...nextMessages, { role: 'assistant', content: reply }]);
     } catch (err) {
-      toast({ title: 'Inlezen mislukt', description: (err as Error).message || 'Onbekende fout', variant: 'destructive' });
-    } finally { setParsing(false); }
+      setChatMessages([...nextMessages, { role: 'assistant', content: `Sorry, er ging iets mis: ${(err as Error).message}` }]);
+    } finally { setChatBusy(false); }
   };
 
   // ── derived ──────────────────────────────────────────────
@@ -594,9 +642,47 @@ const DataInputTab = ({
             display: 'flex', flexDirection: 'column', gap: '10px',
             boxShadow: '0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px -16px rgba(0,0,0,0.6)',
           }}>
-            <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MessageSquarePlus size={13} />
-              Plak een screenshot of typ je testgegevens — of klik op <Paperclip size={11} style={{ display: 'inline', verticalAlign: 'middle' }} /> voor een bestand.
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MessageSquarePlus size={13} />
+                <span style={{ color: 'var(--wb-text-dim)', fontWeight: 600 }}>Assistent</span>
+              </div>
+              <span style={{ fontSize: '10.5px', color: 'var(--wb-emerald)' }}>● Online</span>
+            </div>
+
+            {/* Conversatie-historiek */}
+            <div style={{
+              maxHeight: '340px', overflowY: 'auto',
+              display: 'flex', flexDirection: 'column', gap: '8px',
+              padding: '4px 2px',
+            }}>
+              {chatMessages.map((m, idx) => (
+                <div key={idx} style={{
+                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                  maxWidth: '92%',
+                  padding: m.role === 'user' ? '8px 12px' : '4px 2px',
+                  borderRadius: m.role === 'user' ? '12px' : '0',
+                  background: m.role === 'user' ? 'var(--wb-indigo)' : 'transparent',
+                  color: m.role === 'user' ? '#fff' : 'var(--wb-text)',
+                  fontSize: '13px', lineHeight: 1.5,
+                  whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                }}>
+                  {m.role === 'assistant'
+                    ? m.content.split('\n').map((line, j) => (
+                        <div key={j} dangerouslySetInnerHTML={{
+                          __html: line
+                            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'),
+                        }} />
+                      ))
+                    : m.content}
+                </div>
+              ))}
+              {chatBusy && (
+                <div style={{ alignSelf: 'flex-start', fontSize: '13px', color: 'var(--wb-text-mute)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> aan het typen…
+                </div>
+              )}
             </div>
 
             {pastedImage && (
@@ -644,7 +730,7 @@ const DataInputTab = ({
                 }}
                 placeholder={pastedImage
                   ? 'Optionele extra context bij je screenshot…'
-                  : 'Plak hier een screenshot of typ je testgegevens…\nbv.  1,2 km   7:36   1,7 mmol   141 bpm'}
+                  : 'Stel een vraag, plak een screenshot of typ je testdata…'}
                 rows={4}
                 className="font-mono-num wb-focus"
                 style={{
@@ -656,7 +742,7 @@ const DataInputTab = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                   onClick={() => imageInputRef.current?.click()}
-                  disabled={parsing}
+                  disabled={parsing || chatBusy}
                   className="wb-focus wb-transition"
                   aria-label="Bestand toevoegen"
                   title="Foto / screenshot toevoegen"
@@ -673,7 +759,7 @@ const DataInputTab = ({
                 </div>
                 <button
                   onClick={handleComposerSubmit}
-                  disabled={parsing || (!pasteText.trim() && !pastedImage)}
+                  disabled={parsing || chatBusy || (!pasteText.trim() && !pastedImage)}
                   className="wb-focus wb-transition"
                   aria-label="Versturen"
                   style={{
@@ -682,11 +768,11 @@ const DataInputTab = ({
                     background: 'var(--wb-indigo)', color: '#fff',
                     border: '1px solid var(--wb-indigo-dim)',
                     fontSize: '13px', fontWeight: 600, cursor: 'pointer',
-                    opacity: (parsing || (!pasteText.trim() && !pastedImage)) ? 0.5 : 1,
+                    opacity: (parsing || chatBusy || (!pasteText.trim() && !pastedImage)) ? 0.5 : 1,
                   }}
                 >
-                  {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp size={15} />}
-                  {parsing ? 'Inlezen…' : 'Versturen'}
+                  {(parsing || chatBusy) ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp size={15} />}
+                  {parsing ? 'Inlezen…' : chatBusy ? 'Bezig…' : 'Versturen'}
                 </button>
               </div>
             </div>
