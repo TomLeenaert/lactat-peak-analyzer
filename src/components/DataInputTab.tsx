@@ -414,7 +414,7 @@ const DataInputTab = ({
                       }}
                     >
                       {/* # */}
-                      <td style={{ padding: '8px', textAlign: 'center', width: '40px' }}>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', width: '48px' }}>
                         <div style={{
                           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                           width: '24px', height: '24px', borderRadius: '6px',
@@ -429,7 +429,7 @@ const DataInputTab = ({
                       </td>
 
                       {/* Time mm:ss */}
-                      <td style={{ padding: '8px 6px', width: '130px' }}>
+                      <td style={{ padding: '12px 8px', width: '130px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                           <input
                             type="number" min="0" max="99"
@@ -454,7 +454,7 @@ const DataInputTab = ({
                       </td>
 
                       {/* Lactate */}
-                      <td style={{ padding: '8px 6px', width: '100px' }}>
+                      <td style={{ padding: '12px 8px', width: '100px' }}>
                         <input
                           type="number" step="0.1" min="0" max="25"
                           value={row.lactate || ''}
@@ -467,7 +467,7 @@ const DataInputTab = ({
                       </td>
 
                       {/* HR */}
-                      <td style={{ padding: '8px 6px', width: '90px' }}>
+                      <td style={{ padding: '12px 8px', width: '90px' }}>
                         <input
                           type="number" min="0" max="220"
                           value={row.hr || ''}
