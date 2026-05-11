@@ -700,19 +700,31 @@ const DataInputTab = ({
 
             {needsValidation && (
               <div style={{
-                display: 'flex', alignItems: 'flex-start', gap: '10px',
-                padding: '10px 12px',
-                background: 'rgba(245,158,11,0.06)',
-                border: '1px solid rgba(245,158,11,0.35)',
-                borderRadius: '10px',
+                display: 'flex', alignItems: 'center', gap: '12px',
+                padding: '12px 14px',
+                background: 'rgba(245,158,11,0.08)',
+                border: '1px solid rgba(245,158,11,0.45)',
+                borderRadius: '12px',
               }}>
-                <AlertTriangle size={15} style={{ color: 'var(--wb-amber)', flexShrink: 0, marginTop: '2px' }} />
+                <AlertTriangle size={18} style={{ color: 'var(--wb-amber)', flexShrink: 0 }} />
                 <div style={{ flex: 1, fontSize: '12.5px', color: 'var(--wb-text)', lineHeight: 1.45 }}>
-                  <strong style={{ color: 'var(--wb-amber)' }}>Controle vereist.</strong> Loop alle tredes na en pas aan waar nodig vóór de berekening.
+                  <strong style={{ color: 'var(--wb-amber)' }}>Controle vereist.</strong> Loop alle tredes na en klik dan op de knop hiernaast.
                 </div>
-                <button onClick={() => setNeedsValidation(false)} className="wb-focus wb-transition"
-                  style={{ ...secondaryBtn, color: 'var(--wb-amber)', borderColor: 'rgba(245,158,11,0.4)', padding: '5px 10px', fontSize: '12px', whiteSpace: 'nowrap' }}>
-                  <Check className="h-3.5 w-3.5" /> Gecontroleerd
+                <button onClick={() => setNeedsValidation(false)} className="wb-focus wb-transition wb-pulse-cta"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    background: 'var(--wb-amber)',
+                    color: '#1a1205',
+                    border: '1px solid var(--wb-amber)',
+                    padding: '9px 16px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    borderRadius: '10px',
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    boxShadow: '0 0 0 0 rgba(245,158,11,0.55)',
+                  }}>
+                  <Check className="h-4 w-4" /> Gecontroleerd
                 </button>
               </div>
             )}
