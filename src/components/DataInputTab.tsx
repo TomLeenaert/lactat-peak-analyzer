@@ -1,12 +1,13 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPace, type StepData } from '@/lib/lactate-math';
-import { Trash2, Plus, Timer, Droplets, Heart } from 'lucide-react';
+import { Trash2, Plus, Timer, Droplets, Heart, Image as ImageIcon, AlertTriangle, Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLang } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
 import ProtocolBar from '@/components/ProtocolBar';
 import type { ProtocolSettings } from '@/lib/protocol-types';
 
@@ -78,6 +79,9 @@ const DataInputTab = ({
 }: DataInputTabProps) => {
   const dist = parseFloat(stepDistance) || 1600;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [parsing, setParsing] = useState(false);
+  const [needsValidation, setNeedsValidation] = useState(false);
   const { toast } = useToast();
   const { t } = useLang();
 
@@ -157,6 +161,71 @@ const DataInputTab = ({
     e.target.value = '';
   };
 
+  // ── Image / screenshot import via Lovable AI (vision) ─────────────────
+  const fileToDataUrl = (file: File): Promise<string> => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(file);
+  });
+
+  const handleImageImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      toast({ title: 'Bestand te groot', description: 'Maximaal 8 MB.', variant: 'destructive' });
+      return;
+    }
+    setParsing(true);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const { data, error } = await supabase.functions.invoke('parse-test-image', { body: { image: dataUrl } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const rawSteps: Array<Record<string, unknown>> = Array.isArray(data?.steps) ? data.steps : [];
+      if (!rawSteps.length) {
+        toast({ title: 'Niets herkend', description: 'Geen tredes gevonden in de afbeelding.', variant: 'destructive' });
+        return;
+      }
+
+      const importedSteps: StepData[] = rawSteps.map((row) => {
+        const distance = (typeof row.distance === 'number' && row.distance > 0) ? row.distance : dist;
+        const time = typeof row.time_sec === 'number' && row.time_sec > 0 ? row.time_sec : 0;
+        const speed = (typeof row.speed === 'number' && row.speed > 0)
+          ? row.speed
+          : (time > 0 ? (distance / 1000) / (time / 3600) : 0);
+        return {
+          speed,
+          lactate: typeof row.lactate === 'number' ? row.lactate : 0,
+          hr: typeof row.hr === 'number' ? row.hr : 0,
+          watt: 0,
+          distance,
+          time,
+        };
+      });
+
+      const rl = data?.resting_lactate;
+      if (typeof rl === 'number' && rl > 0) setRestingLactate(String(rl));
+
+      setTestData(importedSteps);
+      setNeedsValidation(true);
+      toast({
+        title: 'Afbeelding ingelezen',
+        description: `${importedSteps.length} tredes herkend — controleer en pas aan waar nodig.`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Inlezen mislukt',
+        description: (err as Error).message || 'Onbekende fout',
+        variant: 'destructive',
+      });
+    } finally {
+      setParsing(false);
+    }
+  };
+
   const addRow = () => setTestData([...testData, { speed: 0, lactate: 0, hr: 0, watt: 0, distance: dist, time: 0 }]);
   const removeRow = (i: number) => setTestData(testData.filter((_, idx) => idx !== i));
 
@@ -205,6 +274,54 @@ const DataInputTab = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleJsonImport} />
+          <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
+
+          {/* Import-knoppen */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={parsing}
+              style={{ flex: '1 1 220px' }}
+            >
+              {parsing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ImageIcon className="h-4 w-4 mr-2" />}
+              {parsing ? 'Beeld wordt gelezen…' : 'Foto / screenshot inlezen'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              style={{ flex: '1 1 160px' }}
+            >
+              JSON importeren
+            </Button>
+          </div>
+
+          {/* Validatie-banner na AI-import */}
+          {needsValidation && (
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: '10px',
+              padding: '12px 14px',
+              background: 'rgba(255,180,0,0.08)',
+              border: '1px solid rgba(255,180,0,0.4)',
+              borderRadius: '10px',
+            }}>
+              <AlertTriangle size={18} style={{ color: '#ffb400', flexShrink: 0, marginTop: '2px' }} />
+              <div style={{ flex: 1, fontSize: '13px', color: 'rgba(255,255,255,0.85)' }}>
+                <strong style={{ color: '#ffb400' }}>Controle vereist.</strong> De waarden zijn automatisch ingelezen.
+                Loop alle tredes na (tijd, lactaat, hartslag, afstand) en pas aan waar nodig vóór de berekening.
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setNeedsValidation(false)}
+                style={{ color: '#ffb400', height: '28px' }}
+              >
+                <Check className="h-4 w-4 mr-1" /> Gecontroleerd
+              </Button>
+            </div>
+          )}
 
           {/* Rustlactaat */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -396,8 +513,18 @@ const DataInputTab = ({
           <Button variant="secondary" size="sm" onClick={addRow} className="w-full">
             <Plus className="h-4 w-4 mr-1" /> {t('data.addStep')}
           </Button>
-          <Button className="w-full" onClick={onCalculate} style={{ background: 'linear-gradient(135deg, #6644ff, #8866ff)', border: 'none' }}>
-            {t('data.calculate')}
+          <Button
+            className="w-full"
+            onClick={onCalculate}
+            disabled={needsValidation}
+            style={{
+              background: needsValidation
+                ? 'rgba(255,255,255,0.08)'
+                : 'linear-gradient(135deg, #6644ff, #8866ff)',
+              border: 'none',
+            }}
+          >
+            {needsValidation ? 'Bevestig eerst de ingelezen waarden' : t('data.calculate')}
           </Button>
         </CardContent>
       </Card>
