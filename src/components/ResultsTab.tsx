@@ -221,80 +221,78 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-      <div ref={resultsRef} style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '2px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div ref={resultsRef} style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '2px' }}>
 
       {/* Threshold hero cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         {/* LT1 */}
         <div style={{
           background: 'rgba(0,229,122,0.05)', border: '1px solid rgba(0,229,122,0.25)',
-          borderRadius: '18px', padding: '18px 14px', textAlign: 'center',
+          borderRadius: '14px', padding: '10px 12px',
+          display: 'flex', alignItems: 'center', gap: '12px',
           position: 'relative', overflow: 'hidden',
         }}>
-          <div style={{
-            position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)',
-            width: '100px', height: '100px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0,229,122,0.15) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
-          <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#00e57a', marginBottom: '12px' }}>
-            {t('results.aerobicThreshold')}
-          </p>
-          <p style={{ fontSize: '40px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '4px' }}>{formatPace(lt1.best)}</p>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', marginBottom: '12px' }}>/km</p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', color: '#00e57a', margin: 0, marginBottom: '2px' }}>
+              {t('results.aerobicThreshold')}
+            </p>
+            <p style={{ fontSize: '34px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {formatPace(lt1.best)}<span style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', marginLeft: '4px' }}>/km</span>
+            </p>
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
             {lt1HR > 0 && (
-              <span style={{ fontSize: '13px', fontWeight: 700, color: '#00e57a', background: 'rgba(0,229,122,0.15)', padding: '4px 10px', borderRadius: '6px' }}>{lt1HR} bpm</span>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#00e57a', background: 'rgba(0,229,122,0.15)', padding: '3px 8px', borderRadius: '5px' }}>{lt1HR} bpm</span>
             )}
-            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: '6px' }}>{lt1Lac} mmol/L</span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{lt1Lac} mmol/L</span>
           </div>
         </div>
 
         {/* LT2 */}
         <div style={{
           background: 'rgba(255,107,43,0.05)', border: '1px solid rgba(255,107,43,0.25)',
-          borderRadius: '18px', padding: '18px 14px', textAlign: 'center',
+          borderRadius: '14px', padding: '10px 12px',
+          display: 'flex', alignItems: 'center', gap: '12px',
           position: 'relative', overflow: 'hidden',
         }}>
-          <div style={{
-            position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)',
-            width: '100px', height: '100px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,107,43,0.15) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
-          <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#ff6b2b', marginBottom: '12px' }}>
-            {t('results.anaerobicThreshold')}
-          </p>
-          <p style={{ fontSize: '40px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '4px' }}>{formatPace(lt2.best)}</p>
-          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)', marginBottom: '12px' }}>/km</p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', color: '#ff6b2b', margin: 0, marginBottom: '2px' }}>
+              {t('results.anaerobicThreshold')}
+            </p>
+            <p style={{ fontSize: '34px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
+              {formatPace(lt2.best)}<span style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', marginLeft: '4px' }}>/km</span>
+            </p>
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
             {lt2HR > 0 && (
-              <span style={{ fontSize: '13px', fontWeight: 700, color: '#ff6b2b', background: 'rgba(255,107,43,0.15)', padding: '4px 10px', borderRadius: '6px' }}>{lt2HR} bpm</span>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#ff6b2b', background: 'rgba(255,107,43,0.15)', padding: '3px 8px', borderRadius: '5px' }}>{lt2HR} bpm</span>
             )}
-            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: '6px' }}>{lt2Lac} mmol/L</span>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{lt2Lac} mmol/L</span>
           </div>
         </div>
       </div>
 
       {/* Lactate curve */}
-      <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '16px' }}>
-        <p style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: '12px' }}>
+      <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '8px 10px' }}>
+        <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: '4px', marginTop: 0 }}>
           {t('results.lactateCurve')}
         </p>
-        <LactateChart results={results} />
+        <div style={{ height: '180px' }}>
+          <LactateChart results={results} />
+        </div>
       </div>
 
       {/* Zone bar */}
-      <div style={{ borderRadius: '12px', overflow: 'hidden', height: '36px', display: 'flex', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ borderRadius: '8px', overflow: 'hidden', height: '24px', display: 'flex', border: '1px solid rgba(255,255,255,0.06)' }}>
         {zones.map(z => {
           const width = Math.max(((z.to - z.from) / totalRange) * 100, 5);
           return (
             <div key={z.name} style={{
               width: `${width}%`, background: z.color,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '12px', fontWeight: 800, color: '#fff',
-              textShadow: '0 1px 3px rgba(0,0,0,0.6)', letterSpacing: '0.5px',
+              fontSize: '11px', fontWeight: 800, color: '#fff',
+              textShadow: '0 1px 2px rgba(0,0,0,0.6)', letterSpacing: '0.4px',
             }}>
               {z.name.replace('Zone ', 'Z')}
             </div>
@@ -302,77 +300,51 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
         })}
       </div>
 
-      {/* Zone cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {/* Zone cards — compact one-line rows */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
         {zones.map(z => {
           const hrFrom = interpolateHR(z.from, speeds, hrs);
           const hrTo = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
-          const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
-          const lacTo = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
           const hasHR = hrFrom > 0;
-
-          const metric = (label: string, value: string, accent = false) => (
-            <div style={{
-              background: accent ? `${z.color}14` : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${accent ? `${z.color}40` : 'rgba(255,255,255,0.07)'}`,
-              borderRadius: '10px',
-              padding: '10px 12px',
-              display: 'flex', flexDirection: 'column', gap: '4px',
-              minWidth: 0,
-            }}>
-              <span style={{
-                fontSize: '10px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
-                color: accent ? z.color : 'rgba(255,255,255,0.45)',
-              }}>{label}</span>
-              <span style={{
-                fontSize: '15px', fontWeight: 700, color: '#fff',
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
-              }}>{value}</span>
-            </div>
-          );
 
           return (
             <div key={z.name} style={{
-              background: `linear-gradient(135deg, ${z.color}0d 0%, rgba(255,255,255,0.02) 60%)`,
-              border: '1px solid rgba(255,255,255,0.07)',
+              background: `linear-gradient(90deg, ${z.color}14 0%, rgba(255,255,255,0.02) 70%)`,
+              border: '1px solid rgba(255,255,255,0.06)',
               borderLeft: `3px solid ${z.color}`,
-              borderRadius: '14px',
-              padding: '14px 16px',
-              display: 'flex', flexDirection: 'column', gap: '12px',
+              borderRadius: '8px',
+              padding: '8px 12px',
+              display: 'grid',
+              gridTemplateColumns: 'minmax(140px, 1.2fr) minmax(0, 1fr) minmax(0, 1fr)',
+              alignItems: 'center',
+              gap: '10px',
             }}>
-              {/* Header row */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  background: `${z.color}1f`, padding: '4px 10px', borderRadius: '999px',
-                  border: `1px solid ${z.color}3d`,
-                }}>
-                  <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: z.color }} />
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff', letterSpacing: '0.4px' }}>
-                    {z.name}
-                  </span>
-                </div>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+              {/* Zone label */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: z.color, flexShrink: 0 }} />
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff', letterSpacing: '0.3px' }}>
+                  {z.name.replace('Zone ', 'Z')}
+                </span>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {z.label}
                 </span>
               </div>
 
-              {/* Metrics grid */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${hasHR ? 2 : 1}, minmax(0, 1fr))`,
-                gap: '8px',
-              }}>
-                {metric('Pace /km', `${formatPace(z.to)} – ${formatPace(z.from)}`, true)}
-                {hasHR && metric('Hartslag', `${hrFrom} – ${hrTo} bpm`)}
+              {/* Pace */}
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: z.color, lineHeight: 1 }}>Pace</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#fff', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                  {formatPace(z.to)}–{formatPace(z.from)}
+                </span>
               </div>
 
-              <p style={{
-                fontSize: '12.5px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.55, margin: 0,
-              }} className="hidden sm:block">
-                {z.desc}
-              </p>
+              {/* HR */}
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', lineHeight: 1 }}>HR</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#fff', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                  {hasHR ? `${hrFrom}–${hrTo} bpm` : '—'}
+                </span>
+              </div>
             </div>
           );
         })}
