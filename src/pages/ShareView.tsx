@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from '@/components/LactateChart';
+import Seo from '@/components/Seo';
 
 const ShareView = () => {
   const { token } = useParams<{ token: string }>();
@@ -90,9 +91,14 @@ const ShareView = () => {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0e0e0e', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+      <Seo
+        title={`${athleteName} — Lactate test results`}
+        description={`Shared lactate threshold results for ${athleteName}.`}
+        noindex
+      />
 
       {/* Header */}
-      <div style={{
+      <header style={{
         background: '#131313',
         borderBottom: '1px solid #262626',
         padding: '16px 20px',
@@ -104,9 +110,9 @@ const ShareView = () => {
           <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '2px' }}>
             Testresultaten
           </div>
-          <div style={{ fontSize: '17px', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif', color: '#fff', letterSpacing: '-0.3px' }}>
+          <h1 style={{ fontSize: '17px', fontWeight: 800, fontFamily: 'Space Grotesk, sans-serif', color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>
             {athleteName}
-          </div>
+          </h1>
           {formattedDate && (
             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>{formattedDate}</div>
           )}
@@ -119,9 +125,10 @@ const ShareView = () => {
             Lac<span style={{ color: '#fff' }}>.</span>Test
           </span>
         </a>
-      </div>
+      </header>
 
-      <div style={{ maxWidth: '560px', margin: '0 auto', padding: '20px 16px 48px' }}>
+      <main style={{ maxWidth: '560px', margin: '0 auto', padding: '20px 16px 48px' }}>
+        <h2 className="sr-only">Drempels</h2>
 
         {/* Threshold hero cards */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
@@ -163,7 +170,7 @@ const ShareView = () => {
 
         {/* Lactate curve */}
         <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '16px', marginBottom: '14px' }}>
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '12px' }}>Lactaatcurve</p>
+          <h2 style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '12px', margin: '0 0 12px' }}>Lactaatcurve</h2>
           <LactateChart results={results} />
         </div>
 
