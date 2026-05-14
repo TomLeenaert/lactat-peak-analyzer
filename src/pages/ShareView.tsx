@@ -230,7 +230,7 @@ const ShareView = () => {
           </a>
         </div>
 
-      </div>
+      </main>
     </div>
   );
 };
