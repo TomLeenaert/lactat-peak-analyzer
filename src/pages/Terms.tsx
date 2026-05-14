@@ -86,7 +86,7 @@ const Terms = () => {
           Vragen over deze voorwaarden? Mail naar{' '}
           <a href="mailto:tom@lactest.app" style={{ color: '#6644ff' }}>tom@lactest.app</a>.
         </Section>
-      </div>
+      </main>
     </div>
   );
 };
