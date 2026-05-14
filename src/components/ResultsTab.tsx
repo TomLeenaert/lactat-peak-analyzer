@@ -303,41 +303,75 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       </div>
 
       {/* Zone cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {zones.map(z => {
           const hrFrom = interpolateHR(z.from, speeds, hrs);
           const hrTo = interpolateHR(Math.min(z.to, speeds[speeds.length - 1]), speeds, hrs);
           const lacFrom = Math.max(0, polyEval(coeffs, Math.max(z.from, speeds[0]))).toFixed(1);
           const lacTo = Math.max(0, polyEval(coeffs, Math.min(z.to, speeds[speeds.length - 1]))).toFixed(1);
+          const hasHR = hrFrom > 0;
+
+          const metric = (label: string, value: string, accent = false) => (
+            <div style={{
+              background: accent ? `${z.color}14` : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${accent ? `${z.color}40` : 'rgba(255,255,255,0.07)'}`,
+              borderRadius: '10px',
+              padding: '10px 12px',
+              display: 'flex', flexDirection: 'column', gap: '4px',
+              minWidth: 0,
+            }}>
+              <span style={{
+                fontSize: '10px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
+                color: accent ? z.color : 'rgba(255,255,255,0.45)',
+              }}>{label}</span>
+              <span style={{
+                fontSize: '15px', fontWeight: 700, color: '#fff',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap',
+              }}>{value}</span>
+            </div>
+          );
 
           return (
             <div key={z.name} style={{
-              background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
-              borderLeft: `4px solid ${z.color}`, borderRadius: '12px', padding: '14px 16px',
+              background: `linear-gradient(135deg, ${z.color}0d 0%, rgba(255,255,255,0.02) 60%)`,
+              border: '1px solid rgba(255,255,255,0.07)',
+              borderLeft: `3px solid ${z.color}`,
+              borderRadius: '14px',
+              padding: '14px 16px',
+              display: 'flex', flexDirection: 'column', gap: '12px',
             }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: z.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#fff' }}>{z.name}</span>
-                  </div>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginLeft: '17px' }}>{z.label}</span>
+              {/* Header row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  background: `${z.color}1f`, padding: '4px 10px', borderRadius: '999px',
+                  border: `1px solid ${z.color}3d`,
+                }}>
+                  <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: z.color }} />
+                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff', letterSpacing: '0.4px' }}>
+                    {z.name}
+                  </span>
                 </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontSize: '14px', fontFamily: 'monospace', fontWeight: 700, color: '#fff', marginBottom: '3px' }}>
-                    {formatPace(z.to)} – {formatPace(z.from)} /km
-                  </p>
-                  {hrFrom > 0 && (
-                    <p style={{ fontSize: '13px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.7)', marginBottom: '2px' }}>
-                      {hrFrom} – {hrTo} bpm
-                    </p>
-                  )}
-                  <p style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.5)' }}>
-                    {lacFrom} – {lacTo} mmol/L
-                  </p>
-                </div>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                  {z.label}
+                </span>
               </div>
-              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.55)', marginTop: '10px', lineHeight: 1.5 }} className="hidden sm:block">
+
+              {/* Metrics grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${hasHR ? 3 : 2}, minmax(0, 1fr))`,
+                gap: '8px',
+              }}>
+                {metric('Pace /km', `${formatPace(z.to)} – ${formatPace(z.from)}`, true)}
+                {hasHR && metric('Hartslag', `${hrFrom} – ${hrTo} bpm`)}
+                {metric('Lactaat', `${lacFrom} – ${lacTo} mmol/L`)}
+              </div>
+
+              <p style={{
+                fontSize: '12.5px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.55, margin: 0,
+              }} className="hidden sm:block">
                 {z.desc}
               </p>
             </div>
