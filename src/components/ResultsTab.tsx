@@ -361,12 +361,11 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
               {/* Metrics grid */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: `repeat(${hasHR ? 3 : 2}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${hasHR ? 2 : 1}, minmax(0, 1fr))`,
                 gap: '8px',
               }}>
                 {metric('Pace /km', `${formatPace(z.to)} – ${formatPace(z.from)}`, true)}
                 {hasHR && metric('Hartslag', `${hrFrom} – ${hrTo} bpm`)}
-                {metric('Lactaat', `${lacFrom} – ${lacTo} mmol/L`)}
               </div>
 
               <p style={{
