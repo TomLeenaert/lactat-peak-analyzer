@@ -235,6 +235,7 @@ const Auth = () => {
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                   required
+                  aria-label={lang === 'nl' ? 'Voornaam' : 'First name'}
                   onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
                   onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
@@ -249,6 +250,7 @@ const Auth = () => {
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                   required
+                  aria-label={lang === 'nl' ? 'Achternaam' : 'Last name'}
                   onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
                   onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
@@ -267,6 +269,7 @@ const Auth = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              aria-label="E-mail"
               onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
               onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
             />
@@ -285,6 +288,7 @@ const Auth = () => {
               onChange={e => setPassword(e.target.value)}
               required
               minLength={6}
+              aria-label={lang === 'nl' ? 'Wachtwoord' : 'Password'}
               onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
               onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
             />
