@@ -192,12 +192,16 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       pdf.setDrawColor(60, 60, 80);
       pdf.line(margin, headerH, pageW - margin, headerH);
 
-      // Image of results
+      // Image of results — limited to half page for compact layout with big readable numbers
       const imgW = pageW - margin * 2;
       const imgH = (canvas.height * imgW) / canvas.width;
-      const maxImgH = pageH - headerH - footerH - 8;
-      const finalH = Math.min(imgH, maxImgH);
-      const finalW = (canvas.width * finalH) / canvas.height === imgW ? imgW : (imgH > maxImgH ? (canvas.width * finalH) / canvas.height : imgW);
+      const maxImgH = (pageH / 2) - 4; // half page max
+      let finalW = imgW;
+      let finalH = imgH;
+      if (imgH > maxImgH) {
+        finalH = maxImgH;
+        finalW = (canvas.width * finalH) / canvas.height;
+      }
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', (pageW - finalW) / 2, headerH + 4, finalW, finalH);
 
