@@ -9,6 +9,7 @@ import stepTestImg from '@/assets/step-test.png';
 import stepAnalyzeImg from '@/assets/step-analyze.jpg';
 import stepTrainImg from '@/assets/step-train.png';
 import LandingDemo from '@/components/LandingDemo';
+import Seo from '@/components/Seo';
 
 import { useLang } from '@/contexts/LanguageContext';
 import './Landing.css';
@@ -329,10 +330,16 @@ const Landing = () => {
           </div>
         </div>
       </div>
+      <Seo
+        title="MyLactest — Free lactate threshold analysis for coaches"
+        description="Turn field test data into aerobic and anaerobic thresholds plus 5 training zones in seconds. Free, no lab required."
+        path="/"
+      />
+      <main>
       <section className="lp-hero-wrap" id="how">
         {/* Brand — centered above both columns */}
         <div className="lp-hero-brand">
-          <img src={logoSrc} alt="MyLactest" className="lp-hero-logo" />
+          <img src={logoSrc} alt="MyLactest" className="lp-hero-logo" width={260} height={260} fetchPriority="high" decoding="async" />
           <span className="lp-hero-logo-label">MyLactest</span>
         </div>
 
@@ -500,6 +507,7 @@ const Landing = () => {
           ))}
         </div>
       </section>
+      </main>
 
       <footer className="lp-footer">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
 import { Trash2 } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
+import Seo from '@/components/Seo';
 
 interface StoredThresholdResults {
   lt1Speed?: number;
@@ -138,6 +139,7 @@ const AthleteDetail = () => {
         rightContent={editButton}
       />
 
+      <Seo title={`${athlete?.name ?? 'Athlete'} — MyLactest`} path={`/athlete/${id}`} noindex />
       <main style={{ padding: '24px 24px 120px' }}>
 
         {/* Athlete profile header */}
@@ -302,6 +304,7 @@ const AthleteDetail = () => {
                       <span style={{ color: '#777575', fontSize: '18px' }}>›</span>
                       <button
                         onClick={e => { e.stopPropagation(); if (confirm(t('detail.deleteTest'))) deleteTest.mutate(test.id); }}
+                        aria-label={t('detail.deleteTest')}
                         style={{
                           width: '28px', height: '28px',
                           background: 'rgba(239,68,68,0.07)',
@@ -330,10 +333,10 @@ const AthleteDetail = () => {
             <DialogDescription>{t('detail.editDesc')}</DialogDescription>
           </DialogHeader>
           <form onSubmit={e => { e.preventDefault(); updateAthlete.mutate(editForm); }} className="space-y-4">
-            <Input placeholder={t('dash.namePlaceholder')} value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} required />
-            <Input type="date" value={editForm.birth_date} onChange={e => setEditForm(p => ({ ...p, birth_date: e.target.value }))} />
-            <Input placeholder={t('detail.sport')} value={editForm.sport} onChange={e => setEditForm(p => ({ ...p, sport: e.target.value }))} />
-            <Input placeholder={t('detail.notes')} value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))} />
+            <Input placeholder={t('dash.namePlaceholder')} aria-label={t('dash.namePlaceholder')} value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} required />
+            <Input type="date" aria-label="Geboortedatum" value={editForm.birth_date} onChange={e => setEditForm(p => ({ ...p, birth_date: e.target.value }))} />
+            <Input placeholder={t('detail.sport')} aria-label={t('detail.sport')} value={editForm.sport} onChange={e => setEditForm(p => ({ ...p, sport: e.target.value }))} />
+            <Input placeholder={t('detail.notes')} aria-label={t('detail.notes')} value={editForm.notes} onChange={e => setEditForm(p => ({ ...p, notes: e.target.value }))} />
             <Button type="submit" className="w-full" disabled={updateAthlete.isPending}>{t('common.save')}</Button>
           </form>
         </DialogContent>

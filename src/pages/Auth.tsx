@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/contexts/LanguageContext';
 import { isDisposableEmail } from '@/lib/disposable-emails';
+import Seo from '@/components/Seo';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
@@ -112,7 +113,7 @@ const Auth = () => {
   };
 
   return (
-    <div style={{
+    <main style={{
       minHeight: '100vh',
       background: '#0e0e0e',
       backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)',
@@ -124,6 +125,12 @@ const Auth = () => {
       padding: '24px 20px',
       fontFamily: 'Inter, sans-serif',
     }}>
+      <Seo
+        title={isLogin ? 'Sign in — MyLactest' : 'Create account — MyLactest'}
+        description="Sign in or create your free MyLactest account to analyse lactate threshold tests."
+        path="/auth"
+        noindex
+      />
       <div style={{ width: '100%', maxWidth: '360px' }}>
 
         {/* Back button */}
@@ -228,6 +235,7 @@ const Auth = () => {
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                   required
+                  aria-label={lang === 'nl' ? 'Voornaam' : 'First name'}
                   onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
                   onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
@@ -242,6 +250,7 @@ const Auth = () => {
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                   required
+                  aria-label={lang === 'nl' ? 'Achternaam' : 'Last name'}
                   onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
                   onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
@@ -260,6 +269,7 @@ const Auth = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              aria-label="E-mail"
               onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
               onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
             />
@@ -278,6 +288,7 @@ const Auth = () => {
               onChange={e => setPassword(e.target.value)}
               required
               minLength={6}
+              aria-label={lang === 'nl' ? 'Wachtwoord' : 'Password'}
               onFocus={e => { e.currentTarget.style.border = '1px solid #bd9dff'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(189,157,255,0.15)'; }}
               onBlur={e => { e.currentTarget.style.border = '1px solid #262626'; e.currentTarget.style.boxShadow = 'none'; }}
             />
@@ -409,7 +420,7 @@ const Auth = () => {
         </div>
 
       </div>
-    </div>
+    </main>
   );
 };
 

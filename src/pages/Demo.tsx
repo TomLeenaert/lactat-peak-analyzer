@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ResultsTab from '@/components/ResultsTab';
 import ZonesTab from '@/components/ZonesTab';
 import { DEMO_RESULTS, DEMO_STEPS } from '@/lib/demo-data';
+import Seo from '@/components/Seo';
 
 // ── types ────────────────────────────────────────────────────────────────────
 type Step = 0 | 1 | 2 | 3;
@@ -270,7 +271,12 @@ const Demo = () => {
         </div>
       </nav>
 
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '48px 24px 80px' }}>
+      <Seo
+        title="Live demo — see MyLactest in action"
+        description="Walk through the full MyLactest flow — from athlete setup to threshold analysis — with sample data, no login."
+        path="/demo"
+      />
+      <main style={{ maxWidth: '860px', margin: '0 auto', padding: '48px 24px 80px' }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
@@ -352,11 +358,18 @@ const Demo = () => {
           {/* Progress dots */}
           <div style={{ display: 'flex', gap: '8px' }}>
             {STEPS_META.map((_, i) => (
-              <div key={i} onClick={() => setStep(i as Step)} style={{
-                width: step === i ? '24px' : '8px', height: '8px', borderRadius: '4px',
-                background: step === i ? '#6644ff' : step > i ? 'rgba(102,68,255,0.5)' : 'rgba(255,255,255,0.15)',
-                transition: 'all .3s', cursor: 'pointer',
-              }} />
+              <button
+                key={i}
+                type="button"
+                onClick={() => setStep(i as Step)}
+                aria-label={`Stap ${i + 1}`}
+                aria-current={step === i ? 'step' : undefined}
+                style={{
+                  width: step === i ? '24px' : '8px', height: '8px', borderRadius: '4px',
+                  background: step === i ? '#6644ff' : step > i ? 'rgba(102,68,255,0.5)' : 'rgba(255,255,255,0.15)',
+                  transition: 'all .3s', cursor: 'pointer', border: 'none', padding: 0,
+                }}
+              />
             ))}
           </div>
 
@@ -385,7 +398,7 @@ const Demo = () => {
           )}
         </div>
 
-      </div>
+      </main>
     </div>
   );
 };

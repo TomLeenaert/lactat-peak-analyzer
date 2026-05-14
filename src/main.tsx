@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
@@ -30,7 +31,11 @@ const renderStartupError = () => {
 
 import("./App.tsx")
   .then(({ default: App }) => {
-    root.render(<App />);
+    root.render(
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    );
   })
   .catch((error) => {
     console.error("[Startup Error]", error);

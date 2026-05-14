@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Seo from '@/components/Seo';
 
 const Privacy = () => {
   const navigate = useNavigate();
@@ -21,7 +22,12 @@ const Privacy = () => {
         }}>← Terug</button>
       </nav>
 
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '60px 24px 80px' }}>
+      <Seo
+        title="Privacy Policy — MyLactest"
+        description="How MyLactest stores and protects your account and lactate test data."
+        path="/privacy"
+      />
+      <main style={{ maxWidth: '720px', margin: '0 auto', padding: '60px 24px 80px' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '8px' }}>Privacybeleid</h1>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', marginBottom: '48px' }}>
           Laatst bijgewerkt: {new Date().toLocaleDateString('nl-BE', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -101,7 +107,7 @@ const Privacy = () => {
             gegevensbeschermingsautoriteit.be
           </a>.
         </Section>
-      </div>
+      </main>
     </div>
   );
 };

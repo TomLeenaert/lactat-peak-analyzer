@@ -13,6 +13,7 @@ import { type ProtocolSettings, DEFAULT_PROTOCOL } from '@/lib/protocol-types';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
+import Seo from '@/components/Seo';
 
 const AthleteTest = () => {
   const { id: athleteId, testId } = useParams<{ id: string; testId?: string }>();
@@ -138,6 +139,7 @@ const AthleteTest = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo title={`${testId ? t('test.viewTest') : t('test.newTest')} — MyLactest`} path={`/athlete/${athleteId}/test`} noindex />
       <AppNav
         backTo={`/athlete/${athleteId}`}
         backLabel={t('test.allAthletes')}
@@ -146,6 +148,7 @@ const AthleteTest = () => {
       />
 
       <main className="w-full px-2 py-2 pb-6">
+        <h1 className="sr-only">{`${testId ? t('test.viewTest') : t('test.newTest')}${athlete?.name ? ` — ${athlete.name}` : ''}`}</h1>
         <StepNav activeTab={activeTab} onTabChange={setActiveTab} hasResults={!!results} />
 
         {(activeTab === 'data' || activeTab === 'protocol') && (

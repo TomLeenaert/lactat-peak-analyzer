@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppNav from '@/components/AppNav';
 import logoSrc from '@/assets/screen.png';
 import { useLang } from '@/contexts/LanguageContext';
+import Seo from '@/components/Seo';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Unexpected error';
 
@@ -94,7 +95,7 @@ const Dashboard = () => {
 
   const navRight = editingClub ? (
     <form onSubmit={e => { e.preventDefault(); updateClubName.mutate(clubNameInput); setEditingClub(false); }} style={{ display: 'flex', gap: '8px' }}>
-      <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} style={{ height: '28px', width: '140px', fontSize: '13px' }} placeholder={t('dash.clubName')} />
+      <Input value={clubNameInput} onChange={e => setClubNameInput(e.target.value)} style={{ height: '28px', width: '140px', fontSize: '13px' }} placeholder={t('dash.clubName')} aria-label={t('dash.clubName')} />
       <Button type="submit" size="sm" variant="outline" style={{ height: '28px', fontSize: '12px' }}>{t('common.save')}</Button>
     </form>
   ) : (
@@ -118,6 +119,7 @@ const Dashboard = () => {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0e0e0e' }}>
+      <Seo title="Dashboard — MyLactest" path="/dashboard" noindex />
       <AppNav rightContent={navRight} />
 
       <main style={{ padding: '24px 24px 120px' }}>
@@ -130,13 +132,13 @@ const Dashboard = () => {
           }}>
             {t('dash.status')}
           </span>
-          <h2 style={{
+          <h1 style={{
             fontFamily: 'Space Grotesk, sans-serif', fontSize: '48px', fontWeight: 900,
             letterSpacing: '-2px', lineHeight: 1, color: '#fff',
             margin: '0 0 20px', textTransform: 'uppercase',
           }}>
             {t('dash.athletes').toUpperCase()}
-          </h2>
+          </h1>
 
           <button
             onClick={() => setDialogOpen(true)}
@@ -229,6 +231,7 @@ const Dashboard = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <button
                         onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: a.id, name: a.name, testCount }); }}
+                        aria-label={`Verwijder ${a.name}`}
                         style={{
                           background: 'rgba(255,60,60,0.1)', border: '1px solid rgba(255,60,60,0.2)',
                           borderRadius: '4px', padding: '6px 8px', cursor: 'pointer',
@@ -287,6 +290,7 @@ const Dashboard = () => {
           <form onSubmit={e => { e.preventDefault(); addAthlete.mutate(newAthlete); }} className="space-y-4">
             <Input
               placeholder={t('dash.namePlaceholder')}
+              aria-label={t('dash.namePlaceholder')}
               value={newAthlete.name}
               onChange={e => setNewAthlete(p => ({ ...p, name: e.target.value }))}
               required
