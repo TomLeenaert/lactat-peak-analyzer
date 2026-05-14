@@ -358,11 +358,18 @@ const Demo = () => {
           {/* Progress dots */}
           <div style={{ display: 'flex', gap: '8px' }}>
             {STEPS_META.map((_, i) => (
-              <div key={i} onClick={() => setStep(i as Step)} style={{
-                width: step === i ? '24px' : '8px', height: '8px', borderRadius: '4px',
-                background: step === i ? '#6644ff' : step > i ? 'rgba(102,68,255,0.5)' : 'rgba(255,255,255,0.15)',
-                transition: 'all .3s', cursor: 'pointer',
-              }} />
+              <button
+                key={i}
+                type="button"
+                onClick={() => setStep(i as Step)}
+                aria-label={`Stap ${i + 1}`}
+                aria-current={step === i ? 'step' : undefined}
+                style={{
+                  width: step === i ? '24px' : '8px', height: '8px', borderRadius: '4px',
+                  background: step === i ? '#6644ff' : step > i ? 'rgba(102,68,255,0.5)' : 'rgba(255,255,255,0.15)',
+                  transition: 'all .3s', cursor: 'pointer', border: 'none', padding: 0,
+                }}
+              />
             ))}
           </div>
 
@@ -391,7 +398,7 @@ const Demo = () => {
           )}
         </div>
 
-      </div>
+      </main>
     </div>
   );
 };
