@@ -174,6 +174,7 @@ const ShareView = () => {
           <LactateChart results={results} />
         </div>
 
+        <h2 className="sr-only">Trainingszones</h2>
         {/* Zone bar */}
         <div style={{ borderRadius: '8px', overflow: 'hidden', height: '28px', display: 'flex', border: '1px solid rgba(255,255,255,0.06)', marginBottom: '10px' }}>
           {zones.map(z => {
