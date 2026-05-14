@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ResultsTab from '@/components/ResultsTab';
 import ZonesTab from '@/components/ZonesTab';
 import { DEMO_RESULTS, DEMO_STEPS } from '@/lib/demo-data';
+import Seo from '@/components/Seo';
 
 // ── types ────────────────────────────────────────────────────────────────────
 type Step = 0 | 1 | 2 | 3;
@@ -270,7 +271,12 @@ const Demo = () => {
         </div>
       </nav>
 
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '48px 24px 80px' }}>
+      <Seo
+        title="Live demo — see MyLactest in action"
+        description="Walk through the full MyLactest flow — from athlete setup to threshold analysis — with sample data, no login."
+        path="/demo"
+      />
+      <main style={{ maxWidth: '860px', margin: '0 auto', padding: '48px 24px 80px' }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
