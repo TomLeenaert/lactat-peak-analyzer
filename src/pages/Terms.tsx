@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Seo from '@/components/Seo';
 
 const Terms = () => {
   const navigate = useNavigate();
@@ -21,7 +22,12 @@ const Terms = () => {
         }}>← Terug</button>
       </nav>
 
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '60px 24px 80px' }}>
+      <Seo
+        title="Terms of Service — MyLactest"
+        description="Terms governing the use of MyLactest's free lactate threshold analysis service."
+        path="/terms"
+      />
+      <main style={{ maxWidth: '720px', margin: '0 auto', padding: '60px 24px 80px' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '8px' }}>Gebruiksvoorwaarden</h1>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', marginBottom: '48px' }}>
           Laatst bijgewerkt: {new Date().toLocaleDateString('nl-BE', { year: 'numeric', month: 'long', day: 'numeric' })}
