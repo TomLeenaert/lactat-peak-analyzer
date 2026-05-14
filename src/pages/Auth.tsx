@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/contexts/LanguageContext';
 import { isDisposableEmail } from '@/lib/disposable-emails';
+import Seo from '@/components/Seo';
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : 'Er is een onverwachte fout opgetreden.';
 
@@ -112,7 +113,7 @@ const Auth = () => {
   };
 
   return (
-    <div style={{
+    <main style={{
       minHeight: '100vh',
       background: '#0e0e0e',
       backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)',
@@ -124,6 +125,12 @@ const Auth = () => {
       padding: '24px 20px',
       fontFamily: 'Inter, sans-serif',
     }}>
+      <Seo
+        title={isLogin ? 'Sign in — MyLactest' : 'Create account — MyLactest'}
+        description="Sign in or create your free MyLactest account to analyse lactate threshold tests."
+        path="/auth"
+        noindex
+      />
       <div style={{ width: '100%', maxWidth: '360px' }}>
 
         {/* Back button */}
