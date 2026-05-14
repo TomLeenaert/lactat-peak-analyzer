@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
