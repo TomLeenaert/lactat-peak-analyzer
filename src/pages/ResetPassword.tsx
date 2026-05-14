@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import Seo from '@/components/Seo';
 
@@ -47,9 +47,7 @@ const ResetPassword = () => {
         <Seo title="Reset password — MyLactest" path="/reset-password" noindex />
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle asChild>
-              <h1>Wachtwoord resetten</h1>
-            </CardTitle>
+            <h1 className="text-2xl font-semibold leading-none tracking-tight">Wachtwoord resetten</h1>
             <CardDescription>Ongeldige of verlopen link. Vraag een nieuwe reset link aan.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -65,9 +63,7 @@ const ResetPassword = () => {
       <Seo title="Set new password — MyLactest" path="/reset-password" noindex />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle asChild>
-            <h1>Nieuw wachtwoord instellen</h1>
-          </CardTitle>
+          <h1 className="text-2xl font-semibold leading-none tracking-tight">Nieuw wachtwoord instellen</h1>
           <CardDescription>Kies een nieuw wachtwoord voor je account.</CardDescription>
         </CardHeader>
         <CardContent>
