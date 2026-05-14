@@ -225,8 +225,8 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      <div ref={resultsRef} style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '2px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxWidth: '760px', margin: '0 auto', width: '100%' }}>
+      <div ref={resultsRef} style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '4px' }}>
 
       {/* Threshold hero cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
