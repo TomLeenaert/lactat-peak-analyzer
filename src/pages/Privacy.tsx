@@ -107,7 +107,7 @@ const Privacy = () => {
             gegevensbeschermingsautoriteit.be
           </a>.
         </Section>
-      </div>
+      </main>
     </div>
   );
 };
