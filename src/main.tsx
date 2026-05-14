@@ -31,7 +31,11 @@ const renderStartupError = () => {
 
 import("./App.tsx")
   .then(({ default: App }) => {
-    root.render(<App />);
+    root.render(
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    );
   })
   .catch((error) => {
     console.error("[Startup Error]", error);
