@@ -282,9 +282,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
         <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.4px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', marginBottom: '8px', marginTop: 0 }}>
           {t('results.lactateCurve')}
         </p>
-        <div style={{ height: '240px' }}>
-          <LactateChart results={results} />
-        </div>
+        <LactateChart results={results} />
       </div>
 
       {/* Zone bar */}
