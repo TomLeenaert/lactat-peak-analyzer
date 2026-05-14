@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import Seo from '@/components/Seo';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -42,25 +43,31 @@ const ResetPassword = () => {
 
   if (!ready) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <main className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Seo title="Reset password — MyLactest" path="/reset-password" noindex />
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle>Wachtwoord resetten</CardTitle>
+            <CardTitle asChild>
+              <h1>Wachtwoord resetten</h1>
+            </CardTitle>
             <CardDescription>Ongeldige of verlopen link. Vraag een nieuwe reset link aan.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate('/auth')} className="w-full">Naar inlogpagina</Button>
           </CardContent>
         </Card>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <main className="min-h-screen bg-background flex items-center justify-center px-4">
+      <Seo title="Set new password — MyLactest" path="/reset-password" noindex />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle>Nieuw wachtwoord instellen</CardTitle>
+          <CardTitle asChild>
+            <h1>Nieuw wachtwoord instellen</h1>
+          </CardTitle>
           <CardDescription>Kies een nieuw wachtwoord voor je account.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -68,6 +75,7 @@ const ResetPassword = () => {
             <Input
               type="password"
               placeholder="Nieuw wachtwoord"
+              aria-label="Nieuw wachtwoord"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -79,7 +87,7 @@ const ResetPassword = () => {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 };
 
