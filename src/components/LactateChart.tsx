@@ -48,7 +48,7 @@ const LactateChart = ({ results }: LactateChartProps) => {
 
   return (
     <div className="w-full">
-      <div className="w-full h-[280px] sm:h-[380px] md:h-[450px]">
+      <div className="w-full h-[260px] sm:h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart margin={{ top: 20, right: 40, bottom: 45, left: 10 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
