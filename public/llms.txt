@@ -1,0 +1,17 @@
+# MyLactest
+
+> Free lactate threshold analysis for coaches and endurance athletes. Turn field test data into aerobic and anaerobic thresholds plus 5 training zones in seconds.
+
+MyLactest is a web app that calculates lactate thresholds (LT1/AeT and LT2/AnT) from a running, cycling or rowing step test. It produces a full lactate curve, training zones for pace and heart rate, and a coach-ready report — all on a phone, at the track, with no lab required. The service is completely free.
+
+## Pages
+
+- [Home](/): Product overview, how it works, and feature comparison.
+- [Demo](/demo): Interactive walkthrough of the full flow with sample data — no login.
+- [Sign in / Register](/auth): Free account creation and login.
+- [Privacy](/privacy): How user data is stored and protected.
+- [Terms](/terms): Terms of service.
+
+## Optional
+
+- [Reset password](/reset-password): Password reset confirmation page.
