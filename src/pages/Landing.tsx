@@ -302,21 +302,22 @@ const Landing = () => {
             className="lp-btn-login"
             onClick={() => navigate('/auth')}
             style={{
-              background: 'none',
-              border: '1px solid rgba(255,255,255,0.15)',
-              color: 'rgba(255,255,255,0.7)',
-              padding: '6px 16px',
-              borderRadius: '6px',
-              fontSize: '13px',
-              fontWeight: 600,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1.5px solid rgba(255,255,255,0.25)',
+              color: '#fff',
+              padding: '12px 28px',
+              borderRadius: '10px',
+              fontSize: '16px',
+              fontWeight: 700,
               cursor: 'pointer',
               fontFamily: 'Inter, sans-serif',
               transition: 'all 0.15s',
+              letterSpacing: '0.01em',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'rgba(255,255,255,0.09)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
           >
-            Inloggen
+            Log in →
           </button>
         </div>
         <button className="lp-hamburger" onClick={() => setMobileMenuOpen(true)} aria-label="Menu">
