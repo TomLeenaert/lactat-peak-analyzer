@@ -286,10 +286,8 @@ const Landing = () => {
           <img src={logoSrc} alt="MyLactest" style={{ width: '34px', height: '34px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
           MyLactest
         </a>
-        <div className="lp-nav-links">
-          <a className="lp-nav-link" href="#how-it-works">{t.navHow}</a>
-          <a className="lp-nav-link" href="#features">{t.navFeat}</a>
-        </div>
+        <div className="lp-nav-links" />
+
         <div className="lp-nav-right">
           <button
             className="lp-btn-lang"
@@ -332,8 +330,6 @@ const Landing = () => {
             <X size={24} />
           </button>
           <div className="lp-mobile-menu-links">
-            <a href="#how-it-works" onClick={closeMobileMenu}>{t.navHow}</a>
-            <a href="#features" onClick={closeMobileMenu}>{t.navFeat}</a>
             <button
               className="lp-btn-lang"
               onClick={() => { setLang(lang === 'nl' ? 'en' : 'nl'); closeMobileMenu(); }}
