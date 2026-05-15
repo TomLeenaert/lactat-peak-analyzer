@@ -30,8 +30,8 @@ const ShareView = () => {
 
       // Log a public view event (non-blocking)
       (supabase.rpc as any)('log_event', {
-        p_event_type: 'share_link_view',
-        p_metadata: { test_id: (share as any).test_result_id },
+        _event_type: 'share_link_view',
+        _metadata: { test_id: (share as any).test_result_id },
       }).then(() => {}).catch(() => {});
 
       return {
