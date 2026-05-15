@@ -27,7 +27,8 @@ const COPY = {
     cmdLabel: 'start',
     cmdText: 'mylactest.app → analyseer → resultaten',
     cta1: 'Start gratis →',
-    cta2: 'Bekijk demo',
+    cta2: 'Snelle rondleiding',
+    cta3: 'Open demo-account',
     featKicker: 'Wat is inbegrepen',
     featTitleA: 'Alles om slimmer te coachen.',
     featTitleB: 'Sneller. Wetenschappelijk.',
@@ -91,7 +92,8 @@ const COPY = {
     cmdLabel: 'start',
     cmdText: 'mylactest.app → analyse → results',
     cta1: 'Start free →',
-    cta2: 'View demo',
+    cta2: 'Quick tour',
+    cta3: 'Open demo account',
     featKicker: "What's included",
     featTitleA: 'Everything you need to coach smarter.',
     featTitleB: 'Faster. Scientifically.',
@@ -359,6 +361,14 @@ const Landing = () => {
               <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
               <button
                 className="lp-hero-cta-secondary"
+                onClick={() => {
+                  document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
+                {t.cta2} →
+              </button>
+              <button
+                className="lp-hero-cta-secondary"
                 onClick={async () => {
                   try {
                     const { error } = await supabase.auth.signInWithPassword({
@@ -371,8 +381,9 @@ const Landing = () => {
                     toast({ title: 'Error', description: err instanceof Error ? err.message : 'Fout', variant: 'destructive' });
                   }
                 }}
+                style={{ background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)', color: '#fff', borderColor: 'transparent' }}
               >
-                {t.cta2} →
+                {t.cta3} →
               </button>
             </div>
           </div>
