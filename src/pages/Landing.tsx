@@ -104,7 +104,7 @@ const COPY = {
     cta3: 'Open demo account',
     cardDemoTitle: 'Show me',
     cardDemoDesc: 'Open the demo account with 5 real athletes and test data. No signup.',
-    cardDemoCta: 'Open demo account →',
+    cardDemoCta: 'Open the demo account →',
     cardSignupTitle: 'I have a test to analyse',
     cardSignupDesc: 'Create a free account and upload your own test data.',
     cardSignupCta: 'Register free →',
