@@ -88,7 +88,7 @@ const COPY = {
     eyebrow: 'Free · No credit card needed',
     heroTitleA: 'Know your thresholds.',
     heroTitleB: 'Train with data.',
-    heroDesc: 'MyLactest turns your field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
+    heroDesc: 'MyLactest turns your running field test data into a full analysis report with aerobic and anaerobic threshold and 5 training zones.',
     cmdLabel: 'start',
     cmdText: 'mylactest.app → analyse → results',
     cta1: 'Start free →',
