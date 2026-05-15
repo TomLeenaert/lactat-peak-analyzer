@@ -25,7 +25,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const trackEvent = (event_type: string, metadata: Record<string, unknown> = {}) => {
-    (supabase.rpc as any)('log_event', { p_event_type: event_type, p_metadata: { ...metadata, test_id: testId ?? null } })
+    (supabase.rpc as any)('log_event', { _event_type: event_type, _metadata: { ...metadata, test_id: testId ?? null } })
       .then(() => {})
       .catch(() => {});
   };
