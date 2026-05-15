@@ -366,10 +366,6 @@ const Landing = () => {
               <em>{t.heroTitleB}</em>
             </h1>
             <p className="lp-hero-desc">{t.heroDesc}</p>
-            <div className="lp-hero-eyebrow">
-              <span className="lp-hero-eyebrow-dot" />
-              <span>{t.eyebrow}</span>
-            </div>
 <div className="lp-hero-cards">
               <button
                 type="button"
