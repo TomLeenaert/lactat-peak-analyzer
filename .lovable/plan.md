@@ -1,42 +1,39 @@
-## Doel
-LT1 (aerobe drempel) realistischer maken zodat hij niet onnaturlijk laag uitvalt door een te lage baseline of uitschieter, en de coach waarschuwen wanneer de afstand tussen LT1 en LT2 atypisch is.
+## Probleem
 
-## Wijzigingen in `src/lib/lactate-math.ts`
+LinkedIn (en andere social platforms) toont een oude preview omdat:
+1. Er geen `og:image` is gedefinieerd in `index.html` — social platforms vallen dan terug op een eerder gescrapete afbeelding.
+2. LinkedIn cachet previews agressief (~7 dagen) per URL.
 
-### 1. Baseline-floor van 1.5 mmol/L voor Baseline+0.5
-In de hoofdfunctie `calculate(...)`, daar waar nu `lt1_bsln` berekend wordt (regel ~487):
+## Oplossing
 
-- Nieuwe afgeleide waarde introduceren: `baselineLac = Math.max(restLac, 1.5)`.
-- LT1 baseline-methode wordt: `findSpeedAtLactateOrNull(coeffs, baselineLac + 0.5, xMin, xMax)`.
-- `restLac` zelf laten we ongemoeid (blijft de gerapporteerde rustlactaat); enkel de drempel-berekening krijgt de floor.
-- Als de floor effectief werd toegepast (`restLac < 1.5`), een `info`-warning toevoegen:
-  > "Gedetecteerde baseline (X.X mmol/L) lag onder 1.5 — een ondergrens van 1.5 mmol/L is gebruikt voor de Aerobic Threshold om vertekening door een te lage eerste trede te vermijden."
+### 1. OG-image genereren (1200×630)
+Een nieuwe afbeelding die past bij het huidige hero-scherm:
+- Donkere achtergrond (`#0c0d11`)
+- MyLactest bloeddruppel-logo gecentreerd
+- Witte titel "MyLactest"
+- Subtitel in paars accent: "Ken je drempels. Train met data."
+- Klein "Gratis · Geen creditcard nodig" pill onderaan
 
-Hiervoor breiden we het `CalcWarning.code` union uit met een nieuwe code `BASELINE_FLOORED`.
+Opgeslagen als `public/og-image.jpg` (JPG voor kleinere bestandsgrootte, <300KB aanbevolen door LinkedIn).
 
-### 2. Cross-check pace-verschil LT1 ↔ LT2
-Na het berekenen van `lt1_best` en `lt2_best`, het verschil in pace per km berekenen:
-
-```text
-pace1 = 60 / lt1_best   (min/km)
-pace2 = 60 / lt2_best
-deltaSecPerKm = (pace1 - pace2) * 60
+### 2. Meta tags uitbreiden in `index.html`
+Toevoegen:
+```html
+<meta property="og:image" content="https://mylactest.com/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="MyLactest — Ken je drempels. Train met data." />
+<meta property="og:url" content="https://mylactest.com/" />
+<meta name="twitter:image" content="https://mylactest.com/og-image.jpg" />
 ```
 
-Indien `deltaSecPerKm > 60` (en beide snelheden > 0): warning toevoegen met nieuwe code `LT_GAP_LARGE`:
-> "Ongewoon groot verschil tussen drempels (Δ ≈ Xs/km). Controleer of de Aerobic Threshold niet kunstmatig laag is door een uitschieter in de beginpunten."
+### 3. Cache vernieuwen na publish
+Belangrijk om te weten: na publiceren moet je LinkedIn's cache forceren te verversen, anders blijft de oude preview komen ondanks de nieuwe meta tags. Dit doe je via:
+- **LinkedIn Post Inspector**: https://www.linkedin.com/post-inspector/ → URL plakken → "Inspect" — dit dwingt LinkedIn een nieuwe scrape.
+- Hetzelfde voor Facebook (Sharing Debugger) en Twitter/X (Card Validator) als je daar ook deelt.
 
-Typische waarden 30–45 s/km worden niet gemeld; >60 s/km wel.
+## Technische details
 
-### 3. Typing
-`CalcWarning['code']` uitbreiden met `'BASELINE_FLOORED' | 'LT_GAP_LARGE'`. Alle bestaande consumers iterëren simpelweg over warnings en tonen `message` — geen UI-aanpassingen nodig (warnings verschijnen automatisch in de bestaande warnings-lijst in AnalyzeTab/ResultsTab).
-
-## Niet aanpassen
-- Geen wijzigingen in de berekening van LT2 / Modified Dmax.
-- Geen wijzigingen in UI-componenten, zones, of de chatbot — de nieuwe warnings vloeien door de bestaande `results.warnings` pipeline.
-- `restLac` veld in resultaten blijft de werkelijke gemeten/ingevoerde waarde (voor transparantie in rapport).
-
-## Verificatie
-- Bestaande testcase `test-lactate.js` runnen om regressie te checken.
-- Snelle sanity: dataset met restLac = 1.0 mmol/L → LT1 moet nu op snelheid bij 2.0 mmol/L liggen (1.5 + 0.5) i.p.v. 1.5 mmol/L, en een `BASELINE_FLOORED`-warning verschijnen.
-- Dataset met LT1 = 10 km/h en LT2 = 14 km/h → Δ ≈ 103 s/km → `LT_GAP_LARGE`-warning.
+- De OG-image wordt door `imagegen` gegenereerd (premium quality voor leesbare typografie) op exact 1200×630 en geplaatst in `public/` zodat hij beschikbaar is op `https://mylactest.com/og-image.jpg`.
+- `og:url` wordt expliciet gezet zodat LinkedIn niet rommelt met query-parameters.
+- Geen wijzigingen nodig aan React-routes of backend; dit is puur statische `<head>` + één afbeelding.
