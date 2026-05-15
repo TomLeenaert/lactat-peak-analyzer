@@ -1244,3 +1244,113 @@
 .landing-page {
   overflow-x: hidden;
 }
+
+/* ── Hero CTA cards (Just show me / I have a test) ── */
+.lp-hero-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 28px;
+  width: 100%;
+  max-width: 520px;
+}
+.lp-hero-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto auto;
+  column-gap: 14px;
+  row-gap: 6px;
+  align-items: start;
+  text-align: left;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.09);
+  color: #fff;
+  cursor: pointer;
+  font-family: Inter, sans-serif;
+  transition: border-color .15s, background .15s, transform .15s;
+}
+.lp-hero-card:hover {
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.045);
+  transform: translateY(-1px);
+}
+.lp-hero-card-icon {
+  grid-row: 1;
+  grid-column: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  background: rgba(0,201,167,0.15);
+  color: #00fdc1;
+  border: 1px solid rgba(0,201,167,0.3);
+}
+.lp-hero-card-icon--signup {
+  background: rgba(139,74,255,0.18);
+  color: #c9b1ff;
+  border-color: rgba(139,74,255,0.35);
+}
+.lp-hero-card-title {
+  grid-row: 1;
+  grid-column: 2;
+  align-self: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+}
+.lp-hero-card-desc {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.55);
+}
+.lp-hero-card-cta {
+  grid-row: 3;
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.lp-hero-card-cta--demo { color: #00fdc1; }
+.lp-hero-card-cta--signup { color: #c9b1ff; }
+
+/* ── 60-second tour link ── */
+.lp-hero-tour {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  font-family: Inter, sans-serif;
+  color: rgba(255,255,255,0.55);
+  font-size: 14px;
+}
+.lp-hero-tour-play {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+.lp-hero-tour-prompt { color: rgba(255,255,255,0.55); }
+.lp-hero-tour-link {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.lp-hero-tour:hover .lp-hero-tour-link { color: #00fdc1; }

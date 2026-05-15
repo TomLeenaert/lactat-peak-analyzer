@@ -29,6 +29,14 @@ const COPY = {
     cta1: 'Start gratis →',
     cta2: 'Snelle rondleiding',
     cta3: 'Open demo-account',
+    cardDemoTitle: 'Toon mij gewoon',
+    cardDemoDesc: 'Open een demo-account met 5 echte atleten en testdata. Geen registratie.',
+    cardDemoCta: 'Open demo-account →',
+    cardSignupTitle: 'Ik heb een test om te analyseren',
+    cardSignupDesc: 'Maak gratis een account en upload je eigen testdata.',
+    cardSignupCta: 'Gratis registreren →',
+    tourPrompt: 'Nieuw hier?',
+    tourLink: 'Bekijk de 60-seconden rondleiding',
     featKicker: 'Wat is inbegrepen',
     featTitleA: 'Alles om slimmer te coachen.',
     featTitleB: 'Sneller. Wetenschappelijk.',
@@ -94,6 +102,14 @@ const COPY = {
     cta1: 'Start free →',
     cta2: 'Quick tour',
     cta3: 'Open demo account',
+    cardDemoTitle: 'Just show me',
+    cardDemoDesc: 'Open a demo account with 5 real athletes and test data. No signup.',
+    cardDemoCta: 'Open demo account →',
+    cardSignupTitle: 'I have a test to analyse',
+    cardSignupDesc: 'Create a free account and upload your own test data.',
+    cardSignupCta: 'Register free →',
+    tourPrompt: 'New here?',
+    tourLink: 'Watch the 60-second tour',
     featKicker: "What's included",
     featTitleA: 'Everything you need to coach smarter.',
     featTitleB: 'Faster. Scientifically.',
@@ -286,21 +302,22 @@ const Landing = () => {
             className="lp-btn-login"
             onClick={() => navigate('/auth')}
             style={{
-              background: 'none',
-              border: '1px solid rgba(255,255,255,0.15)',
-              color: 'rgba(255,255,255,0.7)',
-              padding: '6px 16px',
-              borderRadius: '6px',
-              fontSize: '13px',
-              fontWeight: 600,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1.5px solid rgba(255,255,255,0.25)',
+              color: '#fff',
+              padding: '12px 28px',
+              borderRadius: '10px',
+              fontSize: '16px',
+              fontWeight: 700,
               cursor: 'pointer',
               fontFamily: 'Inter, sans-serif',
               transition: 'all 0.15s',
+              letterSpacing: '0.01em',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'rgba(255,255,255,0.09)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
           >
-            Inloggen
+            Log in →
           </button>
         </div>
         <button className="lp-hamburger" onClick={() => setMobileMenuOpen(true)} aria-label="Menu">
@@ -357,18 +374,10 @@ const Landing = () => {
               <span className="lp-hero-eyebrow-dot" />
               <span>{t.eyebrow}</span>
             </div>
-<div className="lp-hero-actions">
-              <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
+<div className="lp-hero-cards">
               <button
-                className="lp-hero-cta-secondary"
-                onClick={() => {
-                  document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-              >
-                {t.cta2} →
-              </button>
-              <button
-                className="lp-hero-cta-secondary"
+                type="button"
+                className="lp-hero-card lp-hero-card--demo"
                 onClick={async () => {
                   try {
                     const { error } = await supabase.auth.signInWithPassword({
@@ -381,11 +390,36 @@ const Landing = () => {
                     toast({ title: 'Error', description: err instanceof Error ? err.message : 'Fout', variant: 'destructive' });
                   }
                 }}
-                style={{ background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)', color: '#fff', borderColor: 'transparent' }}
               >
-                {t.cta3} →
+                <span className="lp-hero-card-icon" aria-hidden>→</span>
+                <span className="lp-hero-card-title">{t.cardDemoTitle}</span>
+                <span className="lp-hero-card-desc">{t.cardDemoDesc}</span>
+                <span className="lp-hero-card-cta lp-hero-card-cta--demo">{t.cardDemoCta}</span>
+              </button>
+
+              <button
+                type="button"
+                className="lp-hero-card lp-hero-card--signup"
+                onClick={() => navigate('/auth')}
+              >
+                <span className="lp-hero-card-icon lp-hero-card-icon--signup" aria-hidden>↑</span>
+                <span className="lp-hero-card-title">{t.cardSignupTitle}</span>
+                <span className="lp-hero-card-desc">{t.cardSignupDesc}</span>
+                <span className="lp-hero-card-cta lp-hero-card-cta--signup">{t.cardSignupCta}</span>
               </button>
             </div>
+
+            <button
+              type="button"
+              className="lp-hero-tour"
+              onClick={() => {
+                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              <span className="lp-hero-tour-play" aria-hidden>▶</span>
+              <span className="lp-hero-tour-prompt">{t.tourPrompt}</span>
+              <span className="lp-hero-tour-link">{t.tourLink}</span>
+            </button>
           </div>
 
           <div className="lp-demo-window" id="demo-live">
