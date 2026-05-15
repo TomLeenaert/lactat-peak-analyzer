@@ -217,9 +217,41 @@ const Admin = () => {
 
         {/* Coaches overview — simple view: name + tests + export status */}
         <div style={{ ...card, marginBottom: '24px' }}>
+          {/* placeholder removed */}
+        </div>
+
+        {/* Coaches funnel summary */}
+        {data?.coaches_overview && data.coaches_overview.length > 0 && (() => {
+          const stages: FunnelStage[] = ['signed_up','created_athlete','started_test','calculated','shared'];
+          const counts = stages.map(s => ({ s, n: data.coaches_overview.filter(c => stageOf(c) === s).length }));
+          const total = data.coaches_overview.length;
+          return (
+            <div style={{ ...card, marginBottom: '14px' }}>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 600, marginBottom: '10px' }}>
+                Activatie-trechter — {total} coaches
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${stages.length}, 1fr)`, gap: '8px' }}>
+                {counts.map(({ s, n }) => {
+                  const meta = STAGE_META[s];
+                  const pct = total ? Math.round((n / total) * 100) : 0;
+                  return (
+                    <div key={s} style={{ background: meta.bg, border: `1px solid ${meta.color}33`, borderRadius: '10px', padding: '10px 12px' }}>
+                      <div style={{ fontSize: '11px', color: meta.color, fontWeight: 700, marginBottom: '4px' }}>{meta.label}</div>
+                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{n}</div>
+                      <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>{pct}%</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Coaches: per-coach activity breakdown */}
+        <div style={{ ...card, marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
-              Coaches — testen & export
+              Coaches — wat hebben ze gedaan?
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
@@ -228,20 +260,19 @@ const Admin = () => {
               <button
                 onClick={() => {
                   const rows = data?.coaches_overview ?? [];
-                  const header = ['Naam', 'Email', 'Club', 'Testen', 'Exports', 'Laatste export'];
+                  const header = ['Naam','Email','Club','Inschrijfdatum','Atleten','Testen','Tests met data','Tests berekend','WhatsApp','PDF','Afbeelding','Link','Totaal exports','Laatste activiteit','Laatste export'];
                   const csv = [header, ...rows.map(c => [
-                    c.full_name ?? '',
-                    c.email ?? '',
-                    c.club_name ?? '',
-                    String(c.test_count),
+                    c.full_name ?? '', c.email ?? '', c.club_name ?? '', c.signup_at,
+                    String(c.athlete_count), String(c.tests_total), String(c.tests_with_data), String(c.tests_calculated),
+                    String(c.shares_whatsapp), String(c.shares_pdf), String(c.shares_image), String(c.shares_link),
                     String(c.export_count),
-                    c.last_export_at ?? '',
+                    c.last_activity_at ?? '', c.last_export_at ?? '',
                   ])].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
                   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement('a');
                   a.href = url;
-                  a.download = `coaches-${new Date().toISOString().slice(0,10)}.csv`;
+                  a.download = `coaches-activity-${new Date().toISOString().slice(0,10)}.csv`;
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
@@ -270,76 +301,82 @@ const Admin = () => {
               </button>
             </div>
           </div>
+
           {!data?.coaches_overview?.length ? (
             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>Nog geen coaches.</div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '900px' }}>
                 <thead>
-                  <tr style={{ textAlign: 'left', color: 'rgba(255,255,255,0.4)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  <tr style={{ textAlign: 'left', color: 'rgba(255,255,255,0.4)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Coach</th>
-                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Email</th>
-                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }}>Testen</th>
-                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>Tot export</th>
-                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }}>Exports</th>
+                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>Status</th>
+                    <th style={{ padding: '8px 6px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }} title="Atleten aangemaakt">Atl.</th>
+                    <th style={{ padding: '8px 6px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }} title="Testen aangemaakt / met data / berekend">Testen</th>
+                    <th style={{ padding: '8px 6px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }} title="WhatsApp deelacties">
+                      <MessageCircle size={12} style={{ display: 'inline', verticalAlign: 'middle', color: '#25D366' }} />
+                    </th>
+                    <th style={{ padding: '8px 6px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }} title="PDF downloads">
+                      <FileText size={12} style={{ display: 'inline', verticalAlign: 'middle', color: '#f97316' }} />
+                    </th>
+                    <th style={{ padding: '8px 6px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }} title="Afbeeldingen gedeeld">
+                      <ImageIcon size={12} style={{ display: 'inline', verticalAlign: 'middle', color: '#a78bfa' }} />
+                    </th>
+                    <th style={{ padding: '8px 6px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }} title="Share links gemaakt">
+                      <LinkIcon size={12} style={{ display: 'inline', verticalAlign: 'middle', color: '#60a5fa' }} />
+                    </th>
+                    <th style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right' }}>Laatste actie</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.coaches_overview.map(c => {
-                    const completed = c.export_count > 0;
+                    const stage = stageOf(c);
+                    const meta = STAGE_META[stage];
                     return (
                       <tr key={c.user_id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                         <td style={{ padding: '10px' }}>
                           <div style={{ color: '#fff', fontWeight: 500 }}>
                             {c.full_name || <span style={{ color: 'rgba(255,255,255,0.3)' }}>(geen naam)</span>}
                           </div>
-                          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)' }}>
-                            {c.club_name || '—'}
-                          </div>
-                        </td>
-                        <td style={{ padding: '10px' }}>
-                          {c.email ? (
-                            <a href={`mailto:${c.email}?subject=${encodeURIComponent('myLactest — ' + (c.test_count > 0 ? `je ${c.test_count} test(en)` : 'welkom'))}`}
-                               style={{ color: '#60a5fa', fontSize: '12px', textDecoration: 'none' }}>
+                          {c.email && (
+                            <a href={`mailto:${c.email}`} style={{ color: '#60a5fa', fontSize: '11px', textDecoration: 'none' }}>
                               {c.email}
                             </a>
-                          ) : (
-                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>—</span>
+                          )}
+                          {c.club_name && (
+                            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>{c.club_name}</div>
                           )}
                         </td>
-                        <td style={{ padding: '10px', textAlign: 'right', color: '#fff', fontWeight: 700, fontSize: '15px' }}>
-                          {c.test_count}
+                        <td style={{ padding: '10px' }}>
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center',
+                            padding: '3px 8px', borderRadius: '999px',
+                            background: meta.bg, color: meta.color,
+                            fontSize: '10px', fontWeight: 700, whiteSpace: 'nowrap',
+                          }}>
+                            {meta.label}
+                          </span>
                         </td>
-                        <td style={{ padding: '10px', textAlign: 'center' }}>
-                          {c.test_count === 0 ? (
-                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>—</span>
-                          ) : completed ? (
-                            <span style={{
-                              display: 'inline-flex', alignItems: 'center', gap: '4px',
-                              padding: '3px 8px', borderRadius: '999px',
-                              background: 'rgba(0,201,167,0.12)', color: '#00c9a7',
-                              fontSize: '11px', fontWeight: 600,
-                            }}>
-                              ✓ Ja
-                            </span>
-                          ) : (
-                            <span style={{
-                              display: 'inline-flex', alignItems: 'center', gap: '4px',
-                              padding: '3px 8px', borderRadius: '999px',
-                              background: 'rgba(248,113,113,0.10)', color: '#f87171',
-                              fontSize: '11px', fontWeight: 600,
-                            }}>
-                              Niet afgerond
-                            </span>
-                          )}
+                        <td style={{ padding: '8px 6px', textAlign: 'right', color: c.athlete_count ? '#fff' : 'rgba(255,255,255,0.25)', fontWeight: 700 }}>
+                          {c.athlete_count}
                         </td>
-                        <td style={{ padding: '10px', textAlign: 'right', color: 'rgba(255,255,255,0.7)' }}>
-                          {c.export_count}
-                          {c.last_export_at && (
-                            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>
-                              laatst {formatRelative(c.last_export_at)}
+                        <td style={{ padding: '8px 6px', textAlign: 'right' }}>
+                          <div style={{ color: c.tests_total ? '#fff' : 'rgba(255,255,255,0.25)', fontWeight: 700 }}>
+                            {c.tests_total}
+                          </div>
+                          {c.tests_total > 0 && (
+                            <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>
+                              {c.tests_with_data} data · {c.tests_calculated} ber.
                             </div>
                           )}
+                        </td>
+                        {[c.shares_whatsapp, c.shares_pdf, c.shares_image, c.shares_link].map((n, i) => (
+                          <td key={i} style={{ padding: '8px 6px', textAlign: 'center', color: n ? '#fff' : 'rgba(255,255,255,0.2)', fontWeight: n ? 700 : 400 }}>
+                            {n || '—'}
+                          </td>
+                        ))}
+                        <td style={{ padding: '10px', textAlign: 'right', fontSize: '11px', color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap' }}>
+                          {c.last_activity_at ? formatRelative(c.last_activity_at) : '—'}
                         </td>
                       </tr>
                     );
