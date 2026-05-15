@@ -30,9 +30,19 @@ interface CoachRow {
   full_name: string | null;
   club_name: string | null;
   email: string | null;
-  test_count: number;
+  signup_at: string;
+  athlete_count: number;
+  tests_total: number;
+  tests_with_data: number;
+  tests_calculated: number;
+  last_test_at: string | null;
+  shares_whatsapp: number;
+  shares_pdf: number;
+  shares_image: number;
+  shares_link: number;
   export_count: number;
   last_export_at: string | null;
+  last_activity_at: string;
 }
 interface Overview {
   totals: {
@@ -55,6 +65,22 @@ interface Overview {
   coaches_overview: CoachRow[];
   recent_activity: ActivityRow[];
 }
+
+type FunnelStage = 'signed_up' | 'created_athlete' | 'started_test' | 'calculated' | 'shared';
+const stageOf = (c: CoachRow): FunnelStage => {
+  if (c.export_count > 0) return 'shared';
+  if (c.tests_calculated > 0) return 'calculated';
+  if (c.tests_with_data > 0) return 'started_test';
+  if (c.athlete_count > 0) return 'created_athlete';
+  return 'signed_up';
+};
+const STAGE_META: Record<FunnelStage, { label: string; color: string; bg: string }> = {
+  signed_up:        { label: 'Alleen ingeschreven',     color: '#f87171', bg: 'rgba(248,113,113,0.10)' },
+  created_athlete:  { label: 'Atleet aangemaakt',       color: '#fbbf24', bg: 'rgba(251,191,36,0.12)' },
+  started_test:     { label: 'Test ingevuld',           color: '#60a5fa', bg: 'rgba(96,165,250,0.12)' },
+  calculated:       { label: 'Resultaten berekend',     color: '#a78bfa', bg: 'rgba(167,139,250,0.14)' },
+  shared:           { label: 'Resultaten gedeeld',      color: '#00c9a7', bg: 'rgba(0,201,167,0.14)' },
+};
 
 const SHARE_META: Record<string, { label: string; icon: JSX.Element; color: string }> = {
   share_whatsapp: { label: 'WhatsApp', icon: <MessageCircle size={14} />, color: '#25D366' },
