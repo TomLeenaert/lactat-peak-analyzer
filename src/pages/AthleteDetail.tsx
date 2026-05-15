@@ -175,7 +175,7 @@ const AthleteDetail = () => {
               {athlete.name}
             </h1>
             {athlete.notes && (
-              <p style={{ fontSize: '12px', color: '#adaaaa', margin: '4px 0 0', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 700 }}>
+              <p style={{ fontSize: '15px', color: '#c9c7c7', margin: '8px 0 0', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 700, lineHeight: 1.45 }}>
                 {athlete.notes}
               </p>
             )}
