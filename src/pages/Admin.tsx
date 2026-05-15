@@ -215,10 +215,6 @@ const Admin = () => {
           ))}
         </div>
 
-        {/* Coaches overview — simple view: name + tests + export status */}
-        <div style={{ ...card, marginBottom: '24px' }}>
-          {/* placeholder removed */}
-        </div>
 
         {/* Coaches funnel summary */}
         {data?.coaches_overview && data.coaches_overview.length > 0 && (() => {
