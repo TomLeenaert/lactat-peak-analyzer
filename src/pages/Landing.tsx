@@ -23,7 +23,7 @@ const COPY = {
     eyebrow: 'Gratis · Geen creditcard nodig',
     heroTitleA: 'Ken je drempels.',
     heroTitleB: 'Train met data.',
-    heroDesc: 'MyLactest zet je veldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
+    heroDesc: 'MyLactest zet je loopveldtestdata om naar een volledig analyserapport met aerobe en anaerobe drempel en 5 trainingszones.',
     cmdLabel: 'start',
     cmdText: 'mylactest.app → analyseer → resultaten',
     cta1: 'Start gratis →',
@@ -334,7 +334,7 @@ const Landing = () => {
       </div>
       <Seo
         title="MyLactest — Free lactate threshold analysis for coaches"
-        description="Turn field test data into aerobic and anaerobic thresholds plus 5 training zones in seconds. Free, no lab required."
+        description="Turn running field test data into aerobic and anaerobic thresholds plus 5 training zones in seconds. Free, no lab required."
         path="/"
       />
       <main>
