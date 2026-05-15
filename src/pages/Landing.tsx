@@ -373,18 +373,10 @@ const Landing = () => {
               <span className="lp-hero-eyebrow-dot" />
               <span>{t.eyebrow}</span>
             </div>
-<div className="lp-hero-actions">
-              <button className="lp-hero-cta-primary" onClick={() => navigate('/auth')}>{t.cta1}</button>
+<div className="lp-hero-cards">
               <button
-                className="lp-hero-cta-secondary"
-                onClick={() => {
-                  document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-              >
-                {t.cta2} →
-              </button>
-              <button
-                className="lp-hero-cta-secondary"
+                type="button"
+                className="lp-hero-card lp-hero-card--demo"
                 onClick={async () => {
                   try {
                     const { error } = await supabase.auth.signInWithPassword({
@@ -397,11 +389,36 @@ const Landing = () => {
                     toast({ title: 'Error', description: err instanceof Error ? err.message : 'Fout', variant: 'destructive' });
                   }
                 }}
-                style={{ background: 'linear-gradient(135deg, #8b4aff 0%, #bd9dff 100%)', color: '#fff', borderColor: 'transparent' }}
               >
-                {t.cta3} →
+                <span className="lp-hero-card-icon" aria-hidden>→</span>
+                <span className="lp-hero-card-title">{t.cardDemoTitle}</span>
+                <span className="lp-hero-card-desc">{t.cardDemoDesc}</span>
+                <span className="lp-hero-card-cta lp-hero-card-cta--demo">{t.cardDemoCta}</span>
+              </button>
+
+              <button
+                type="button"
+                className="lp-hero-card lp-hero-card--signup"
+                onClick={() => navigate('/auth')}
+              >
+                <span className="lp-hero-card-icon lp-hero-card-icon--signup" aria-hidden>↑</span>
+                <span className="lp-hero-card-title">{t.cardSignupTitle}</span>
+                <span className="lp-hero-card-desc">{t.cardSignupDesc}</span>
+                <span className="lp-hero-card-cta lp-hero-card-cta--signup">{t.cardSignupCta}</span>
               </button>
             </div>
+
+            <button
+              type="button"
+              className="lp-hero-tour"
+              onClick={() => {
+                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              <span className="lp-hero-tour-play" aria-hidden>▶</span>
+              <span className="lp-hero-tour-prompt">{t.tourPrompt}</span>
+              <span className="lp-hero-tour-link">{t.tourLink}</span>
+            </button>
           </div>
 
           <div className="lp-demo-window" id="demo-live">
