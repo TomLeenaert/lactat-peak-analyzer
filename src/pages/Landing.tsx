@@ -286,10 +286,8 @@ const Landing = () => {
           <img src={logoSrc} alt="MyLactest" style={{ width: '34px', height: '34px', objectFit: 'contain', mixBlendMode: 'lighten' }} />
           MyLactest
         </a>
-        <div className="lp-nav-links">
-          <a className="lp-nav-link" href="#how-it-works">{t.navHow}</a>
-          <a className="lp-nav-link" href="#features">{t.navFeat}</a>
-        </div>
+        <div className="lp-nav-links" />
+
         <div className="lp-nav-right">
           <button
             className="lp-btn-lang"
