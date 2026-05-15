@@ -32,7 +32,7 @@ const COPY = {
     featKicker: 'Wat is inbegrepen',
     featTitleA: 'Alles om slimmer te coachen.',
     featTitleB: 'Sneller. Wetenschappelijk.',
-    featLead: 'Eén veldtest wordt een compleet prestatierapport. Gebouwd voor coaches die duidelijkheid willen, geen complexiteit.',
+    featLead: 'Eén loopveldtest wordt een compleet prestatierapport. Gebouwd voor coaches die duidelijkheid willen, geen complexiteit.',
     feat: [
       { title: 'Mobiel. Op de piste.', desc: 'Voer je test uit en analyseer direct vanaf je telefoon. Geen lab. Geen spreadsheets. Geen gedoe.' },
       { title: 'Volledige lactaatcurve', desc: 'Nauwkeurige curve met datapunten, modelfit en belangrijke referentiemarkers. Helder inzicht in de fysiologie van je atleet.' },
@@ -97,7 +97,7 @@ const COPY = {
     featKicker: "What's included",
     featTitleA: 'Everything you need to coach smarter.',
     featTitleB: 'Faster. Scientifically.',
-    featLead: 'Turn one field test into a complete performance blueprint. Built for coaches who want clarity, not complexity.',
+    featLead: 'Turn one running field test into a complete performance blueprint. Built for coaches who want clarity, not complexity.',
     feat: [
       { title: 'Mobile. On the track.', desc: 'Run and analyse your test directly from your phone. No lab. No spreadsheets. No friction.' },
       { title: 'Full lactate curve', desc: 'Accurate curve with data points, model fit and key reference markers. Clear insight into your athlete\'s physiology.' },
