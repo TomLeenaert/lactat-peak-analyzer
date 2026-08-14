@@ -65,6 +65,8 @@ const DataInputTab = ({
   const [pastedImage, setPastedImage] = useState<string | null>(null);
   const [pastedFileName, setPastedFileName] = useState<string | null>(null);
   const [protocolOpen, setProtocolOpen] = useState(false);
+  // Ruwe (tekst) waarden per rij voor het lactaatveld, zodat "2," of "2." blijft staan tijdens typen
+  const [lactateRaw, setLactateRaw] = useState<Record<number, { raw: string; num: number }>>({});
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'assistant' | 'user'; content: string }>>([
     {
       role: 'assistant',
@@ -580,9 +582,25 @@ const DataInputTab = ({
                       {/* Lactate */}
                       <td style={{ padding: '8px 8px' }}>
                         <input
-                          type="number" step="0.1" min="0" max="25"
-                          value={row.lactate || ''}
-                          onChange={(e) => updateRow(i, { lactate: parseFloat(e.target.value) || 0 })}
+                          type="text" inputMode="decimal"
+                          value={
+                            lactateRaw[i] !== undefined && lactateRaw[i].num === row.lactate
+                              ? lactateRaw[i].raw
+                              : (row.lactate || '')
+                          }
+                          onChange={(e) => {
+                            // enkel cijfers en één scheidingsteken (, of .)
+                            let raw = e.target.value.replace(/[^\d.,]/g, '');
+                            const firstSep = raw.search(/[.,]/);
+                            if (firstSep !== -1) {
+                              raw = raw.slice(0, firstSep + 1) + raw.slice(firstSep + 1).replace(/[.,]/g, '');
+                            }
+                            let num = parseFloat(raw.replace(',', '.'));
+                            if (!isFinite(num)) num = 0;
+                            num = Math.min(25, Math.max(0, num));
+                            setLactateRaw((prev) => ({ ...prev, [i]: { raw, num } }));
+                            updateRow(i, { lactate: num });
+                          }}
                           placeholder="—"
                           aria-label={`Trap ${i + 1} lactaat`}
                           className="wb-cell no-spin"

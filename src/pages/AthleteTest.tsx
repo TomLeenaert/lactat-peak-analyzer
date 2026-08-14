@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,6 +34,13 @@ const AthleteTest = () => {
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
 
+  // ── Autosave state ──────────────────────────────────────────
+  const [activeTestId, setActiveTestId] = useState<string | undefined>(testId);
+  const [autoStatus, setAutoStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const hydratedRef = useRef(!testId); // bij een bestaande test pas na het laden
+  const savingRef = useRef(false);
+
   const { data: existingTest } = useQuery({
     queryKey: ['test', testId],
     queryFn: async () => {
@@ -55,6 +62,7 @@ const AthleteTest = () => {
         setResults(data.results_json as unknown as CalculationResults);
         setActiveTab('analyze');
       }
+      hydratedRef.current = true;
       return data;
     },
     enabled: !!testId,
@@ -90,7 +98,7 @@ const AthleteTest = () => {
   }, [protocol, toast, t]);
 
   const onCalculate = useCallback(() => {
-    const result = calculate(testData, parseFloat(restingLactate) || 0);
+    const result = calculate(testData, parseFloat(String(restingLactate).replace(',', '.')) || 0);
     if (typeof result === 'string') {
       toast({ title: t('common.error'), description: result, variant: 'destructive' });
       return;
@@ -100,17 +108,60 @@ const AthleteTest = () => {
     toast({ title: t('test.calculationDone') });
   }, [testData, restingLactate, toast, t]);
 
+  const buildPayload = useCallback(() => ({
+    athlete_id: athleteId!,
+    test_date: testDate,
+    protocol_json: protocol as unknown as Record<string, unknown>,
+    steps_json: testData as unknown as Record<string, unknown>[],
+    results_json: results as unknown as Record<string, unknown>,
+  }), [athleteId, testDate, protocol, testData, results]);
+
+  // ── Debounced autosave ─────────────────────────────────────
+  useEffect(() => {
+    if (!athleteId) return;
+    if (!hydratedRef.current) return;
+    const hasData = testData.some((r) => (r?.lactate ?? 0) > 0);
+    if (!hasData) return;
+
+    const timer = setTimeout(async () => {
+      if (savingRef.current) return;
+      savingRef.current = true;
+      setAutoStatus('saving');
+      try {
+        const payload = buildPayload();
+        if (activeTestId) {
+          const { error } = await supabase.from('test_results').update(payload as any).eq('id', activeTestId);
+          if (error) throw error;
+        } else {
+          const { data, error } = await supabase
+            .from('test_results')
+            .insert(payload as any)
+            .select('id')
+            .single();
+          if (error) throw error;
+          if (data?.id) {
+            setActiveTestId(data.id);
+            navigate(`/athlete/${athleteId}/test/${data.id}`, { replace: true });
+          }
+        }
+        setAutoStatus('saved');
+        setSavedAt(new Date().toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' }));
+        queryClient.invalidateQueries({ queryKey: ['tests', athleteId] });
+      } catch {
+        setAutoStatus('idle');
+      } finally {
+        savingRef.current = false;
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [testData, protocol, testDate, restingLactate, results, athleteId, activeTestId, buildPayload, navigate, queryClient]);
+
   const saveTest = useMutation({
     mutationFn: async () => {
-      const payload = {
-        athlete_id: athleteId!,
-        test_date: testDate,
-        protocol_json: protocol as unknown as Record<string, unknown>,
-        steps_json: testData as unknown as Record<string, unknown>[],
-        results_json: results as unknown as Record<string, unknown>,
-      };
-      if (testId) {
-        const { error } = await supabase.from('test_results').update(payload as any).eq('id', testId);
+      const payload = buildPayload();
+      if (activeTestId) {
+        const { error } = await supabase.from('test_results').update(payload as any).eq('id', activeTestId);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('test_results').insert(payload as any);
@@ -125,16 +176,27 @@ const AthleteTest = () => {
     onError: (err: Error) => toast({ title: t('common.error'), description: err.message, variant: 'destructive' }),
   });
 
-  const saveButton = results ? (
-    <Button
-      onClick={() => saveTest.mutate()}
-      disabled={saveTest.isPending}
-      size="sm"
-      style={{ background: '#6644ff', border: 'none', color: '#fff', fontSize: '13px' }}
-    >
-      <Save className="h-3.5 w-3.5 mr-1.5" />
-      {saveTest.isPending ? t('common.saving') : t('common.save')}
-    </Button>
+  const autoIndicator = autoStatus === 'idle' ? null : (
+    <span style={{ fontSize: '12px', color: 'var(--wb-text-mute, #8b8b9e)', whiteSpace: 'nowrap' }}>
+      {autoStatus === 'saving' ? 'Opslaan…' : `Opgeslagen ✓${savedAt ? ` ${savedAt}` : ''}`}
+    </span>
+  );
+
+  const saveButton = (results || autoIndicator) ? (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+      {autoIndicator}
+      {results && (
+        <Button
+          onClick={() => saveTest.mutate()}
+          disabled={saveTest.isPending}
+          size="sm"
+          style={{ background: '#6644ff', border: 'none', color: '#fff', fontSize: '13px' }}
+        >
+          <Save className="h-3.5 w-3.5 mr-1.5" />
+          {saveTest.isPending ? t('common.saving') : t('common.save')}
+        </Button>
+      )}
+    </div>
   ) : undefined;
 
   return (
