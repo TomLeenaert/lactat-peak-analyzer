@@ -62,6 +62,7 @@ const AthleteTest = () => {
         setResults(data.results_json as unknown as CalculationResults);
         setActiveTab('analyze');
       }
+      hydratedRef.current = true;
       return data;
     },
     enabled: !!testId,
