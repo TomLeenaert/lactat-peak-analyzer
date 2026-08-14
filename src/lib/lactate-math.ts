@@ -658,15 +658,19 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
 export function getZones(results: CalculationResults): ZoneData[] {
   const lt1s = results.lt1.best;
-  const lt2s = results.lt2.best;
-  const maxSpeed = results.speeds[results.speeds.length - 1];
+  // Defensieve guard: bij drempelomkering (THRESHOLD_ORDER) mag lt2 nooit onder lt1 liggen,
+  // anders krijgen zones een negatieve breedte.
+  const lt2s = Math.max(results.lt2.best, lt1s);
+  const maxSpeed = Math.max(results.speeds[results.speeds.length - 1], lt2s);
 
   const minZoneWidth = 0.3;
   let zone3Top = lt2s * 0.95;
   if (zone3Top - lt1s < minZoneWidth) zone3Top = lt1s + minZoneWidth;
   zone3Top = Math.min(zone3Top, lt2s - minZoneWidth * 0.5);
+  // Clamp binnen [lt1s, lt2s] zodat Zone 3 en Zone 4 nooit negatief worden.
+  zone3Top = Math.min(Math.max(zone3Top, lt1s), lt2s);
 
-  return [
+  const zones: ZoneData[] = [
     { name: 'Zone 1', label: 'Herstel',              color: '#60a5fa', from: 0,         to: lt1s * 0.85, desc: 'Zeer licht, actief herstel' },
     { name: 'Zone 2', label: 'Aeroob (Endurance)',   color: '#34d399', from: lt1s*0.85, to: lt1s,        desc: 'Duurloop, vetverbranding, basis' },
     { name: 'Zone 3', label: 'Tempo',                color: '#fbbf24', from: lt1s,      to: zone3Top,    desc: 'Stevig tempo, marathon/HM-tempo' },
@@ -674,7 +678,11 @@ export function getZones(results: CalculationResults): ZoneData[] {
     // Zone 5 cap op maxSpeed (geen *1.1 extrapolatie meer) — voorkomt dalende HR in Z5.
     { name: 'Zone 5', label: 'VO₂max',               color: '#ef4444', from: lt2s,      to: maxSpeed,    desc: 'Intervallen, maximale inspanning' },
   ];
+
+  // Laatste vangnet: geen enkele zone mag een negatieve breedte hebben.
+  return zones.map(z => ({ ...z, to: Math.max(z.to, z.from) }));
 }
+
 
 // ============ BACKWARDS COMPAT EXPORT ============
 // Bestaande imports gebruikten polyFit3 — we behouden de naam, maar nu via fit-route.
