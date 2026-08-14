@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLang } from '@/contexts/LanguageContext';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from '@/components/LactateChart';
 import Seo from '@/components/Seo';
@@ -9,7 +9,7 @@ import Seo from '@/components/Seo';
 const ShareView = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useLang();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['share', token],
