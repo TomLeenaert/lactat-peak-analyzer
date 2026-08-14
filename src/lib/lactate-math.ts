@@ -362,13 +362,22 @@ function computeLogLog(speeds: number[], lactates: number[]): number | null {
 
 // ============ DIAGNOSTIEK ============
 
+function median(values: number[]): number {
+  const s = [...values].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
 function detectOutliers(speeds: number[], lactates: number[], coeffsAsc: number[], xs: XScale, warnings: CalcWarning[]) {
   const res = speeds.map((s, i) => lactates[i] - evalNorm(coeffsAsc, xs, s));
-  const mean = res.reduce((a, b) => a + b, 0) / res.length;
-  const sd = Math.sqrt(res.reduce((s, r) => s + (r - mean) ** 2, 0) / res.length);
-  if (sd < 0.05) return;
+  // Robuuste score: mediaan + MAD i.p.v. mean/SD, want bij 6–9 trappen blaast
+  // de uitschieter zelf de SD op waardoor hij nooit gedetecteerd wordt.
+  const med = median(res);
+  const mad = median(res.map(r => Math.abs(r - med)));
+  if (mad < 0.05) return;
   res.forEach((r, i) => {
-    if (Math.abs((r - mean) / sd) > 2.5) {
+    const z = (0.6745 * (r - med)) / mad;
+    if (Math.abs(z) > 3) {
       warnings.push({
         severity: 'warning', code: 'OUTLIER', affectedStep: i,
         message: `Trap ${i + 1} (${speeds[i]} km/h, ${lactates[i]} mmol/L) wijkt sterk af van de curve.`,
@@ -376,6 +385,7 @@ function detectOutliers(speeds: number[], lactates: number[], coeffsAsc: number[
     }
   });
 }
+
 
 /** Vindt de eerste snelheid waar de fit duidelijk daalt; null als monotoon stijgend. */
 function findNonMonotonicPoint(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number): number | null {
