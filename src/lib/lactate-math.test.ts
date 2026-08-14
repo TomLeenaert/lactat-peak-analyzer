@@ -66,10 +66,11 @@ describe('calculate — vangrail interpolatie', () => {
       [10, 3.9, 140], [11, 4.1, 150], [12, 4.15, 158],
       [13, 4.2, 166], [14, 4.3, 174], [15, 4.4, 182],
     ]), 1.5));
-    if (r.lt2.best <= r.lt1.best) {
-      expect(codes(r)).toContain('THRESHOLD_ORDER');
-    } else {
-      expect(r.lt2.best).toBeGreaterThan(r.lt1.best);
+    expect(codes(r)).toContain('THRESHOLD_ORDER');
+    // Herstel enkel wanneer de interpolatie een hogere snelheid oplevert
+    if (r.lt2.interp !== null && r.lt2.interp !== undefined && r.lt2.interp > r.lt1.best) {
+      expect(r.lt2.best).toBe(r.lt2.interp);
     }
+
   });
 });
