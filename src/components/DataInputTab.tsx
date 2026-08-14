@@ -132,7 +132,10 @@ const DataInputTab = ({
         if (resting) setRestingLactate(resting);
         if (distance) setStepDistance(distance);
         setTestData(imported);
+        setNeedsValidation(true);
+        setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} trappen** ingelezen uit je JSON-bestand. **Controleer elke trap** (tijd, lactaat, HR, snelheid) en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan met de berekening.` }]);
         toast({ title: t('data.imported'), description: `${imported.length} ${t('data.stepsLoaded')}` });
+
       } catch {
         toast({ title: t('common.error'), description: t('data.invalidJson'), variant: 'destructive' });
       }
