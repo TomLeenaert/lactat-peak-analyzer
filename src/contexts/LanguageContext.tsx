@@ -406,6 +406,11 @@ const translations = {
     'results.oblaNotReached': 'OBLA not reached',
     'results.oblaZoneCaption': 'Zones from the anaerobic threshold are estimates — the test did not reach 4.0 mmol/L.',
     'results.warnings': 'Analysis notes',
+    'results.zonesInconsistent': 'Training zones cannot be calculated — the thresholds of this test are physiologically inconsistent. Check the lactate values or retest.',
+    'results.bothInterpolated': 'Both thresholds were determined by interpolation between the measured steps because the curve fit was not reliable.',
+    'results.shareFailed': 'Sharing failed — try again or contact info@mylactest.com.',
+    'results.imageFailed': 'Image export failed — try again or contact info@mylactest.com.',
+    'results.pdfFailed': 'PDF export failed — try again or contact info@mylactest.com.',
     // Zones
     'zones.calculateFirst': 'Calculate first to see training zones.',
     'zones.noResults': 'No results available. Go to Data and click Calculate.',
