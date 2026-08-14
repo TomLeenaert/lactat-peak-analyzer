@@ -78,8 +78,8 @@ describe('calculate — vangrail interpolatie', () => {
 describe('getZones — geen negatieve zonebreedtes', () => {
   it('(bug 1) vlakke curve met drempelomkering levert geen negatieve zone op', () => {
     const r = ok(calculate(mk([
-      [10, 4.2, 140], [11, 4.3, 148], [12, 4.4, 156],
-      [13, 4.55, 164], [14, 4.7, 172], [15, 4.8, 180],
+      [10, 4.2, 140], [11, 4.4, 148], [12, 4.5, 156], [13, 4.6, 164],
+      [14, 4.7, 172], [15, 4.8, 180], [16, 4.9, 186],
     ]), 1.5));
     expect(codes(r)).toContain('THRESHOLD_ORDER');
     const zones = getZones(r);
