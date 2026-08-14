@@ -879,6 +879,21 @@ const DataInputTab = ({
                   }}>
                   <Paperclip size={15} />
                 </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={parsing || chatBusy}
+                  className="wb-focus wb-transition"
+                  aria-label="JSON-bestand importeren"
+                  title="JSON-bestand importeren"
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '8px',
+                    background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+                    color: 'var(--wb-text-dim)', cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <FileJson size={15} />
+                </button>
+
                 <div style={{ flex: 1 }} />
                 <button
                   onClick={handleComposerSubmit}
