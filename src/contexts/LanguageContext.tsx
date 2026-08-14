@@ -190,6 +190,11 @@ const translations = {
     'results.oblaNotReached': 'OBLA niet bereikt',
     'results.oblaZoneCaption': 'Zones vanaf de anaerobe drempel zijn schattingen — de test bereikte geen 4.0 mmol/L.',
     'results.warnings': 'Opmerkingen bij deze analyse',
+    'results.zonesInconsistent': 'Trainingszones kunnen niet berekend worden — de drempels van deze test zijn fysiologisch inconsistent. Controleer de lactaatwaarden of test opnieuw.',
+    'results.bothInterpolated': 'Beide drempels zijn bepaald via interpolatie tussen de gemeten trappen omdat de curvefit niet betrouwbaar was.',
+    'results.shareFailed': 'Delen mislukt — probeer opnieuw of contacteer info@mylactest.com.',
+    'results.imageFailed': 'Delen als afbeelding mislukt — probeer opnieuw of contacteer info@mylactest.com.',
+    'results.pdfFailed': 'PDF-export mislukt — probeer opnieuw of contacteer info@mylactest.com.',
     // Zones
     'zones.calculateFirst': 'Eerst berekenen om trainingszones te zien.',
     'zones.noResults': 'Geen resultaten beschikbaar. Ga naar Data en klik op Berekenen.',
