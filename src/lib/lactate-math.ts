@@ -377,19 +377,57 @@ function detectOutliers(speeds: number[], lactates: number[], coeffsAsc: number[
   });
 }
 
-function checkMonotonicity(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number, warnings: CalcWarning[]) {
+/** Vindt de eerste snelheid waar de fit duidelijk daalt; null als monotoon stijgend. */
+function findNonMonotonicPoint(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number): number | null {
   const N = 100, step = (xMax - xMin) / N;
   for (let i = 1; i < N; i++) {
     const v = xMin + i * step;
-    if (evalNormDeriv(coeffsAsc, xs, v) < -0.05) {
-      warnings.push({
-        severity: 'warning', code: 'NON_MONOTONIC',
-        message: `Lactaatcurve daalt rond ${v.toFixed(1)} km/h — fysiologisch ongebruikelijk, controleer metingen.`,
-      });
-      return;
-    }
+    if (evalNormDeriv(coeffsAsc, xs, v) < -0.05) return v;
+  }
+  return null;
+}
+
+function checkMonotonicity(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number, warnings: CalcWarning[]) {
+  const v = findNonMonotonicPoint(coeffsAsc, xs, xMin, xMax);
+  if (v !== null) {
+    warnings.push({
+      severity: 'warning', code: 'NON_MONOTONIC',
+      message: `Lactaatcurve daalt rond ${v.toFixed(1)} km/h — fysiologisch ongebruikelijk, controleer metingen.`,
+    });
   }
 }
+
+// ============ MONOTONE INTERPOLATIE OP RUWE MEETPUNTEN ============
+// Vangnet tegen de polynoomfit: echte lactaatwaarden stijgen na de baseline
+// monotoon, dus een rechte lijn tussen twee opeenvolgende meetpunten is een
+// veilige referentie. Geen extrapolatie buiten het gemeten bereik.
+
+/**
+ * Zoekt de EERSTE opwaartse kruising waar lactates[i-1] < target <= lactates[i]
+ * en interpoleert lineair de bijhorende snelheid.
+ * @returns snelheid, of null als het doel binnen het meetbereik nooit opwaarts
+ *          gekruist wordt (dus niet extrapoleren).
+ */
+export function interpolateThreshold(target: number, speeds: number[], lactates: number[]): number | null {
+  const n = Math.min(speeds.length, lactates.length);
+  for (let i = 1; i < n; i++) {
+    const l0 = lactates[i - 1], l1 = lactates[i];
+    if (l0 < target && target <= l1) {
+      const dl = l1 - l0;
+      if (dl <= 0) return speeds[i];
+      const t = (target - l0) / dl;
+      return speeds[i - 1] + t * (speeds[i] - speeds[i - 1]);
+    }
+  }
+  return null;
+}
+
+/** Verschil in tempo (s/km) tussen twee snelheden in km/h. */
+function paceDiffSecPerKm(a: number, b: number): number {
+  if (a <= 0 || b <= 0) return Infinity;
+  return Math.abs((60 / a) - (60 / b)) * 60;
+}
+
 
 /**
  * Detecteer een submaximale all-out trap.
