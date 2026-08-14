@@ -65,6 +65,8 @@ const DataInputTab = ({
   const [pastedImage, setPastedImage] = useState<string | null>(null);
   const [pastedFileName, setPastedFileName] = useState<string | null>(null);
   const [protocolOpen, setProtocolOpen] = useState(false);
+  // Ruwe (tekst) waarden per rij voor het lactaatveld, zodat "2," of "2." blijft staan tijdens typen
+  const [lactateRaw, setLactateRaw] = useState<Record<number, { raw: string; num: number }>>({});
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'assistant' | 'user'; content: string }>>([
     {
       role: 'assistant',
