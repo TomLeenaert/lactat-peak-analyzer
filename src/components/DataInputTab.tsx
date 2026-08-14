@@ -544,14 +544,32 @@ const DataInputTab = ({
                           }}>
                             {isFinal ? <Zap size={12} color="var(--wb-amber)" /> : allFilled ? <Check size={13} /> : i + 1}
                           </div>
-                          <span style={{
-                            fontSize: '10.5px', fontWeight: 700,
-                            color: isFinal ? 'var(--wb-amber)' : 'var(--wb-text-mute)',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            whiteSpace: 'nowrap',
-                          }}>
-                            {row.distance ? `${row.distance}m` : '—'}
-                          </span>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                            <input
+                              type="text" inputMode="numeric" pattern="[0-9]*"
+                              value={row.distance || ''}
+                              onChange={(e) => {
+                                const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                                updateStepDistanceFor(i, v);
+                              }}
+                              aria-label={`Trap ${i + 1} afstand`}
+                              className="wb-focus no-spin font-mono-num"
+                              style={{
+                                width: '44px', height: '22px',
+                                background: 'transparent', border: '1px solid var(--wb-border-2)',
+                                borderRadius: '4px', outline: 'none',
+                                color: isFinal ? 'var(--wb-amber)' : 'var(--wb-text-mute)',
+                                fontSize: '11.5px', fontWeight: 600,
+                                textAlign: 'center',
+                              }}
+                            />
+                            <span style={{
+                              fontSize: '10.5px', fontWeight: 700,
+                              color: isFinal ? 'var(--wb-amber)' : 'var(--wb-text-mute)',
+                              fontFamily: "'JetBrains Mono', monospace",
+                            }}>m</span>
+                          </div>
+
                         </div>
                       </td>
 
