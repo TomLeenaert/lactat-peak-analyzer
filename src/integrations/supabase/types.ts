@@ -98,6 +98,44 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_results: {
+        Row: {
+          athlete_name: string
+          created_at: string
+          created_by: string
+          id: string
+          test_date: string
+          test_result_id: string
+          token: string
+        }
+        Insert: {
+          athlete_name: string
+          created_at?: string
+          created_by: string
+          id?: string
+          test_date: string
+          test_result_id: string
+          token?: string
+        }
+        Update: {
+          athlete_name?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          test_date?: string
+          test_result_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_results_test_result_id_fkey"
+            columns: ["test_result_id"]
+            isOneToOne: false
+            referencedRelation: "test_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       test_results: {
         Row: {
           athlete_id: string
@@ -166,6 +204,14 @@ export type Database = {
     }
     Functions: {
       admin_overview: { Args: never; Returns: Json }
+      create_share_link: {
+        Args: {
+          p_athlete_name: string
+          p_test_date: string
+          p_test_result_id: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
