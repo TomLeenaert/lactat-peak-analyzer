@@ -336,6 +336,15 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
         <LactateChart results={results} />
       </div>
 
+      {zonesInconsistent ? (
+        <div style={{
+          padding: '12px 14px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, lineHeight: 1.5,
+          background: 'rgba(255,171,64,0.08)', border: '1px solid rgba(255,171,64,0.25)', color: '#ffab40',
+        }}>
+          {t('results.zonesInconsistent')}
+        </div>
+      ) : (
+      <>
       {/* Zone bar */}
       <div style={{ borderRadius: '10px', overflow: 'hidden', height: '32px', display: 'flex', border: '1px solid rgba(255,255,255,0.06)' }}>
         {zones.map(z => {
@@ -408,6 +417,8 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
           );
         })}
       </div>
+      </>
+      )}
       </div>{/* end ref wrapper */}
 
       {/* Share as image button */}
