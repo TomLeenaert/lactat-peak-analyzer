@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import {
   Trash2, Plus, AlertTriangle, Check, Loader2,
-  Zap, X, ArrowUp, Paperclip, MessageSquarePlus,
+  Zap, X, ArrowUp, Paperclip, FileJson, MessageSquarePlus,
   Clock, Droplet, Heart,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatPace, type StepData } from '@/lib/lactate-math';
 import type { ProtocolSettings } from '@/lib/protocol-types';
 import logoSrc from '@/assets/screen.png';
+
 
 interface DataInputTabProps {
   testData: StepData[];
