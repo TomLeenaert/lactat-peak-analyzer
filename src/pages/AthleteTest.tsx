@@ -34,6 +34,13 @@ const AthleteTest = () => {
   const [stepIncrement, setStepIncrement] = useState('1');
   const [results, setResults] = useState<CalculationResults | null>(null);
 
+  // ── Autosave state ──────────────────────────────────────────
+  const [activeTestId, setActiveTestId] = useState<string | undefined>(testId);
+  const [autoStatus, setAutoStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const hydratedRef = useRef(!testId); // bij een bestaande test pas na het laden
+  const savingRef = useRef(false);
+
   const { data: existingTest } = useQuery({
     queryKey: ['test', testId],
     queryFn: async () => {
