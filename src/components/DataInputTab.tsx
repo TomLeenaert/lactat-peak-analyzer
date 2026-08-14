@@ -360,7 +360,9 @@ const DataInputTab = ({
             }}
           />
           <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+          <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)', opacity: 0.7, marginLeft: '4px' }}>per trap aanpasbaar in de tabel</span>
         </div>
+
 
         {/* All-Out toggle + distance */}
         {protocol && setProtocol && (
