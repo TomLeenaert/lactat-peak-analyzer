@@ -68,7 +68,8 @@ const ShareView = () => {
   }
 
   const { athleteName, testDate, results } = data;
-  const { lt1, lt2, speeds, hrs, coeffs } = results;
+  const { lt1, lt2, speeds, hrs, coeffs, warnings } = results;
+  const lt2NotReached = lt2.oblaReached === false;
 
   if (!lt1 || !lt2 || !coeffs) {
     return (
@@ -157,16 +158,41 @@ const ShareView = () => {
           }}>
             <div style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '100px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,107,43,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#ff6b2b', marginBottom: '10px' }}>Anaerobe drempel</p>
-            <p style={{ fontSize: '34px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px', marginBottom: '2px', fontFamily: 'Space Grotesk, sans-serif' }}>
-              {formatPace(lt2.best)}
+            <p style={{
+              fontSize: lt2NotReached ? '21px' : '34px', fontWeight: 900, color: '#fff', lineHeight: 1,
+              letterSpacing: lt2NotReached ? '-0.5px' : '-1px', marginBottom: lt2NotReached ? '10px' : '2px', fontFamily: 'Space Grotesk, sans-serif',
+            }}>
+              {lt2NotReached ? 'niet bepaalbaar' : formatPace(lt2.best)}
             </p>
-            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>/km</p>
+            {!lt2NotReached && <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginBottom: '10px' }}>/km</p>}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
-              {lt2HR > 0 && <span style={{ fontSize: '11px', fontWeight: 600, color: '#ff6b2b', background: 'rgba(255,107,43,0.1)', padding: '3px 8px', borderRadius: '6px' }}>{lt2HR} bpm</span>}
-              <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: '6px' }}>{lt2Lac} mmol/L</span>
+              {lt2NotReached ? (
+                <span style={{ fontSize: '11px', fontWeight: 600, color: '#ffab40', background: 'rgba(255,107,43,0.1)', padding: '3px 8px', borderRadius: '6px' }}>OBLA niet bereikt</span>
+              ) : (
+                <>
+                  {lt2HR > 0 && <span style={{ fontSize: '11px', fontWeight: 600, color: '#ff6b2b', background: 'rgba(255,107,43,0.1)', padding: '3px 8px', borderRadius: '6px' }}>{lt2HR} bpm</span>}
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.06)', padding: '3px 8px', borderRadius: '6px' }}>{lt2Lac} mmol/L</span>
+                </>
+              )}
             </div>
           </div>
         </div>
+
+        {Array.isArray(warnings) && warnings.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '2px' }}>Opmerkingen bij deze analyse</div>
+            {warnings.map((w, i) => (
+              <div key={i} style={{
+                padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 500, lineHeight: 1.4,
+                background: w.severity === 'warning' ? 'rgba(255,171,64,0.08)' : 'rgba(255,255,255,0.04)',
+                border: w.severity === 'warning' ? '1px solid rgba(255,171,64,0.25)' : '1px solid rgba(255,255,255,0.08)',
+                color: w.severity === 'warning' ? '#ffab40' : 'rgba(255,255,255,0.55)',
+              }}>
+                {w.message}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Lactate curve */}
         <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '16px', marginBottom: '14px' }}>
@@ -186,6 +212,12 @@ const ShareView = () => {
             );
           })}
         </div>
+
+        {lt2NotReached && (
+          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', textAlign: 'center', margin: '8px 0 14px' }}>
+            Zones vanaf de anaerobe drempel zijn schattingen — de test bereikte geen 4.0 mmol/L.
+          </p>
+        )}
 
         {/* Zone cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '32px' }}>
