@@ -327,6 +327,8 @@ const DataInputTab = ({
   return (
     <>
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
+      <input ref={fileInputRef} type="file" accept=".json,application/json" className="hidden" onChange={handleJsonImport} />
+
 
       {/* Action bar — afstand + all-out afstand */}
       <div style={{
