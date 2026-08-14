@@ -546,8 +546,9 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt1_obla = findSpeedAtLactateOrNull(coeffs, 2.0, xMin, xMax);
   const lt1_bsln = findSpeedAtLactateOrNull(coeffs, baselineLac + 0.5, xMin, xMax);
   const lt1_loglog = computeLogLog(speeds, lactates);
-  const lt1_best = lt1_bsln ?? lt1_loglog ?? lt1_obla ?? xMin;
-  const lt1_method =
+  const polyAe = lt1_bsln ?? lt1_loglog ?? lt1_obla ?? xMin;
+  let lt1_best = polyAe;
+  let lt1_method =
     lt1_bsln !== null ? 'Baseline+0.5' :
     lt1_loglog !== null ? 'Log-Log' :
     lt1_obla !== null ? 'OBLA 2.0' : 'fallback';
@@ -557,11 +558,72 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt2_dmax = computeDmax(coeffsAsc, xScale, speeds, lactates, 0, speeds.length - 1);
   const modStartIdx = findModDmaxStart(lactates, restLac);
   const lt2_moddmax = computeDmax(coeffsAsc, xScale, speeds, lactates, modStartIdx, speeds.length - 1);
-  const lt2_best = lt2_moddmax ?? lt2_dmax ?? lt2_obla ?? xMax;
-  const lt2_method =
+  const polyAn = lt2_moddmax ?? lt2_dmax ?? lt2_obla ?? xMax;
+  let lt2_best = polyAn;
+  let lt2_method =
     lt2_moddmax !== null ? 'Modified Dmax' :
     lt2_dmax !== null ? 'Dmax' :
     lt2_obla !== null ? 'OBLA 4.0' : 'fallback';
+
+  // ===== Vangrail: monotone interpolatie op de RUWE meetpunten =====
+  // De polynoom blijft de tekencurve; deze check corrigeert enkel onmogelijke
+  // of onbetrouwbare drempelwaarden.
+  const nonMonoAt = findNonMonotonicPoint(coeffsAsc, xScale, xMin, xMax);
+  const fitNonMonotonic = nonMonoAt !== null;
+  const PACE_TOL_SEC = 8; // afwijking > ~8 s/km = polynoom niet te vertrouwen
+
+  const interpAe =
+    interpolateThreshold(baselineLac + 0.5, speeds, lactates) ??
+    interpolateThreshold(2.0, speeds, lactates);
+  let lt1_interpolated = false;
+  if (
+    interpAe !== null &&
+    (fitNonMonotonic || polyAe < xMin || polyAe > xMax || paceDiffSecPerKm(polyAe, interpAe) > PACE_TOL_SEC)
+  ) {
+    lt1_best = interpAe;
+    lt1_method = 'Interpolation';
+    lt1_interpolated = true;
+    warnings.push({
+      severity: 'info',
+      code: 'THRESHOLD_INTERPOLATED',
+      message: `Aerobe drempel is bepaald via interpolatie tussen de gemeten trappen (${interpAe.toFixed(1)} km/h) in plaats van de curvefit (${polyAe.toFixed(1)} km/h) — de fit was niet betrouwbaar (niet-monotoon of te grote afwijking).`,
+    });
+  }
+
+  const interpAn = interpolateThreshold(4.0, speeds, lactates);
+  let lt2_interpolated = false;
+  if (interpAn === null) {
+    warnings.push({
+      severity: 'warning',
+      code: 'OBLA_NOT_REACHED',
+      message: `Het maximaal gemeten lactaat blijft onder 4.0 mmol/L — de anaerobe drempel kan niet betrouwbaar bepaald worden. De getoonde waarde is een schatting; verleng de test met een zwaardere trap.`,
+    });
+  } else if (
+    fitNonMonotonic || polyAn < xMin || polyAn > xMax || paceDiffSecPerKm(polyAn, interpAn) > PACE_TOL_SEC
+  ) {
+    lt2_best = interpAn;
+    lt2_method = 'Interpolation';
+    lt2_interpolated = true;
+    warnings.push({
+      severity: 'info',
+      code: 'THRESHOLD_INTERPOLATED',
+      message: `Anaerobe drempel is bepaald via interpolatie tussen de gemeten trappen (${interpAn.toFixed(1)} km/h) in plaats van de curvefit (${polyAn.toFixed(1)} km/h) — de fit was niet betrouwbaar (niet-monotoon of te grote afwijking).`,
+    });
+  }
+
+  // Harde volgorde-check: LT2 moet sneller zijn dan LT1
+  if (lt2_best <= lt1_best) {
+    warnings.push({
+      severity: 'warning',
+      code: 'THRESHOLD_ORDER',
+      message: `Anaerobe drempel (${lt2_best.toFixed(1)} km/h) ligt niet boven de aerobe drempel (${lt1_best.toFixed(1)} km/h) — fysiologisch onmogelijk. Controleer de lactaatwaarden van deze test.`,
+    });
+    if (interpAn !== null && interpAn > lt1_best) {
+      lt2_best = interpAn;
+      lt2_method = 'Interpolation';
+      lt2_interpolated = true;
+    }
+  }
 
   // HR/Watt op drempels
   const lt1_hr = interpolateAt(lt1_best, speeds, hrs, true);
@@ -583,8 +645,9 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
   return {
     coeffs, r2, speeds, lactates, hrs, watts, restLac, minActiveLac, modStartIdx,
-    lt1: { obla: lt1_obla, bsln: lt1_bsln, loglog: lt1_loglog, best: lt1_best, method: lt1_method, hr: lt1_hr, watt: lt1_watt },
-    lt2: { obla: lt2_obla, dmax: lt2_dmax, moddmax: lt2_moddmax, best: lt2_best, method: lt2_method, hr: lt2_hr, watt: lt2_watt },
+    lt1: { obla: lt1_obla, bsln: lt1_bsln, loglog: lt1_loglog, best: lt1_best, method: lt1_method, hr: lt1_hr, watt: lt1_watt, interpolated: lt1_interpolated, interp: interpAe },
+    lt2: { obla: lt2_obla, dmax: lt2_dmax, moddmax: lt2_moddmax, best: lt2_best, method: lt2_method, hr: lt2_hr, watt: lt2_watt, interpolated: lt2_interpolated, interp: interpAn, oblaReached: interpAn !== null },
+
     curveType,
     quality: { r2, rmse, fitQuality: r2 >= 0.95 ? 'good' : r2 >= 0.85 ? 'moderate' : 'poor' },
     warnings,
