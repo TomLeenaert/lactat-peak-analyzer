@@ -61,7 +61,8 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     );
   }
 
-  const { lt1, lt2, speeds, hrs, coeffs } = results;
+  const { lt1, lt2, speeds, hrs, coeffs, warnings } = results;
+  const lt2NotReached = lt2.oblaReached === false;
   if (!coeffs || !Array.isArray(coeffs)) {
     return (
       <div style={{ border: '1px dashed rgba(255,255,255,0.08)', borderRadius: '16px', padding: '48px 24px', textAlign: 'center' }}>
@@ -88,9 +89,13 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     msg += `\n\n🟢 *${t('wa.aerobic')}*: ${formatPace(lt1.best)} /km`;
     if (lt1HR > 0) msg += ` (${lt1HR} bpm)`;
     msg += ` — ${lt1Lac} mmol/L`;
-    msg += `\n🟠 *${t('wa.anaerobic')}*: ${formatPace(lt2.best)} /km`;
-    if (lt2HR > 0) msg += ` (${lt2HR} bpm)`;
-    msg += ` — ${lt2Lac} mmol/L`;
+    if (lt2.oblaReached === false) {
+      msg += `\n🟠 *${t('wa.anaerobic')}*: ${t('wa.anaerobicNotReached')}`;
+    } else {
+      msg += `\n🟠 *${t('wa.anaerobic')}*: ${formatPace(lt2.best)} /km`;
+      if (lt2HR > 0) msg += ` (${lt2HR} bpm)`;
+      msg += ` — ${lt2Lac} mmol/L`;
+    }
     msg += `\n\n${t('wa.zones')}`;
     zones.forEach(z => {
       msg += `\n${z.name}: ${formatPace(z.to)} – ${formatPace(z.from)} /km`;
@@ -264,18 +269,44 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
             <p style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '1.4px', textTransform: 'uppercase', color: '#ff6b2b', margin: 0, marginBottom: '4px' }}>
               {t('results.anaerobicThreshold')}
             </p>
-            <p style={{ fontSize: '46px', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1.5px', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
-              {formatPace(lt2.best)}<span style={{ fontSize: '15px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', marginLeft: '5px' }}>/km</span>
+            <p style={{
+              fontSize: lt2NotReached ? '21px' : '46px', fontWeight: 900, color: '#fff', lineHeight: 1,
+              letterSpacing: lt2NotReached ? '-0.5px' : '-1.5px', margin: 0, fontVariantNumeric: 'tabular-nums',
+            }}>
+              {lt2NotReached ? t('results.anaerobicNotDetermined') : formatPace(lt2.best)}
+              {!lt2NotReached && <span style={{ fontSize: '15px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', marginLeft: '5px' }}>/km</span>}
             </p>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end' }}>
-            {lt2HR > 0 && (
-              <span style={{ fontSize: '14px', fontWeight: 700, color: '#ff6b2b', background: 'rgba(255,107,43,0.15)', padding: '4px 10px', borderRadius: '6px' }}>{lt2HR} bpm</span>
+            {lt2NotReached ? (
+              <span style={{ fontSize: '14px', fontWeight: 600, color: '#ffab40' }}>{t('results.oblaNotReached')}</span>
+            ) : (
+              <>
+                {lt2HR > 0 && (
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#ff6b2b', background: 'rgba(255,107,43,0.15)', padding: '4px 10px', borderRadius: '6px' }}>{lt2HR} bpm</span>
+                )}
+                <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{lt2Lac} mmol/L</span>
+              </>
             )}
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{lt2Lac} mmol/L</span>
           </div>
         </div>
       </div>
+
+      {Array.isArray(warnings) && warnings.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '2px' }}>{t('results.warnings')}</div>
+          {warnings.map((w, i) => (
+            <div key={i} style={{
+              padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 500, lineHeight: 1.4,
+              background: w.severity === 'warning' ? 'rgba(255,171,64,0.08)' : 'rgba(255,255,255,0.04)',
+              border: w.severity === 'warning' ? '1px solid rgba(255,171,64,0.25)' : '1px solid rgba(255,255,255,0.08)',
+              color: w.severity === 'warning' ? '#ffab40' : 'rgba(255,255,255,0.55)',
+            }}>
+              {w.message}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Lactate curve */}
       <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '12px 14px' }}>
@@ -301,6 +332,12 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
           );
         })}
       </div>
+
+      {lt2NotReached && (
+        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', textAlign: 'center', margin: '8px 0 0' }}>
+          {t('results.oblaZoneCaption')}
+        </p>
+      )}
 
       {/* Zone cards — compact one-line rows */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
