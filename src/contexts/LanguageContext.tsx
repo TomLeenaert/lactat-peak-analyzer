@@ -195,6 +195,7 @@ const translations = {
     'results.shareFailed': 'Delen mislukt — probeer opnieuw of contacteer info@mylactest.com.',
     'results.imageFailed': 'Delen als afbeelding mislukt — probeer opnieuw of contacteer info@mylactest.com.',
     'results.pdfFailed': 'PDF-export mislukt — probeer opnieuw of contacteer info@mylactest.com.',
+    'share.notFound': 'Link ongeldig of verlopen.',
     // Zones
     'zones.calculateFirst': 'Eerst berekenen om trainingszones te zien.',
     'zones.noResults': 'Geen resultaten beschikbaar. Ga naar Data en klik op Berekenen.',
@@ -416,6 +417,7 @@ const translations = {
     'results.shareFailed': 'Sharing failed — try again or contact info@mylactest.com.',
     'results.imageFailed': 'Image export failed — try again or contact info@mylactest.com.',
     'results.pdfFailed': 'PDF export failed — try again or contact info@mylactest.com.',
+    'share.notFound': 'Link invalid or expired.',
     // Zones
     'zones.calculateFirst': 'Calculate first to see training zones.',
     'zones.noResults': 'No results available. Go to Data and click Calculate.',

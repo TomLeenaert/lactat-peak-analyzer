@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useLang } from '@/contexts/LanguageContext';
 import { type CalculationResults, getZones, polyEval, formatPace, interpolateHR } from '@/lib/lactate-math';
 import LactateChart from '@/components/LactateChart';
 import Seo from '@/components/Seo';
@@ -8,36 +9,29 @@ import Seo from '@/components/Seo';
 const ShareView = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
+  const { t } = useLang();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['share', token],
     queryFn: async () => {
-      // 1. Fetch the share record
-      const { data: share, error: shareErr } = await (supabase
-        .from as any)('shared_results')
-        .select('test_result_id, athlete_name, test_date')
-        .eq('token', token!)
-        .single();
-      if (shareErr || !share) throw new Error('Link niet gevonden');
-
-      // 2. Fetch the test result (public read via RLS)
-      const { data: test, error: testErr } = await supabase
-        .from('test_results')
-        .select('results_json, test_date')
-        .eq('id', (share as any).test_result_id)
-        .single();
-      if (testErr || !test) throw new Error('Testresultaat niet gevonden');
+      // Token-gated fetch via SECURITY DEFINER RPC (no direct table access)
+      const { data: shared, error } = await (supabase.rpc as any)('get_shared_result', {
+        p_token: token!,
+      });
+      if (error) throw new Error('Link niet gevonden');
+      const row = Array.isArray(shared) ? shared[0] : shared;
+      if (!row) throw new Error('Link niet gevonden');
 
       // Log a public view event (non-blocking)
       (supabase.rpc as any)('log_event', {
         _event_type: 'share_link_view',
-        _metadata: { test_id: (share as any).test_result_id },
+        _metadata: { token: token },
       }).then(() => {}).catch(() => {});
 
       return {
-        athleteName: (share as any).athlete_name,
-        testDate: (share as any).test_date || test.test_date,
-        results: test.results_json as unknown as CalculationResults,
+        athleteName: row.athlete_name as string,
+        testDate: row.test_date as string,
+        results: row.results_json as CalculationResults,
       };
     },
     enabled: !!token,
@@ -56,7 +50,8 @@ const ShareView = () => {
   if (isError || !data?.results) {
     return (
       <div style={{ minHeight: '100vh', background: '#0e0e0e', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
-        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', marginBottom: '16px' }}>Link ongeldig of verlopen.</div>
+        <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', marginBottom: '16px' }}>{t('share.notFound')}</div>
+
         <button
           onClick={() => navigate('/')}
           style={{ padding: '10px 20px', borderRadius: '6px', background: '#bd9dff', color: '#000', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: '13px' }}
