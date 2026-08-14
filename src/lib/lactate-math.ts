@@ -34,6 +34,10 @@ export interface LT1Results {
   method: string;
   hr: number;
   watt: number;
+  /** true wanneer de polynoomwaarde overruled is door interpolatie op de meetpunten */
+  interpolated?: boolean;
+  /** snelheid via interpolatie op ruwe meetpunten (null = doel niet bereikt) */
+  interp?: number | null;
 }
 
 export interface LT2Results {
@@ -44,6 +48,12 @@ export interface LT2Results {
   method: string;
   hr: number;
   watt: number;
+  /** true wanneer de polynoomwaarde overruled is door interpolatie op de meetpunten */
+  interpolated?: boolean;
+  /** snelheid via interpolatie op ruwe meetpunten bij 4.0 mmol/L (null = niet bereikt) */
+  interp?: number | null;
+  /** false wanneer het maximale gemeten lactaat onder 4.0 mmol/L bleef */
+  oblaReached?: boolean;
 }
 
 export interface FitQuality {
@@ -55,10 +65,11 @@ export interface FitQuality {
 export type WarningSeverity = 'info' | 'warning';
 export interface CalcWarning {
   severity: WarningSeverity;
-  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT' | 'BASELINE_FLOORED' | 'LT_GAP_LARGE';
+  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT' | 'BASELINE_FLOORED' | 'LT_GAP_LARGE' | 'THRESHOLD_INTERPOLATED' | 'OBLA_NOT_REACHED' | 'THRESHOLD_ORDER';
   message: string;
   affectedStep?: number;
 }
+
 
 export interface CalculationResults {
   /** Cubic-form coefficients [a3,a2,a1,a0] in RAW speed-space (km/h).
