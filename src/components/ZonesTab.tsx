@@ -43,6 +43,22 @@ const ZonesTab = ({ results }: ZonesTabProps) => {
     );
   }
 
+  const zonesInconsistent =
+    Array.isArray(results.warnings) &&
+    results.warnings.some(w => w.code === 'THRESHOLD_ORDER') &&
+    lt2.best <= lt1.best;
+
+  if (zonesInconsistent) {
+    return (
+      <div style={{
+        padding: '12px 14px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, lineHeight: 1.5,
+        background: 'rgba(255,171,64,0.08)', border: '1px solid rgba(255,171,64,0.25)', color: '#ffab40',
+      }}>
+        {t('results.zonesInconsistent')}
+      </div>
+    );
+  }
+
   const validHR = speeds.map((s, i) => ({ speed: s, hr: hrs[i] })).filter(d => d.hr > 0);
   const hrMin = validHR.length > 0 ? Math.floor(Math.min(...validHR.map(d => d.hr)) / 10) * 10 - 10 : 100;
   const hrMax = validHR.length > 0 ? Math.ceil(Math.max(...validHR.map(d => d.hr)) / 10) * 10 + 10 : 200;
