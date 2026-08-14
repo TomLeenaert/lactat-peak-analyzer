@@ -4,6 +4,7 @@ import LactateChart from './LactateChart';
 import { supabase } from '@/integrations/supabase/client';
 import { Share2, Check, Link, MessageCircle, Download, Image, FileText } from 'lucide-react';
 import { useLang } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import logoSrc from '@/assets/screen.png';
@@ -17,6 +18,7 @@ interface ResultsTabProps {
 
 const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps) => {
   const { t } = useLang();
+  const { toast } = useToast();
   const [sharing, setSharing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -48,6 +50,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       setTimeout(() => setCopied(false), 3000);
     } catch (e) {
       console.error(e);
+      toast({ title: t('common.error'), description: t('results.shareFailed'), variant: 'destructive' });
     } finally {
       setSharing(false);
     }
@@ -71,8 +74,23 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
     );
   }
 
+  const zonesInconsistent =
+    Array.isArray(warnings) && warnings.some(w => w.code === 'THRESHOLD_ORDER') && lt2.best <= lt1.best;
+
   const zones = getZones(results);
   const totalRange = zones[zones.length - 1].to - zones[0].from;
+
+  // Dubbele THRESHOLD_INTERPOLATED-meldingen samenvoegen tot één (enkel weergave).
+  const displayWarnings = (() => {
+    if (!Array.isArray(warnings)) return [];
+    const interpolated = warnings.filter(w => w.code === 'THRESHOLD_INTERPOLATED');
+    if (interpolated.length < 2) return warnings;
+    const rest = warnings.filter(w => w.code !== 'THRESHOLD_INTERPOLATED');
+    return [
+      ...rest,
+      { severity: interpolated[0].severity, code: 'THRESHOLD_INTERPOLATED', message: t('results.bothInterpolated') },
+    ] as typeof warnings;
+  })();
 
   const lt1HR = interpolateHR(lt1.best, speeds, hrs);
   const lt2HR = interpolateHR(lt2.best, speeds, hrs);
@@ -150,6 +168,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       trackEvent('share_image', { method: 'download' });
     } catch (e) {
       console.error('Image generation failed:', e);
+      toast({ title: t('common.error'), description: t('results.imageFailed'), variant: 'destructive' });
     } finally {
       setGeneratingImage(false);
     }
@@ -224,6 +243,7 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       trackEvent('share_pdf');
     } catch (e) {
       console.error('PDF generation failed:', e);
+      toast({ title: t('common.error'), description: t('results.pdfFailed'), variant: 'destructive' });
     } finally {
       setGeneratingPdf(false);
     }
@@ -292,10 +312,10 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
         </div>
       </div>
 
-      {Array.isArray(warnings) && warnings.length > 0 && (
+      {displayWarnings.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '2px' }}>{t('results.warnings')}</div>
-          {warnings.map((w, i) => (
+          {displayWarnings.map((w, i) => (
             <div key={i} style={{
               padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 500, lineHeight: 1.4,
               background: w.severity === 'warning' ? 'rgba(255,171,64,0.08)' : 'rgba(255,255,255,0.04)',
