@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import {
   Trash2, Plus, AlertTriangle, Check, Loader2,
-  Zap, X, ArrowUp, Paperclip, MessageSquarePlus,
+  Zap, X, ArrowUp, Paperclip, FileJson, MessageSquarePlus,
   Clock, Droplet, Heart,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatPace, type StepData } from '@/lib/lactate-math';
 import type { ProtocolSettings } from '@/lib/protocol-types';
 import logoSrc from '@/assets/screen.png';
+
 
 interface DataInputTabProps {
   testData: StepData[];
@@ -131,7 +132,10 @@ const DataInputTab = ({
         if (resting) setRestingLactate(resting);
         if (distance) setStepDistance(distance);
         setTestData(imported);
+        setNeedsValidation(true);
+        setChatMessages(prev => [...prev, { role: 'assistant', content: `Ik heb **${imported.length} trappen** ingelezen uit je JSON-bestand. **Controleer elke trap** (tijd, lactaat, HR, snelheid) en pas aan waar nodig. Klik daarna bovenaan op de knop **✓ Gecontroleerd** om door te gaan met de berekening.` }]);
         toast({ title: t('data.imported'), description: `${imported.length} ${t('data.stepsLoaded')}` });
+
       } catch {
         toast({ title: t('common.error'), description: t('data.invalidJson'), variant: 'destructive' });
       }
@@ -326,6 +330,8 @@ const DataInputTab = ({
   return (
     <>
       <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageImport} />
+      <input ref={fileInputRef} type="file" accept=".json,application/json" className="hidden" onChange={handleJsonImport} />
+
 
       {/* Action bar — afstand + all-out afstand */}
       <div style={{
@@ -354,7 +360,9 @@ const DataInputTab = ({
             }}
           />
           <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)' }}>m</span>
+          <span style={{ fontSize: '11px', color: 'var(--wb-text-mute)', opacity: 0.7, marginLeft: '4px' }}>per trap aanpasbaar in de tabel</span>
         </div>
+
 
         {/* All-Out toggle + distance */}
         {protocol && setProtocol && (
@@ -536,14 +544,32 @@ const DataInputTab = ({
                           }}>
                             {isFinal ? <Zap size={12} color="var(--wb-amber)" /> : allFilled ? <Check size={13} /> : i + 1}
                           </div>
-                          <span style={{
-                            fontSize: '10.5px', fontWeight: 700,
-                            color: isFinal ? 'var(--wb-amber)' : 'var(--wb-text-mute)',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            whiteSpace: 'nowrap',
-                          }}>
-                            {row.distance ? `${row.distance}m` : '—'}
-                          </span>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                            <input
+                              type="text" inputMode="numeric" pattern="[0-9]*"
+                              value={row.distance || ''}
+                              onChange={(e) => {
+                                const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                                updateStepDistanceFor(i, v);
+                              }}
+                              aria-label={`Trap ${i + 1} afstand`}
+                              className="wb-focus no-spin font-mono-num"
+                              style={{
+                                width: '44px', height: '22px',
+                                background: 'transparent', border: '1px solid var(--wb-border-2)',
+                                borderRadius: '4px', outline: 'none',
+                                color: isFinal ? 'var(--wb-amber)' : 'var(--wb-text-mute)',
+                                fontSize: '11.5px', fontWeight: 600,
+                                textAlign: 'center',
+                              }}
+                            />
+                            <span style={{
+                              fontSize: '10.5px', fontWeight: 700,
+                              color: isFinal ? 'var(--wb-amber)' : 'var(--wb-text-mute)',
+                              fontFamily: "'JetBrains Mono', monospace",
+                            }}>m</span>
+                          </div>
+
                         </div>
                       </td>
 
@@ -853,6 +879,21 @@ const DataInputTab = ({
                   }}>
                   <Paperclip size={15} />
                 </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={parsing || chatBusy}
+                  className="wb-focus wb-transition"
+                  aria-label="JSON-bestand importeren"
+                  title="JSON-bestand importeren"
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '8px',
+                    background: 'var(--wb-surface)', border: '1px solid var(--wb-border)',
+                    color: 'var(--wb-text-dim)', cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <FileJson size={15} />
+                </button>
+
                 <div style={{ flex: 1 }} />
                 <button
                   onClick={handleComposerSubmit}
