@@ -212,6 +212,7 @@ export type Database = {
         }
         Returns: string
       }
+      get_shared_result: { Args: { p_token: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
