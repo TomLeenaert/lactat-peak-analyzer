@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculate, interpolateThreshold, type StepData, type CalculationResults } from './lactate-math';
+import { calculate, interpolateThreshold, getZones, type StepData, type CalculationResults } from './lactate-math';
 
 const mk = (rows: [number, number, number][]): StepData[] =>
   rows.map(([speed, lactate, hr]) => ({ speed, lactate, hr, watt: 0 }));
@@ -72,5 +72,35 @@ describe('calculate — vangrail interpolatie', () => {
       expect(r.lt2.best).toBe(r.lt2.interp);
     }
 
+  });
+});
+
+describe('getZones — geen negatieve zonebreedtes', () => {
+  it('(bug 1) vlakke curve met drempelomkering levert geen negatieve zone op', () => {
+    const r = ok(calculate(mk([
+      [10, 4.2, 140], [11, 4.3, 148], [12, 4.4, 156],
+      [13, 4.55, 164], [14, 4.7, 172], [15, 4.8, 180],
+    ]), 1.5));
+    expect(codes(r)).toContain('THRESHOLD_ORDER');
+    const zones = getZones(r);
+    zones.forEach(z => expect(z.to - z.from).toBeGreaterThanOrEqual(0));
+  });
+});
+
+describe('detectOutliers — robuuste MAD-score', () => {
+  const smooth: [number, number, number][] = [
+    [10, 1.2, 130], [11, 1.5, 138], [12, 1.9, 146], [13, 2.5, 154],
+    [14, 3.4, 162], [15, 4.8, 170], [16, 6.8, 178],
+  ];
+
+  it('(bug 2) trap 4 met +2,5 mmol/L afwijking geeft OUTLIER', () => {
+    const rows = smooth.map((row, i) => (i === 3 ? [row[0], row[1] + 2.5, row[2]] : row) as [number, number, number]);
+    const r = ok(calculate(mk(rows), 1.2));
+    expect(codes(r)).toContain('OUTLIER');
+  });
+
+  it('dezelfde curve zonder uitschieter geeft geen OUTLIER', () => {
+    const r = ok(calculate(mk(smooth), 1.2));
+    expect(codes(r)).not.toContain('OUTLIER');
   });
 });
