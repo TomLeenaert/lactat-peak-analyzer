@@ -65,7 +65,7 @@ export interface FitQuality {
 export type WarningSeverity = 'info' | 'warning';
 export interface CalcWarning {
   severity: WarningSeverity;
-  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT' | 'BASELINE_FLOORED' | 'LT_GAP_LARGE' | 'THRESHOLD_INTERPOLATED' | 'OBLA_NOT_REACHED' | 'THRESHOLD_ORDER';
+  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT' | 'LT_GAP_LARGE' | 'THRESHOLD_INTERPOLATED' | 'OBLA_NOT_REACHED' | 'THRESHOLD_ORDER';
   message: string;
   affectedStep?: number;
 }
