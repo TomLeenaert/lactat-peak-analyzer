@@ -480,7 +480,38 @@ function checkAllOutSubmaximal(speeds: number[], lactates: number[], warnings: C
 
 // ============ HOOFDFUNCTIE ============
 
+/** Minimum Lactate Equivalent (Garcia-Tabar & Gorostiaga 2018): de snelheid waar
+ *  de verhouding lactaat/snelheid minimaal is. Gevalideerd als aerobe drempel bij
+ *  getrainde lopers (77 ± 2% van MLSS, r = 0.91). Null bij een randoplossing. */
+function computeLEmin(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number): number | null {
+  const N = 400, step = (xMax - xMin) / N;
+  let bestV: number | null = null, best = Infinity;
+  for (let i = 0; i <= N; i++) {
+    const v = xMin + i * step;
+    if (v <= 0) continue;
+    const ratio = evalNorm(coeffsAsc, xs, v) / v;
+    if (ratio < best) { best = ratio; bestV = v; }
+  }
+  if (bestV === null) return null;
+  if (bestV - xMin < step * 2 || xMax - bestV < step * 2) return null; // rand = geen echt minimum
+  return bestV;
+}
+
+/** Laagste lactaatwaarde van de test: het minimum van de gemeten punten én van de
+ *  gefitte curve. Niet de eerste drie trappen — bij getrainde lopers ligt het
+ *  minimum vaak pas bij trap 3 of 4 (lactate shuttle na de warming-up). */
+function curveNadir(coeffsAsc: number[], xs: XScale, lactates: number[], xMin: number, xMax: number): number {
+  let m = Math.min(...lactates);
+  const N = 200, step = (xMax - xMin) / N;
+  for (let i = 0; i <= N; i++) {
+    const y = evalNorm(coeffsAsc, xs, xMin + i * step);
+    if (y < m) m = y;
+  }
+  return Math.max(m, 0.3);
+}
+
 export function calculate(testData: StepData[], restingLactate: number): CalculationResults | string {
+
   const valid = testData
     .filter(r => Number.isFinite(r.speed) && Number.isFinite(r.lactate) && r.speed > 0 && r.lactate > 0)
     .sort((a, b) => a.speed - b.speed);
