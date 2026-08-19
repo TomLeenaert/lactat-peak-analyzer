@@ -617,13 +617,17 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const PACE_TOL_SEC = 8; // afwijking > ~8 s/km = polynoom niet te vertrouwen
 
   const interpAe =
-    interpolateThreshold(baselineLac + 0.5, speeds, lactates) ??
+    interpolateThreshold(nadirLac + 0.3, speeds, lactates) ??
     interpolateThreshold(2.0, speeds, lactates);
   let lt1_interpolated = false;
+  // Bij de aerobe drempel mag een DALENDE curve de fit niet diskwalificeren: LEmin
+  // ligt per definitie in het gebied waar het lactaat nog daalt of vlak ligt.
+  // De vangrail grijpt hier dus alleen in als de fit geen bruikbare waarde gaf.
   const aeFitUnreliable =
-    isNonMonotonicNear(coeffsAsc, xScale, polyAe, xMin, xMax) ||
     polyAe < xMin || polyAe > xMax ||
-    paceDiffSecPerKm(polyAe, interpAe ?? polyAe) > PACE_TOL_SEC;
+    (lt1_lemin === null && lt1_nadir === null &&
+      paceDiffSecPerKm(polyAe, interpAe ?? polyAe) > PACE_TOL_SEC);
+
   if (interpAe !== null && aeFitUnreliable) {
     lt1_best = interpAe;
     lt1_method = 'Interpolation';
