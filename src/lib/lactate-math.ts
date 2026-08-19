@@ -87,6 +87,8 @@ export interface CalculationResults {
   modStartIdx: number;
   // Nieuwe metadata (niet-breaking)
   curveType: 'linear' | 'quadratic' | 'cubic';
+  /** Versie van het rekenmodel waarmee dit resultaat berekend is. */
+  algorithmVersion?: number;
   quality: FitQuality;
   warnings: CalcWarning[];
 }
