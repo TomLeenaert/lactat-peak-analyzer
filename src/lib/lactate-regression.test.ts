@@ -56,7 +56,13 @@ describe('lactate regression baseline (55 cases)', () => {
     const speeds = c.s.map(r => r[0]);
     const lo = Math.min(...speeds);
     const hi = Math.max(...speeds);
-    expect(res.lt2.best).toBeGreaterThan(res.lt1.best);
+    // Uitzondering: EDGE-02 is een gedegenereerde fallback-case waarvan de
+    // baseline zélf ae === an voorschrijft (4 punten, geen drempelscheiding).
+    // De waardegate blijft daar strikt; alleen de ordening-invariant vervalt.
+    if (c.ae !== c.an) {
+      expect(res.lt2.best).toBeGreaterThan(res.lt1.best);
+    }
+
     expect(res.lt1.best).toBeGreaterThanOrEqual(lo);
     expect(res.lt1.best).toBeLessThanOrEqual(hi);
     expect(res.lt2.best).toBeGreaterThanOrEqual(lo);
