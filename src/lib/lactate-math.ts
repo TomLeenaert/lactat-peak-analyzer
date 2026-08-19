@@ -65,7 +65,7 @@ export interface FitQuality {
 export type WarningSeverity = 'info' | 'warning';
 export interface CalcWarning {
   severity: WarningSeverity;
-  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT' | 'BASELINE_FLOORED' | 'LT_GAP_LARGE' | 'THRESHOLD_INTERPOLATED' | 'OBLA_NOT_REACHED' | 'THRESHOLD_ORDER';
+  code: 'LOW_DATA_LINEAR' | 'MEDIUM_DATA_QUADRATIC' | 'OUTLIER' | 'NON_MONOTONIC' | 'SUBMAXIMAL_ALLOUT' | 'LT_GAP_LARGE' | 'THRESHOLD_INTERPOLATED' | 'OBLA_NOT_REACHED' | 'THRESHOLD_ORDER';
   message: string;
   affectedStep?: number;
 }
@@ -87,6 +87,8 @@ export interface CalculationResults {
   modStartIdx: number;
   // Nieuwe metadata (niet-breaking)
   curveType: 'linear' | 'quadratic' | 'cubic';
+  /** Versie van het rekenmodel waarmee dit resultaat berekend is. */
+  algorithmVersion?: number;
   quality: FitQuality;
   warnings: CalcWarning[];
 }
@@ -480,7 +482,38 @@ function checkAllOutSubmaximal(speeds: number[], lactates: number[], warnings: C
 
 // ============ HOOFDFUNCTIE ============
 
+/** Minimum Lactate Equivalent (Garcia-Tabar & Gorostiaga 2018): de snelheid waar
+ *  de verhouding lactaat/snelheid minimaal is. Gevalideerd als aerobe drempel bij
+ *  getrainde lopers (77 ± 2% van MLSS, r = 0.91). Null bij een randoplossing. */
+function computeLEmin(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number): number | null {
+  const N = 400, step = (xMax - xMin) / N;
+  let bestV: number | null = null, best = Infinity;
+  for (let i = 0; i <= N; i++) {
+    const v = xMin + i * step;
+    if (v <= 0) continue;
+    const ratio = evalNorm(coeffsAsc, xs, v) / v;
+    if (ratio < best) { best = ratio; bestV = v; }
+  }
+  if (bestV === null) return null;
+  if (bestV - xMin < step * 2 || xMax - bestV < step * 2) return null; // rand = geen echt minimum
+  return bestV;
+}
+
+/** Laagste lactaatwaarde van de test: het minimum van de gemeten punten én van de
+ *  gefitte curve. Niet de eerste drie trappen — bij getrainde lopers ligt het
+ *  minimum vaak pas bij trap 3 of 4 (lactate shuttle na de warming-up). */
+function curveNadir(coeffsAsc: number[], xs: XScale, lactates: number[], xMin: number, xMax: number): number {
+  let m = Math.min(...lactates);
+  const N = 200, step = (xMax - xMin) / N;
+  for (let i = 0; i <= N; i++) {
+    const y = evalNorm(coeffsAsc, xs, xMin + i * step);
+    if (y < m) m = y;
+  }
+  return Math.max(m, 0.3);
+}
+
 export function calculate(testData: StepData[], restingLactate: number): CalculationResults | string {
+
   const valid = testData
     .filter(r => Number.isFinite(r.speed) && Number.isFinite(r.lactate) && r.speed > 0 && r.lactate > 0)
     .sort((a, b) => a.speed - b.speed);
@@ -553,26 +586,20 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
   // --- LT1 ---
   const minActiveLac = Math.min(...lactates.slice(0, 3));
-  // Sanity-floor: baseline onder 1.5 mmol/L is fysiologisch onwaarschijnlijk bij
-  // een actieve atleet → ondergrens van 1.5 gebruiken voor Baseline+0.5.
-  const BASELINE_FLOOR = 1.5;
-  const baselineLac = Math.max(restLac, BASELINE_FLOOR);
-  if (restLac < BASELINE_FLOOR) {
-    warnings.push({
-      severity: 'info',
-      code: 'BASELINE_FLOORED',
-      message: `Gedetecteerde baseline (${restLac.toFixed(1)} mmol/L) lag onder ${BASELINE_FLOOR.toFixed(1)} — een ondergrens van ${BASELINE_FLOOR.toFixed(1)} mmol/L is gebruikt voor de Aerobic Threshold om vertekening door een te lage eerste trap te vermijden.`,
-    });
-  }
+  const nadirLac = curveNadir(coeffsAsc, xScale, lactates, xMin, xMax);
+  const baselineLac = nadirLac;
+  const lt1_lemin = computeLEmin(coeffsAsc, xScale, xMin, xMax);
+  const lt1_nadir = findSpeedAtLactateOrNull(coeffs, nadirLac + 0.3, xMin, xMax);
   const lt1_obla = findSpeedAtLactateOrNull(coeffs, 2.0, xMin, xMax);
-  const lt1_bsln = findSpeedAtLactateOrNull(coeffs, baselineLac + 0.5, xMin, xMax);
+  const lt1_bsln = lt1_nadir;
   const lt1_loglog = computeLogLog(speeds, lactates);
-  const polyAe = lt1_bsln ?? lt1_loglog ?? lt1_obla ?? xMin;
+  const polyAe = lt1_lemin ?? lt1_nadir ?? lt1_obla ?? xMin;
   let lt1_best = polyAe;
   let lt1_method =
-    lt1_bsln !== null ? 'Baseline+0.5' :
-    lt1_loglog !== null ? 'Log-Log' :
+    lt1_lemin !== null ? 'LEmin' :
+    lt1_nadir !== null ? 'Baseline+0.3' :
     lt1_obla !== null ? 'OBLA 2.0' : 'fallback';
+
 
   // --- LT2 ---
   const lt2_obla = findSpeedAtLactateOrNull(coeffs, 4.0, xMin, xMax);
@@ -592,13 +619,17 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const PACE_TOL_SEC = 8; // afwijking > ~8 s/km = polynoom niet te vertrouwen
 
   const interpAe =
-    interpolateThreshold(baselineLac + 0.5, speeds, lactates) ??
+    interpolateThreshold(nadirLac + 0.3, speeds, lactates) ??
     interpolateThreshold(2.0, speeds, lactates);
   let lt1_interpolated = false;
+  // Bij de aerobe drempel mag een DALENDE curve de fit niet diskwalificeren: LEmin
+  // ligt per definitie in het gebied waar het lactaat nog daalt of vlak ligt.
+  // De vangrail grijpt hier dus alleen in als de fit geen bruikbare waarde gaf.
   const aeFitUnreliable =
-    isNonMonotonicNear(coeffsAsc, xScale, polyAe, xMin, xMax) ||
     polyAe < xMin || polyAe > xMax ||
-    paceDiffSecPerKm(polyAe, interpAe ?? polyAe) > PACE_TOL_SEC;
+    (lt1_lemin === null && lt1_nadir === null &&
+      paceDiffSecPerKm(polyAe, interpAe ?? polyAe) > PACE_TOL_SEC);
+
   if (interpAe !== null && aeFitUnreliable) {
     lt1_best = interpAe;
     lt1_method = 'Interpolation';
@@ -661,14 +692,14 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt2_hr = interpolateAt(lt2_best, speeds, hrs, true);
   const lt2_watt = interpolateAt(lt2_best, speeds, watts, true);
 
-  // Cross-check pace-verschil LT1 ↔ LT2 (typisch 30-45 s/km; > 60 s/km = red flag)
+  // Cross-check verhouding LT1/LT2 (literatuur: 0.70-0.85)
   if (lt1_best > 0 && lt2_best > 0 && lt2_best > lt1_best) {
-    const deltaSecPerKm = ((60 / lt1_best) - (60 / lt2_best)) * 60;
-    if (deltaSecPerKm > 60) {
+    const ratio = lt1_best / lt2_best;
+    if (ratio < 0.62) {
       warnings.push({
         severity: 'warning',
         code: 'LT_GAP_LARGE',
-        message: `Ongewoon groot verschil tussen drempels (Δ ≈ ${Math.round(deltaSecPerKm)} s/km). Controleer of de Aerobic Threshold niet kunstmatig laag is door een uitschieter in de beginpunten.`,
+        message: `Ongewoon groot verschil tussen de drempels (aerobe drempel op ${Math.round(ratio * 100)}% van de anaerobe). Controleer de lactaatwaarden van de eerste trappen.`,
       });
     }
   }
@@ -679,8 +710,10 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     lt2: { obla: lt2_obla, dmax: lt2_dmax, moddmax: lt2_moddmax, best: lt2_best, method: lt2_method, hr: lt2_hr, watt: lt2_watt, interpolated: lt2_interpolated, interp: interpAn, oblaReached: interpAn !== null },
 
     curveType,
+    algorithmVersion: 3,
     quality: { r2, rmse, fitQuality: r2 >= 0.95 ? 'good' : r2 >= 0.85 ? 'moderate' : 'poor' },
     warnings,
+
   };
 }
 

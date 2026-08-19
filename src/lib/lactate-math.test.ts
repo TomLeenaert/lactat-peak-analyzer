@@ -40,16 +40,27 @@ describe('calculate — vangrail interpolatie', () => {
     expect(r.lt2.oblaReached).toBe(true);
   });
 
-  it('(b) niet-monotone fit: vangrail overschrijft en THRESHOLD_INTERPOLATED vuurt', () => {
+  it('(b) niet-monotone fit: blijft binnen het meetbereik en signaleert NON_MONOTONIC', () => {
     const r = ok(calculate(mk([
       [10, 1.5, 140], [11, 3.6, 150], [12, 1.8, 158],
       [13, 2.0, 166], [14, 5.5, 174], [15, 9.0, 182], [16, 12.0, 188],
     ]), 1.5));
-    expect(codes(r)).toContain('THRESHOLD_INTERPOLATED');
-    expect(r.lt1.interpolated || r.lt2.interpolated).toBe(true);
+    expect(codes(r)).toContain('NON_MONOTONIC');
+    expect(r.lt2.best).toBeGreaterThan(r.lt1.best);
     expect(r.lt1.best).toBeGreaterThanOrEqual(10);
     expect(r.lt1.best).toBeLessThanOrEqual(16);
   });
+
+  it('(f) getrainde loper: aerobe drempel ligt duidelijk onder de anaerobe', () => {
+    const speeds = [12, 14, 15, 16, 17, 18, 19, 20];
+    const lac = [0.9, 0.7, 0.7, 0.9, 1.3, 1.6, 3.0, 5.5];
+    const r = ok(calculate(mk(speeds.map((s, i) => [s, lac[i], 120 + i * 8] as [number, number, number])), 0.7));
+    const ratio = r.lt1.best / r.lt2.best;
+    expect(ratio).toBeGreaterThan(0.70);
+    expect(ratio).toBeLessThan(0.90);
+    expect(['LEmin', 'Baseline+0.3']).toContain(r.lt1.method);
+  });
+
 
   it('(c) max lactaat < 4.0: OBLA_NOT_REACHED en geen onmogelijk snelle waarde', () => {
     const r = ok(calculate(mk([
