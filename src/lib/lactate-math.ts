@@ -690,14 +690,14 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   const lt2_hr = interpolateAt(lt2_best, speeds, hrs, true);
   const lt2_watt = interpolateAt(lt2_best, speeds, watts, true);
 
-  // Cross-check pace-verschil LT1 ↔ LT2 (typisch 30-45 s/km; > 60 s/km = red flag)
+  // Cross-check verhouding LT1/LT2 (literatuur: 0.70-0.85)
   if (lt1_best > 0 && lt2_best > 0 && lt2_best > lt1_best) {
-    const deltaSecPerKm = ((60 / lt1_best) - (60 / lt2_best)) * 60;
-    if (deltaSecPerKm > 60) {
+    const ratio = lt1_best / lt2_best;
+    if (ratio < 0.62) {
       warnings.push({
         severity: 'warning',
         code: 'LT_GAP_LARGE',
-        message: `Ongewoon groot verschil tussen drempels (Δ ≈ ${Math.round(deltaSecPerKm)} s/km). Controleer of de Aerobic Threshold niet kunstmatig laag is door een uitschieter in de beginpunten.`,
+        message: `Ongewoon groot verschil tussen de drempels (aerobe drempel op ${Math.round(ratio * 100)}% van de anaerobe). Controleer de lactaatwaarden van de eerste trappen.`,
       });
     }
   }
@@ -708,8 +708,10 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     lt2: { obla: lt2_obla, dmax: lt2_dmax, moddmax: lt2_moddmax, best: lt2_best, method: lt2_method, hr: lt2_hr, watt: lt2_watt, interpolated: lt2_interpolated, interp: interpAn, oblaReached: interpAn !== null },
 
     curveType,
+    algorithmVersion: 3,
     quality: { r2, rmse, fitQuality: r2 >= 0.95 ? 'good' : r2 >= 0.85 ? 'moderate' : 'poor' },
     warnings,
+
   };
 }
 
