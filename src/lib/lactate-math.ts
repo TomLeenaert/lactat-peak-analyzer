@@ -597,10 +597,11 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     interpolateThreshold(baselineLac + 0.5, speeds, lactates) ??
     interpolateThreshold(2.0, speeds, lactates);
   let lt1_interpolated = false;
-  if (
-    interpAe !== null &&
-    (fitNonMonotonic || polyAe < xMin || polyAe > xMax || paceDiffSecPerKm(polyAe, interpAe) > PACE_TOL_SEC)
-  ) {
+  const aeFitUnreliable =
+    isNonMonotonicNear(coeffsAsc, xScale, polyAe, xMin, xMax) ||
+    polyAe < xMin || polyAe > xMax ||
+    paceDiffSecPerKm(polyAe, interpAe ?? polyAe) > PACE_TOL_SEC;
+  if (interpAe !== null && aeFitUnreliable) {
     lt1_best = interpAe;
     lt1_method = 'Interpolation';
     lt1_interpolated = true;
