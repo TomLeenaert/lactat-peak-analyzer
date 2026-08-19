@@ -397,6 +397,17 @@ function findNonMonotonicPoint(coeffsAsc: number[], xs: XScale, xMin: number, xM
   return null;
 }
 
+/** Daalt de fit binnen een venster van ± `halfWidth` km/h rond `at`? */
+function isNonMonotonicNear(coeffsAsc: number[], xs: XScale, at: number, xMin: number, xMax: number, halfWidth = 1.0): boolean {
+  const lo = Math.max(xMin, at - halfWidth), hi = Math.min(xMax, at + halfWidth);
+  const N = 40, step = (hi - lo) / N;
+  if (step <= 0) return false;
+  for (let i = 0; i <= N; i++) {
+    if (evalNormDeriv(coeffsAsc, xs, lo + i * step) < -0.05) return true;
+  }
+  return false;
+}
+
 function checkMonotonicity(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number, warnings: CalcWarning[]) {
   const v = findNonMonotonicPoint(coeffsAsc, xs, xMin, xMax);
   if (v !== null) {
@@ -578,18 +589,17 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   // ===== Vangrail: monotone interpolatie op de RUWE meetpunten =====
   // De polynoom blijft de tekencurve; deze check corrigeert enkel onmogelijke
   // of onbetrouwbare drempelwaarden.
-  const nonMonoAt = findNonMonotonicPoint(coeffsAsc, xScale, xMin, xMax);
-  const fitNonMonotonic = nonMonoAt !== null;
   const PACE_TOL_SEC = 8; // afwijking > ~8 s/km = polynoom niet te vertrouwen
 
   const interpAe =
     interpolateThreshold(baselineLac + 0.5, speeds, lactates) ??
     interpolateThreshold(2.0, speeds, lactates);
   let lt1_interpolated = false;
-  if (
-    interpAe !== null &&
-    (fitNonMonotonic || polyAe < xMin || polyAe > xMax || paceDiffSecPerKm(polyAe, interpAe) > PACE_TOL_SEC)
-  ) {
+  const aeFitUnreliable =
+    isNonMonotonicNear(coeffsAsc, xScale, polyAe, xMin, xMax) ||
+    polyAe < xMin || polyAe > xMax ||
+    paceDiffSecPerKm(polyAe, interpAe ?? polyAe) > PACE_TOL_SEC;
+  if (interpAe !== null && aeFitUnreliable) {
     lt1_best = interpAe;
     lt1_method = 'Interpolation';
     lt1_interpolated = true;
@@ -609,7 +619,9 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
       message: `Het maximaal gemeten lactaat blijft onder 4.0 mmol/L — de anaerobe drempel kan niet betrouwbaar bepaald worden. De getoonde waarde is een schatting; verleng de test met een zwaardere trap.`,
     });
   } else if (
-    fitNonMonotonic || polyAn < xMin || polyAn > xMax || paceDiffSecPerKm(polyAn, interpAn) > PACE_TOL_SEC
+    isNonMonotonicNear(coeffsAsc, xScale, polyAn, xMin, xMax) ||
+    polyAn < xMin || polyAn > xMax ||
+    (lt2_moddmax === null && lt2_dmax === null && paceDiffSecPerKm(polyAn, interpAn) > PACE_TOL_SEC)
   ) {
     lt2_best = interpAn;
     lt2_method = 'Interpolation';
@@ -621,19 +633,27 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     });
   }
 
-  // Harde volgorde-check: LT2 moet sneller zijn dan LT1
+  // Harde volgorde-check: LT2 moet sneller zijn dan LT1 — herstel eerst, waarschuw pas als herstel faalt
   if (lt2_best <= lt1_best) {
-    warnings.push({
-      severity: 'warning',
-      code: 'THRESHOLD_ORDER',
-      message: `Anaerobe drempel (${lt2_best.toFixed(1)} km/h) ligt niet boven de aerobe drempel (${lt1_best.toFixed(1)} km/h) — fysiologisch onmogelijk. Controleer de lactaatwaarden van deze test.`,
-    });
     if (interpAn !== null && interpAn > lt1_best) {
       lt2_best = interpAn;
       lt2_method = 'Interpolation';
       lt2_interpolated = true;
+      warnings.push({
+        severity: 'info',
+        code: 'THRESHOLD_INTERPOLATED',
+        message: `Anaerobe drempel is hersteld via interpolatie tussen de gemeten trappen (${interpAn.toFixed(1)} km/h) — de curvefit gaf een waarde onder de aerobe drempel.`,
+      });
+    } else {
+      warnings.push({
+        severity: 'warning',
+        code: 'THRESHOLD_ORDER',
+        message: `Anaerobe drempel (${lt2_best.toFixed(1)} km/h) ligt niet boven de aerobe drempel (${lt1_best.toFixed(1)} km/h) — fysiologisch onmogelijk. Controleer de lactaatwaarden van deze test.`,
+      });
     }
   }
+
+
 
   // HR/Watt op drempels
   const lt1_hr = interpolateAt(lt1_best, speeds, hrs, true);

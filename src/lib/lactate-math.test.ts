@@ -61,17 +61,30 @@ describe('calculate — vangrail interpolatie', () => {
     expect(r.lt2.best).toBeGreaterThan(0);
   });
 
-  it('(d) omgekeerde volgorde: THRESHOLD_ORDER vuurt en de orde wordt hersteld indien mogelijk', () => {
+  it('(d) omgekeerde volgorde: hersteld via interpolatie of anders THRESHOLD_ORDER', () => {
     const r = ok(calculate(mk([
       [10, 3.9, 140], [11, 4.1, 150], [12, 4.15, 158],
       [13, 4.2, 166], [14, 4.3, 174], [15, 4.4, 182],
     ]), 1.5));
-    expect(codes(r)).toContain('THRESHOLD_ORDER');
-    // Herstel enkel wanneer de interpolatie een hogere snelheid oplevert
     if (r.lt2.interp !== null && r.lt2.interp !== undefined && r.lt2.interp > r.lt1.best) {
       expect(r.lt2.best).toBe(r.lt2.interp);
+      expect(codes(r)).toContain('THRESHOLD_INTERPOLATED');
+    } else {
+      expect(codes(r)).toContain('THRESHOLD_ORDER');
     }
+  });
 
+  it('(e) dip in de eerste trappen maar schone stijging bovenaan behoudt Modified Dmax', () => {
+    const r = ok(calculate(mk([
+      [12, 0.9, 130], [14, 0.7, 138], [15, 0.7, 145], [16, 0.9, 152],
+      [17, 1.3, 160], [18, 1.6, 168], [19, 3.0, 176], [20, 5.5, 186],
+    ]), 0.9));
+    // De lokale monotonie-check mag de Modified Dmax-waarde niet meer wegvangen:
+    // er is geen "fit niet betrouwbaar"-override op de anaerobe drempel.
+    expect(r.warnings.some(w => /Anaerobe drempel is bepaald via interpolatie/.test(w.message))).toBe(false);
+    expect(r.lt2.moddmax).not.toBeNull();
+    // Modified Dmax blijft leidend, tenzij de volgorde-herstelstap ingrijpt.
+    expect(['Modified Dmax', 'Interpolation']).toContain(r.lt2.method);
   });
 });
 
@@ -81,7 +94,6 @@ describe('getZones — geen negatieve zonebreedtes', () => {
       [10, 4.2, 140], [11, 4.4, 148], [12, 4.5, 156], [13, 4.6, 164],
       [14, 4.7, 172], [15, 4.8, 180], [16, 4.9, 186],
     ]), 1.5));
-    expect(codes(r)).toContain('THRESHOLD_ORDER');
     const zones = getZones(r);
     zones.forEach(z => expect(z.to - z.from).toBeGreaterThanOrEqual(0));
   });
