@@ -621,7 +621,9 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
       message: `Het maximaal gemeten lactaat blijft onder 4.0 mmol/L — de anaerobe drempel kan niet betrouwbaar bepaald worden. De getoonde waarde is een schatting; verleng de test met een zwaardere trap.`,
     });
   } else if (
-    fitNonMonotonic || polyAn < xMin || polyAn > xMax || paceDiffSecPerKm(polyAn, interpAn) > PACE_TOL_SEC
+    isNonMonotonicNear(coeffsAsc, xScale, polyAn, xMin, xMax) ||
+    polyAn < xMin || polyAn > xMax ||
+    (lt2_moddmax === null && lt2_dmax === null && paceDiffSecPerKm(polyAn, interpAn) > PACE_TOL_SEC)
   ) {
     lt2_best = interpAn;
     lt2_method = 'Interpolation';
@@ -633,19 +635,27 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
     });
   }
 
-  // Harde volgorde-check: LT2 moet sneller zijn dan LT1
+  // Harde volgorde-check: LT2 moet sneller zijn dan LT1 — herstel eerst, waarschuw pas als herstel faalt
   if (lt2_best <= lt1_best) {
-    warnings.push({
-      severity: 'warning',
-      code: 'THRESHOLD_ORDER',
-      message: `Anaerobe drempel (${lt2_best.toFixed(1)} km/h) ligt niet boven de aerobe drempel (${lt1_best.toFixed(1)} km/h) — fysiologisch onmogelijk. Controleer de lactaatwaarden van deze test.`,
-    });
     if (interpAn !== null && interpAn > lt1_best) {
       lt2_best = interpAn;
       lt2_method = 'Interpolation';
       lt2_interpolated = true;
+      warnings.push({
+        severity: 'info',
+        code: 'THRESHOLD_INTERPOLATED',
+        message: `Anaerobe drempel is hersteld via interpolatie tussen de gemeten trappen (${interpAn.toFixed(1)} km/h) — de curvefit gaf een waarde onder de aerobe drempel.`,
+      });
+    } else {
+      warnings.push({
+        severity: 'warning',
+        code: 'THRESHOLD_ORDER',
+        message: `Anaerobe drempel (${lt2_best.toFixed(1)} km/h) ligt niet boven de aerobe drempel (${lt1_best.toFixed(1)} km/h) — fysiologisch onmogelijk. Controleer de lactaatwaarden van deze test.`,
+      });
     }
   }
+
+
 
   // HR/Watt op drempels
   const lt1_hr = interpolateAt(lt1_best, speeds, hrs, true);
