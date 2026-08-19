@@ -64,3 +64,23 @@ describe('ResultsTab OBLA not reached', () => {
     expect(screen.queryByText(/OBLA niet bereikt/i)).not.toBeInTheDocument();
   });
 });
+
+describe('ResultsTab fit quality chip', () => {
+  it('renders the chip with label, steps, curve type and R² when quality exists', () => {
+    render(<ResultsTab results={baseResults} athleteName="Test" testDate="2026-05-20" />, { wrapper });
+
+    expect(screen.getByText(/Fit: goed/i)).toBeInTheDocument();
+    expect(screen.getByText(/\(6 trappen, cubic\) · R² 0,98|\(6 trappen, cubic\) · R² 0\.98/)).toBeInTheDocument();
+  });
+
+  it('does not render the chip and does not crash when quality is missing', () => {
+    const results = { ...baseResults, warnings: [] } as CalculationResults;
+    delete (results as { quality?: unknown }).quality;
+    render(<ResultsTab results={results} athleteName="Test" testDate="2026-05-20" />, { wrapper });
+
+    expect(screen.queryByText(/Fit: goed/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Fit: matig/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Fit: zwak/i)).not.toBeInTheDocument();
+  });
+});
+

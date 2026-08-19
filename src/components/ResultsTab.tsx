@@ -315,14 +315,18 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
       {/* Fit quality chip */}
       {results.quality && (() => {
         const fq = results.quality.fitQuality;
-        const token = fq === 'good' ? '166 100% 50%' : fq === 'moderate' ? 'var(--warning)' : 'var(--destructive)';
-        const color = fq === 'good' ? 'hsl(var(--accent))' : `hsl(${token})`;
-        const bg = fq === 'good' ? 'hsl(var(--accent) / 0.10)' : `hsl(${token} / 0.10)`;
-        const border = fq === 'good' ? 'hsl(var(--accent) / 0.28)' : `hsl(${token} / 0.28)`;
+        const token = fq === 'good' ? 'var(--accent)' : fq === 'moderate' ? 'var(--warning)' : 'var(--destructive)';
+        const color = `hsl(${token})`;
+        const bg = `hsl(${token} / 0.10)`;
+        const border = `hsl(${token} / 0.28)`;
         const label = fq === 'good' ? t('results.fitGood') : fq === 'moderate' ? t('results.fitModerate') : t('results.fitPoor');
+        const r2 = typeof results.quality.r2 === 'number' ? results.quality.r2.toFixed(2) : null;
+        const meta = [
+          `${results.speeds.length} ${t('results.fitSteps')}${results.curveType ? `, ${results.curveType}` : ''}`,
+        ];
         return (
           <div
-            title={`R² ${results.quality.r2.toFixed(2)}`}
+            title={r2 ? `R² ${r2}` : undefined}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px', alignSelf: 'flex-start',
               padding: '5px 11px', borderRadius: '999px', background: bg, border: `1px solid ${border}`,
@@ -331,11 +335,12 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
           >
             {label}
             <span style={{ fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}>
-              ({results.speeds.length} {t('results.fitSteps')}, {results.curveType}) · R² {results.quality.r2.toFixed(2)}
+              ({meta[0]}){r2 ? ` · R² ${r2}` : ''}
             </span>
           </div>
         );
       })()}
+
 
 
 
