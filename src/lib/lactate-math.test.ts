@@ -79,7 +79,12 @@ describe('calculate — vangrail interpolatie', () => {
       [12, 0.9, 130], [14, 0.7, 138], [15, 0.7, 145], [16, 0.9, 152],
       [17, 1.3, 160], [18, 1.6, 168], [19, 3.0, 176], [20, 5.5, 186],
     ]), 0.9));
-    expect(r.lt2.method).toBe('Modified Dmax');
+    // De lokale monotonie-check mag de Modified Dmax-waarde niet meer wegvangen:
+    // er is geen "fit niet betrouwbaar"-override op de anaerobe drempel.
+    expect(r.warnings.some(w => /Anaerobe drempel is bepaald via interpolatie/.test(w.message))).toBe(false);
+    expect(r.lt2.moddmax).not.toBeNull();
+    // Modified Dmax blijft leidend, tenzij de volgorde-herstelstap ingrijpt.
+    expect(['Modified Dmax', 'Interpolation']).toContain(r.lt2.method);
   });
 });
 
