@@ -553,26 +553,20 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
 
   // --- LT1 ---
   const minActiveLac = Math.min(...lactates.slice(0, 3));
-  // Sanity-floor: baseline onder 1.5 mmol/L is fysiologisch onwaarschijnlijk bij
-  // een actieve atleet → ondergrens van 1.5 gebruiken voor Baseline+0.5.
-  const BASELINE_FLOOR = 1.5;
-  const baselineLac = Math.max(restLac, BASELINE_FLOOR);
-  if (restLac < BASELINE_FLOOR) {
-    warnings.push({
-      severity: 'info',
-      code: 'BASELINE_FLOORED',
-      message: `Gedetecteerde baseline (${restLac.toFixed(1)} mmol/L) lag onder ${BASELINE_FLOOR.toFixed(1)} — een ondergrens van ${BASELINE_FLOOR.toFixed(1)} mmol/L is gebruikt voor de Aerobic Threshold om vertekening door een te lage eerste trap te vermijden.`,
-    });
-  }
+  const nadirLac = curveNadir(coeffsAsc, xScale, lactates, xMin, xMax);
+  const baselineLac = nadirLac;
+  const lt1_lemin = computeLEmin(coeffsAsc, xScale, xMin, xMax);
+  const lt1_nadir = findSpeedAtLactateOrNull(coeffs, nadirLac + 0.3, xMin, xMax);
   const lt1_obla = findSpeedAtLactateOrNull(coeffs, 2.0, xMin, xMax);
-  const lt1_bsln = findSpeedAtLactateOrNull(coeffs, baselineLac + 0.5, xMin, xMax);
+  const lt1_bsln = lt1_nadir;
   const lt1_loglog = computeLogLog(speeds, lactates);
-  const polyAe = lt1_bsln ?? lt1_loglog ?? lt1_obla ?? xMin;
+  const polyAe = lt1_lemin ?? lt1_nadir ?? lt1_obla ?? xMin;
   let lt1_best = polyAe;
   let lt1_method =
-    lt1_bsln !== null ? 'Baseline+0.5' :
-    lt1_loglog !== null ? 'Log-Log' :
+    lt1_lemin !== null ? 'LEmin' :
+    lt1_nadir !== null ? 'Baseline+0.3' :
     lt1_obla !== null ? 'OBLA 2.0' : 'fallback';
+
 
   // --- LT2 ---
   const lt2_obla = findSpeedAtLactateOrNull(coeffs, 4.0, xMin, xMax);
