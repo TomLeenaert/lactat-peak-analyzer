@@ -589,8 +589,6 @@ export function calculate(testData: StepData[], restingLactate: number): Calcula
   // ===== Vangrail: monotone interpolatie op de RUWE meetpunten =====
   // De polynoom blijft de tekencurve; deze check corrigeert enkel onmogelijke
   // of onbetrouwbare drempelwaarden.
-  const nonMonoAt = findNonMonotonicPoint(coeffsAsc, xScale, xMin, xMax);
-  const fitNonMonotonic = nonMonoAt !== null;
   const PACE_TOL_SEC = 8; // afwijking > ~8 s/km = polynoom niet te vertrouwen
 
   const interpAe =
