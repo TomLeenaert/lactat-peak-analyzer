@@ -47,7 +47,6 @@ describe('lactate regression baseline (55 cases)', () => {
     expect(typeof res).not.toBe('string');
     if (typeof res === 'string') return;
 
-    expect(res.lt1.best).toBeCloseTo(c.ae!, 10 /* placeholder, replaced below */ * 0);
     expect(Math.abs(res.lt1.best - c.ae!)).toBeLessThanOrEqual(TOL);
     expect(Math.abs(res.lt2.best - c.an!)).toBeLessThanOrEqual(TOL);
     expect(res.lt1.method).toBe(c.aeM);
