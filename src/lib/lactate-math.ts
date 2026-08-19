@@ -397,6 +397,17 @@ function findNonMonotonicPoint(coeffsAsc: number[], xs: XScale, xMin: number, xM
   return null;
 }
 
+/** Daalt de fit binnen een venster van ± `halfWidth` km/h rond `at`? */
+function isNonMonotonicNear(coeffsAsc: number[], xs: XScale, at: number, xMin: number, xMax: number, halfWidth = 1.0): boolean {
+  const lo = Math.max(xMin, at - halfWidth), hi = Math.min(xMax, at + halfWidth);
+  const N = 40, step = (hi - lo) / N;
+  if (step <= 0) return false;
+  for (let i = 0; i <= N; i++) {
+    if (evalNormDeriv(coeffsAsc, xs, lo + i * step) < -0.05) return true;
+  }
+  return false;
+}
+
 function checkMonotonicity(coeffsAsc: number[], xs: XScale, xMin: number, xMax: number, warnings: CalcWarning[]) {
   const v = findNonMonotonicPoint(coeffsAsc, xs, xMin, xMax);
   if (v !== null) {
