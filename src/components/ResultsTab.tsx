@@ -312,6 +312,33 @@ const ResultsTab = ({ results, testId, athleteName, testDate }: ResultsTabProps)
         </div>
       </div>
 
+      {/* Fit quality chip */}
+      {results.quality && (() => {
+        const fq = results.quality.fitQuality;
+        const token = fq === 'good' ? '166 100% 50%' : fq === 'moderate' ? 'var(--warning)' : 'var(--destructive)';
+        const color = fq === 'good' ? 'hsl(var(--accent))' : `hsl(${token})`;
+        const bg = fq === 'good' ? 'hsl(var(--accent) / 0.10)' : `hsl(${token} / 0.10)`;
+        const border = fq === 'good' ? 'hsl(var(--accent) / 0.28)' : `hsl(${token} / 0.28)`;
+        const label = fq === 'good' ? t('results.fitGood') : fq === 'moderate' ? t('results.fitModerate') : t('results.fitPoor');
+        return (
+          <div
+            title={`R² ${results.quality.r2.toFixed(2)}`}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px', alignSelf: 'flex-start',
+              padding: '5px 11px', borderRadius: '999px', background: bg, border: `1px solid ${border}`,
+              fontSize: '12px', fontWeight: 700, color,
+            }}
+          >
+            {label}
+            <span style={{ fontWeight: 500, color: 'hsl(var(--muted-foreground))' }}>
+              ({results.speeds.length} {t('results.fitSteps')}, {results.curveType}) · R² {results.quality.r2.toFixed(2)}
+            </span>
+          </div>
+        );
+      })()}
+
+
+
       {displayWarnings.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '2px' }}>{t('results.warnings')}</div>
